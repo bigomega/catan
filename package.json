@@ -1,0 +1,22 @@
+{
+  "name": "catan",
+  "version": "1.0.0",
+  "description": "Free to play multiplayer catan style board game",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bigomega/catan.git"
+  },
+  "author": "bigomega",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bigomega/catan/issues"
+  },
+  "homepage": "https://github.com/bigomega/catan#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
