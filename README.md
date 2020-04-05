@@ -10,6 +10,9 @@ Free to play multiplayer catan style board game
   - [ ] game mechanics + end condition
   - [ ] Input options in UI
   - [ ] ...
+- [ ] Introducing development cards
+- [ ] Introducing robber and Knights
+- [ ] Introducing longest road
 - [ ] Few hardcoded maps
 - [ ] Introducing trading
 - [ ] Making it multiplayer
