@@ -41,36 +41,86 @@ class Board {
     const tile_types = Object.keys(TILES)
     const resource_types = Object.keys(RESOURCES)
 
+    class Edge {
+      static #idCounter = 1
+
+      constructor(corner1, corner2) {
+        this.id = Edge.#idCounter ++
+        this.road = false
+        this.corner1 = corner1
+        this.corner2 = corner2
+      }
+
+      jumpCorner(from) {
+        if (from == this.corner1) return this.corner2
+        if (from == this.corner2) return this.corner1
+        return null
+      }
+    }
+
     class Corner {
-      constructor(tile, rel) {
-        // this.tiles = {}
-        this.neighbours = {
-          left: null,
-          right: null,
-          top_bottom: null,
-        }
+      static #idCounter = 1
+
+      constructor() {
+        this.id = Corner.#idCounter ++
+        this.edges = { top: null, left: null, right: null, bottom: null }
+      }
+
+      setEdge(dir, edge) {
+        this.edges[dir] = edge
       }
 
       setTrade(type) {
         this.trade = type
       }
-
-      setNeighbour(dir, corner) {
-        this.neighbours[dir]
-      }
     }
 
     class Tile {
+      static #idCounter = 1
+
       constructor({type = 'S', left, top_left, top_right, trade_dirs = [], trade_type} = {}) {
+        this.id = Tile.#idCounter ++
         this.type = tile_types.includes(type) ? type : 'S'
         this.corners = {
-          top: top_left?.corners?.bottom_right || top_right?.corners?.bottom_left || new Corner,
-          top_left: top_left?.corners?.bottom || left?.corners?.top_right || new Corner,
-          top_right: top_right?.corners?.bottom || new Corner,
-          bottom_left: left?.corners?.bottom_right || new Corner,
-          bottom_right: new Corner,
-          bottom: new Corner,
+          top: top_left?.corners?.bottom_right || top_right?.corners?.bottom_left,
+          top_left: top_left?.corners?.bottom || left?.corners?.top_right,
+          top_right: top_right?.corners?.bottom,
+          bottom_left: left?.corners?.bottom_right,
+          bottom_right: undefined,
+          bottom: undefined,
         }
+        /**
+         * Just picked corners from existing adjacent tiles
+         * New corners will be created next
+         * Creating edges for the new corners next to existing corners
+         * and attaching them to both corners
+         */
+        Object.keys(this.corners).forEach(dir => {
+          // dir is direction of corner from the tile
+          if (!this.corners[dir]) {
+            const newCorner = new Corner
+            this.corners[dir] = newCorner
+            const OPPOSITES = { top: 'bottom', left: 'right', right: 'left', bottom: 'top' }
+            const connections = ({
+              top: { left: 'top_left', right: 'top_right' },
+              top_left: { right: 'top', bottom: 'bottom_left' },
+              top_right: { left: 'top', bottom: 'bottom_right' },
+              bottom_left: { top: 'top_left', right: 'bottom' },
+              bottom_right: { top: 'top_right', left: 'bottom' },
+              bottom: { left: 'bottom_left', right: 'bottom_right' },
+            })[dir]
+            Object.keys(connections).forEach(c_dir => {
+              // c_dir is direction of corner from another corner
+              // c_loc is the location of corner from tile view (same as dir)
+              const c_loc = connections[c_dir]
+              if (this.corners[c_loc]) {
+                const edge = new Edge(newCorner, this.corners[c_loc])
+                newCorner.setEdge(c_dir, edge)
+                this.corners[c_loc].setEdge(OPPOSITES[c_dir], edge)
+              }
+            })
+          }
+        })
         if (this.type == 'S') {
           trade_dirs.forEach(dir => {
             this.corners[dir]?.setTrade(trade_type)
@@ -116,8 +166,8 @@ class Board {
         }
         if (tile_map[0] == 'S') {
           // Sea map regex with optional trade
-          const sea_regex = `S\\((?<dir>tl|tr|l|r|bl|br)-(?<res>${resource_types.join('|')}|\\*)(?<num>\\d*)\\)`
-          const { dir, res, num } = tile_map.match(new RegExp(sea_regex))?.groups || {}
+          const SEA_REGEX = `S\\((?<dir>tl|tr|l|r|bl|br)-(?<res>${resource_types.join('|')}|\\*)(?<num>\\d*)\\)`
+          const { dir, res, num } = tile_map.match(new RegExp(SEA_REGEX))?.groups || {}
           const trade_dirs = ({
             tl: ['top', 'top_left'],
             tr: ['top', 'top_right'],
