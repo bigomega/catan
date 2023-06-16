@@ -1,0 +1,108 @@
+:root {
+  --tile-width: 151px;
+  --board-size: 994px;
+}
+
+body {
+  margin: 0;
+  background: #1691c6;
+}
+
+@media screen and (min-width: 994px) {
+  #game {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+.board {
+  width: var(--board-size);
+  position: relative;
+  overflow: hidden;
+}
+
+.bg {
+  width: 100%;
+  /* height: 100%;
+  object-fit: contain; */
+}
+
+.render {
+  width: 110%;
+  position: absolute;
+  top: 6px;
+  left: 200px;
+}
+
+.row {
+  position: relative;
+  height: 173px;
+  margin-top: -44px;
+}
+
+.tile {
+  width: var(--tile-width);
+  margin-right: -2px;
+  height: 172px;
+  display: inline-block;
+  vertical-align: top;
+  background-size: cover;
+  position: relative;
+}
+
+.tile.S[data-trade]::after {
+  content: '';
+  background-size: contain;
+  color: red;
+  position: absolute;
+  width: 65px;
+  height: 77px;
+}
+
+.tile.S[data-trade="B"]::after {
+  background-image: url(/images/trade/Brick.png)
+}
+
+.tile.S[data-trade="L"]::after {
+  background-image: url(/images/trade/Lumber.png)
+}
+
+.tile.S[data-trade="O"]::after {
+  background-image: url(/images/trade/Ore.png)
+}
+
+.tile.S[data-trade="S"]::after {
+  background-image: url(/images/trade/Sheep.png)
+}
+
+.tile.S[data-trade="W"]::after {
+  background-image: url(/images/trade/Wheat.png)
+}
+
+.tile.S[data-trade="*"]::after {
+  background-image: url(/images/trade/*.png)
+}
+
+.tile.S[data-trade-dir="bottom_right"]::after {
+  transform: rotate(150deg) translate(-8px, -84px);
+}
+
+.tile.S[data-trade-dir="bottom_left"]::after {
+  transform: rotate(210deg) translate(-54px, -36px)
+}
+
+.tile.S[data-trade-dir="top_right"]::after {
+  transform: rotate(30deg) translate(52px, 6px);
+}
+
+.tile.S[data-trade-dir="top_left"]::after {
+  transform: rotate(330deg) translate(16px, 44px);
+}
+
+.tile.S[data-trade-dir="right"]::after {
+  transform: rotate(90deg) translate(51px, -56px);
+}
+
+.tile.S[data-trade-dir="left"]::after {
+  transform: rotate(270deg) translate(-50px, 23px);
+}
