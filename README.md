@@ -1,5 +1,10 @@
-# catan
+# Catan
 Free to play multiplayer catan style board game
+
+## Architecture
+### Data Structure
+<img src="https://github.com/bigomega/catan/assets/2320747/53b0abb7-78a0-49f3-8de8-0548003b3d81" width="500px"/>
+
 
 ## Todo - v1
 - [ ] basic game
