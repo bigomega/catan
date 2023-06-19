@@ -10,7 +10,7 @@ Free to play multiplayer catan style board game
 - [ ] basic game
   - [x] write a mapkey
   - [x] have basic DS
-  - [ ] rendering the board
+  - [x] rendering the board
   - [ ] rendering other stuff
   - [ ] game mechanics + end condition
   - [ ] Input options in UI
