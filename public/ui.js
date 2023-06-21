@@ -8,13 +8,18 @@ class PlayerUI {
 
 function renderBoard(board) {
   let startDiff = 0
+  let maxLeft = 0
+  let maxLength = 0
   const renderedCorners = []
   const renderedEdges = []
-  document.querySelector('.board .render').innerHTML = board.tiles.map((row, i) => {
+  const $board = document.querySelector('.board')
+  $board.innerHTML = board.tiles.map((row, i) => {
     startDiff += (row.diff || 0)
+    if (startDiff < maxLeft) { maxLeft = startDiff }
+    if (row.length > maxLength) { maxLength = row.length }
 
     return `
-      <div class="row row-${i + 1}" style="left:calc(${startDiff} * var(--tile-width)/2)">
+      <div class="row row-${i + 1}" style="left:calc(${startDiff} * var(--tile-width)/2); width: calc(var(--tile-width) * ${ row.length })">
         ${row.map((tile, j) =>
           `<div
             class="tile ${tile.type}"
@@ -31,9 +36,17 @@ function renderBoard(board) {
               Object.keys(tile.corners).map(dir => {
                 const corner = tile.corners[dir]
                 // if(corner.id == 4) {debugger}
-                if (renderedCorners.includes(corner.id)) { return '' }
+                let $_trade = ''
+                if (tile.type === 'S' && tile.trade_edge && corner.trade) {
+                  $_trade = `<div class="trade-post p-${dir}"></div>`
+                }
+                if (renderedCorners.includes(corner.id)) { return $_trade }
                 renderedCorners.push(corner.id)
-                return `<div class="corner" data-id="C${corner.id}" data-dir="${dir}"></div>`
+                return `
+                  <div class="corner" data-id="C${corner.id}" data-dir="${dir}">
+                  </div>
+                  ${$_trade}
+                `
               }).join('')
             }
             </div>
@@ -63,4 +76,7 @@ function renderBoard(board) {
       </div>
     `
   }).join('')
+
+  $board.style.paddingLeft = `calc(var(--tile-width) / 2 * ${maxLeft*-1})`
+  $board.style.width = `calc(var(--tile-width) * ${maxLength})`
 }
