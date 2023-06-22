@@ -1,4 +1,4 @@
-import Board from "/js/board.js"
+import Board from "./board.js"
 
 export default class Game {
   constructor() {

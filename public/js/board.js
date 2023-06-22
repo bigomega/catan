@@ -1,4 +1,4 @@
-import * as CONST from "/js/const.js"
+import * as CONST from "./const.js"
 
 export default class Board {
   constructor(mapkey, playerCount = 2) {
