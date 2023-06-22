@@ -37,7 +37,7 @@ body {
 .tile {
   width: var(--tile-width);
   margin-right: -2px;
-  height: 172px;
+  height: 176px;
   display: inline-block;
   vertical-align: top;
   background-size: cover;

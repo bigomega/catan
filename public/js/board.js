@@ -1,45 +1,11 @@
-class Game {
-  constructor() {
-    // https://alexbeals.com/projects/catan/?game=GqpQiMyykZIHp26cUs8sSnNiDIA
-    this.mapkey = `S(br-S2).S.S(bl-B2).S
-      -S.M5.J10.J8.S(bl-*3)
-      -S(r-O2).J2.C9.G11.C4.S
-      -S.G6.J4.D.F3.F11.S(l-W2)
-      +S(r-L2).F3.G5.C6.M12.S
-      +S.F8.G10.M9.S(tl-*3)
-      +S(tr-*3).S.S(tl-*3).S`
-    this.board = new Board(this.mapkey)
-    this.start()
-  }
+import * as CONST from "/js/const.js"
 
-  start() {
-    // each turn, check player for actions (after roll)
-    // 1st,2nd turn, they can place house and road free
-    // if their total points == victory, End
-  }
-
-  place(player, item, location) {
-    //
-  }
-
-  roll(player) {
-    // roll 1 - 12
-    Math.floor(Math.random() * 12) + 1
-    // disribute resources to all players
-  }
-
-  end() {
-    //
-  }
-
-}
-
-class Board {
+export default class Board {
   constructor(mapkey, playerCount = 2) {
     this.tiles = []
     this.numbers = [...Array(13)].map(_ => [])
-    const tile_types = Object.keys(TILES)
-    const resource_types = Object.keys(RESOURCES)
+    const tile_types = Object.keys(CONST.TILES)
+    const resource_types = Object.keys(CONST.RESOURCES)
 
     class Edge {
       static #idCounter = 1
@@ -78,7 +44,7 @@ class Board {
     class Tile {
       static #idCounter = 1
 
-      constructor({type = 'S', left, top_left, top_right, trade_edge, trade_type} = {}) {
+      constructor({ type = 'S', left, top_left, top_right, trade_edge, trade_type } = {}) {
         this.id = Tile.#idCounter ++
         this.type = tile_types.includes(type) ? type : 'S'
         this.corners = {
@@ -134,9 +100,9 @@ class Board {
             bottom_left: ['bottom', 'bottom_left'],
             bottom_right: ['bottom', 'bottom_right'],
           }
-          ;(EDGE_2_CORNERS[trade_edge] || []).forEach(dir => {
-            this.corners[dir]?.setTrade(trade_type)
-          })
+            ; (EDGE_2_CORNERS[trade_edge] || []).forEach(dir => {
+              this.corners[dir]?.setTrade(trade_type)
+            })
         }
         if (this.type == 'D') { this.robbed = true }
       }
@@ -158,7 +124,7 @@ class Board {
     const mapkey_list = mapkey.trim().split('\n')
     for (let i = 0; i < mapkey_list.length; i++) {
       let row_map = mapkey_list[i].trim()
-      const prev_row = i > 0 ? this.tiles[i-1] : null
+      const prev_row = i > 0 ? this.tiles[i - 1] : null
       let row_list = []
       if (row_map[0] == '+' || row_map[0] == '-') {
         row_list.diff = +(row_map[0] + '1')
@@ -169,7 +135,7 @@ class Board {
       row_map = row_map.split('.')
       for (let j = 0; j < row_map.length; j++) {
         const tile_map = row_map[j].trim()
-        const prev_tile = j > 0 ? row_list[j-1] : null
+        const prev_tile = j > 0 ? row_list[j - 1] : null
         const row_diff = row_list.diff < 0 ? -1 : 0
         const adjacent_tiles = {
           left: prev_tile,
@@ -206,60 +172,4 @@ class Board {
   distribute(number) {
     //
   }
-}
-
-class Player {
-  constructor() {
-    this.hand_resources = {...RESOURCES}
-    Object.keys(RESOURCES).map(r => this.hand_resources[r] = 0)
-
-    this.hand_development_cards = {...DEVELOPMENT_CARDS}
-    Object.keys(DEVELOPMENT_CARDS).map(r => this.hand_development_cards[r] = 0)
-  }
-
-  addResource(resource, count = 1) {
-    this[resource] += count
-  }
-  hasResource(resource, count = 1) {}
-  removeResource(resource, count = 1) {}
-
-  addPiece(type) {}
-  hasPiece(type) {}
-  removePiece(type) {}
-}
-
-const TILES = {
-  G: 'Grassland',
-  J: 'Jungle',
-  C: 'Clay Pit',
-  M: 'Mountain',
-  F: 'Fields',
-  S: 'Sea',
-  D: 'Desert',
-}
-
-const RESOURCES = {
-  S: 'Sheep',
-  L: 'Lumber',
-  B: 'Brick',
-  O: 'Ore',
-  W: 'Wheat',
-}
-
-const TILE_RES = {
-  G: 'S',
-  J: 'L',
-  C: 'B',
-  M: 'O',
-  F: 'W',
-}
-
-const DEVELOPMENT_CARDS = {
-  K: 'Knight',
-  R: 'Road building', Y: 'Year of plenty', M: 'Monopoly',
-  V: 'Victory point',
-}
-
-const PIECES = {
-  S: 'Settlement', C: 'City', R: 'Road',
 }

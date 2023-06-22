@@ -1,8 +1,14 @@
-<link rel="stylesheet" href="/index.css">
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Catan</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" />
+    <link rel="stylesheet" href="/index.css">
+</head>
 <div id="game">
   <div class="board"></div>
 </div>
 
-<script src="/game.js"></script>
-<script src="/ui.js"></script>
-<script src="/index.js"></script>
+<script src="/socket.io/socket.io.min.js"></script>
+<script src="/index.js" type="module"></script>
