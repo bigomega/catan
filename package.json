@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "npx nodemon index.js -w index.js -w views -w models -e js,html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,8 +19,11 @@
   },
   "homepage": "https://github.com/bigomega/catan#readme",
   "dependencies": {
+    "cookie-parser": "^1.4.6",
     "express": "^4.17.1",
     "http": "^0.0.1-security",
+    "mustache-express": "^1.3.2",
+    "nodemon": "^2.0.22",
     "socket.io": "^4.6.2"
   }
 }

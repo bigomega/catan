@@ -7,6 +7,7 @@ class PlayerUI {
 
   useDevelopmentCard(type, attr) { }
 }
+
 const UI = {
   renderBoard: function(board) {
     let startDiff = 0

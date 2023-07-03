@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catan</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+
+{{#notice}}<div class="notice">{{notice}}</div>{{/notice}}
+<form class="login" action="/login" method="get">
+  <input type="text" placeholder="Your Name" class="name" name="name">
+  <div class="actions-container">
+    <a class="new-game btn" href="/game/new">New Game</a>
+    <div class="join-continer">
+      <input type="text" class="game-id" placeholder="Game ID" name="gameid">
+      <input type="submit" class="join-game btn" value="Join Game">
+    </div>
+  </div>
+</form>
+
+<script>
+  document.querySelector('.name').addEventListener("change", (event) => {
+    document.querySelector('.new-game').href = '/game/new?name=' + event.target.value
+  })
+</script>

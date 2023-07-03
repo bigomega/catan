@@ -1,0 +1,63 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, sans-serif;
+}
+
+.notice {
+  position: absolute;
+  width: 100%;
+  background: #ffe69c;
+  padding: 10px 30px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.login {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.actions-container {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-end;
+}
+
+.name {
+  width: 60%;
+  max-width: 500px;
+  margin: 0 auto 50px;
+  height: 50px;
+  padding: 30px 20px;
+  font-size: 1.8em;
+  border-radius: 50px;
+  box-sizing: border-box;
+}
+
+.game-id {
+  /* margin-bottom: 20px; */
+  padding: 5px 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+.btn {
+  padding: 20px 50px;
+  background: #d1f3ff;
+  border: 1px solid #00a9e4;
+  border-radius: 3px;
+  cursor: pointer;
+    color: inherit;
+      text-decoration: unset;
+      display: block;
+      font-size: 1em;
+}
+.btn:active {
+  background: #00a9e4;
+}
