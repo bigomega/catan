@@ -8,8 +8,17 @@ class PlayerUI {
   useDevelopmentCard(type, attr) { }
 }
 
-const UI = {
-  renderBoard: function(board) {
+class UI {
+  constructor(board) {
+    this.board = board
+  }
+
+  render() {
+    this.renderBoard()
+    this.renderPlayers()
+  }
+
+  renderBoard() {
     let startDiff = 0
     let maxLeft = 0
     let maxLength = 0
@@ -17,7 +26,7 @@ const UI = {
     const renderedEdges = []
     const $board = document.querySelector('.board')
 
-    function _renderCorners(tile) { 
+    function _renderCorners(tile) {
       return Object.keys(tile.corners).map(dir => {
         const corner = tile.corners[dir]
         // if(corner.id == 4) {debugger}
@@ -33,7 +42,7 @@ const UI = {
       }).join('')
     }
 
-    function _renderEdges(tile) { 
+    function _renderEdges(tile) {
       return Object.keys(tile.corners).map(dir => {
         const corner = tile.corners[dir]
         const relevant_edges = ({
@@ -53,7 +62,7 @@ const UI = {
       }).join('')
     }
 
-    function _renderRow(row) { 
+    function _renderRow(row) {
       return row.map((tile, j) =>
         `<div
           class="tile ${tile.type}"
@@ -89,5 +98,11 @@ const UI = {
     $board.style.width = `calc(var(--tile-width) * ${maxLength})`
   }
 
+  renderPlayers() {
+    const $players = document.querySelector('.player')
+    $players.innerHTML = `
+      <div class="">${window.player.name}</div>
+    `
+  }
 }
 export default UI

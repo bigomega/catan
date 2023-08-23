@@ -13,7 +13,8 @@ import UI from "/js/ui.js"
 
 const game = new Game(window.game.mapkey)
 console.log(game)
-UI.renderBoard(game.board)
+const ui = new UI(game.board)
+ui.render()
 // UI.renderPlayers()
 // var socket = io()
 // socket.emit('chat message', 'test')
