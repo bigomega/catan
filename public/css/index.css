@@ -21,223 +21,184 @@ body {
   }
 }
 
+/* --------------------------------------
+ * BOARD
+ * -------------
+*/
+
 .board {
   position: relative;
   margin: 30px 0;
   box-sizing: border-box;
+
+  .row {
+    position: relative;
+    height: 173px;
+    margin-top: -44px;
+  }
+
+  .tile {
+    width: var(--tile-width);
+    margin-right: -2px;
+    height: 176px;
+    display: inline-block;
+    vertical-align: top;
+    background-size: cover;
+    position: relative;
+
+    .number {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-left: 48px;
+      margin-top: 60px;
+      /* opacity: 0.8; */
+      background-color: #E9D49D;
+      border: 2px solid #AD9D75;
+
+      &::before {
+        display: block;
+        content: attr(num) "\a " attr(dots);
+        font-family: serif;
+        font-weight: bold;
+        white-space: pre;
+        text-align: center;
+        font-size: 25px;
+        line-height: 10px;
+        margin-top: 15px;
+      }
+
+      &.red::before {
+        color: red;
+      }
+
+      /* &.robber::before {
+        content: ''
+      } */
+    }
+
+    /* &:has(.number:hover) {
+      filter: sepia(0.9) brightness(0.8);
+    } */
+  }
 }
 
+/* --------------------------------------
+ * TILE - Image & Trade
+ * -------------
+*/
+.board .tile {
+  &.G { background-image:url('/images/tiles/Grassland.png'); }
+  &.J { background-image:url('/images/tiles/Jungle.png'); }
+  &.C { background-image:url('/images/tiles/Clay Pit.png'); }
+  &.M { background-image:url('/images/tiles/Mountain.png'); }
+  &.F { background-image:url('/images/tiles/Fields.png'); }
+  &.D { background-image:url('/images/tiles/Desert.png'); }
 
-.row {
-  position: relative;
-  height: 173px;
-  margin-top: -44px;
+  /* &.S { background-image:url('/images/tiles/Sea.png'); } */
+  &.S {
+    /* background-color: red; */
+    /* z-index: -2; */
+  }
+
+  &.S[data-trade]::after {
+    content: '';
+    background-size: contain;
+    position: absolute;
+    width: 65px;
+    height: 77px;
+  }
+  &.S[data-trade="B"]::after { background-image: url(/images/trade/Brick.png); }
+  &.S[data-trade="L"]::after { background-image: url(/images/trade/Lumber.png); }
+  &.S[data-trade="O"]::after { background-image: url(/images/trade/Ore.png); }
+  &.S[data-trade="S"]::after { background-image: url(/images/trade/Sheep.png); }
+  &.S[data-trade="W"]::after { background-image: url(/images/trade/Wheat.png); }
+  &.S[data-trade="*"]::after { background-image: url(/images/trade/*.png); }
+
+  &.S[data-trade-dir="bottom_right"]::after { transform: translate(67px, 62px); }
+  &.S[data-trade-dir="bottom_left"]::after { transform: translate(29px, 69px); }
+  &.S[data-trade-dir="top_right"]::after { transform: translate(65px, 16px); }
+  &.S[data-trade-dir="top_left"]::after { transform: translate(30px, 19px); }
+  &.S[data-trade-dir="right"]::after { transform: translate(83px, 44px); }
+  &.S[data-trade-dir="left"]::after { transform: translate(20px, 30px); }
 }
 
-.tile {
-  width: var(--tile-width);
-  margin-right: -2px;
-  height: 176px;
-  display: inline-block;
-  vertical-align: top;
-  background-size: cover;
-  position: relative;
+/* --------------------------------------
+ * CORNERS (& Trade Piers)
+ * -------------
+*/
+.board .tile {
+  .corners {
+    position: absolute;
+  }
+
+  .corner {
+    width: 30px;
+    height: 30px;
+    background: #fff9;
+    border-radius: 30px;
+    position: absolute;
+    z-index: 2;
+    cursor: pointer;
+    visibility: hidden;
+
+    &:hover {
+      background: #fff;
+    }
+
+    &[data-dir="top"] { top: -15px; left: 60px; }
+    &[data-dir="top_left"] { top: 30px; left: -15px; }
+    &[data-dir="top_right"] { top: 30px; left: 135px; }
+    &[data-dir="bottom"] { top: 155px; left: 60px; }
+    &[data-dir="bottom_left"] { top: 115px; left: -15px; }
+    &[data-dir="bottom_right"] { top: 115px; left: 135px; }
+  }
+
+  .trade-post {
+    background-image: url(/images/trade/Dock.png);
+    width: 34px;
+    height: 44px;
+    background-size: contain;
+    /* transform: rotate(180deg) translate(0px, 20px); */
+    z-index: 1;
+    position: absolute;
+
+    &.p-top { top: -15px; left: 60px; transform: translate(-2px, 2px); }
+    &.p-top_left { top: 30px; left: -15px; transform: rotate(-60deg) translate(9px, 2px); }
+    &.p-top_right { top: 30px; left: 135px; transform: rotate(60deg) translate(-10px, 3px); }
+    &.p-bottom { top: 155px; left: 60px; transform: rotate(180deg) translate(3px, 15px); }
+    &.p-bottom_left { top: 115px; left: -15px; transform: rotate(-120deg) translate(7px, 11px); }
+    &.p-bottom_right { top: 115px; left: 135px; transform: rotate(120deg) translate(-5px, 13px); }
+  }
 }
 
-.tile.S {
-  /* background-color: red; */
-  /* z-index: -2; */
-}
+/* --------------------------------------
+ * EDGES
+ * -------------
+*/
+.board .tile {
+  .edges {
+    position: absolute;
+  }
 
-.tile.S[data-trade]::after {
-  content: '';
-  background-size: contain;
-  position: absolute;
-  width: 65px;
-  height: 77px;
-}
+  .edge {
+    width: 10px;
+    height: 50px;
+    background: #fff9;
+    position: absolute;
+    z-index: 1;
+    cursor: pointer;
+    visibility: hidden;
 
-.tile.S[data-trade="B"]::after {
-  background-image: url(/images/trade/Brick.png)
-}
+    &:hover {
+      background: #fff;
+    }
 
-.tile.S[data-trade="L"]::after {
-  background-image: url(/images/trade/Lumber.png)
-}
-
-.tile.S[data-trade="O"]::after {
-  background-image: url(/images/trade/Ore.png)
-}
-
-.tile.S[data-trade="S"]::after {
-  background-image: url(/images/trade/Sheep.png)
-}
-
-.tile.S[data-trade="W"]::after {
-  background-image: url(/images/trade/Wheat.png)
-}
-
-.tile.S[data-trade="*"]::after {
-  background-image: url(/images/trade/*.png)
-}
-
-.tile.S[data-trade-dir="bottom_right"]::after {
-  transform: translate(67px, 62px);
-}
-
-.tile.S[data-trade-dir="bottom_left"]::after {
-  transform: translate(29px, 69px);
-}
-
-.tile.S[data-trade-dir="top_right"]::after {
-  transform: translate(65px, 16px);
-}
-
-.tile.S[data-trade-dir="top_left"]::after {
-  transform: translate(30px, 19px);
-}
-
-.tile.S[data-trade-dir="right"]::after {
-  transform: translate(83px, 44px);
-}
-
-.tile.S[data-trade-dir="left"]::after {
-  transform: translate(20px, 30px);
-}
-
-.tile .corners {
-  position: absolute;
-}
-
-.tile .corner {
-  width: 30px;
-  height: 30px;
-  background: #fff9;
-  border-radius: 30px;
-  position: absolute;
-  z-index: 2;
-  cursor: pointer;
-  visibility: hidden;
-}
-
-.tile .corner:hover {
-  background: #fff;
-}
-
-.tile .corner[data-dir="top"] {
-  top: -15px;
-  left: 60px;
-}
-
-.tile .corner[data-dir="top_left"] {
-  top: 30px;
-  left: -15px;
-}
-
-.tile .corner[data-dir="top_right"] {
-  top: 30px;
-  left: 135px;
-}
-
-.tile .corner[data-dir="bottom"] {
-  top: 155px;
-  left: 60px;
-}
-
-.tile .corner[data-dir="bottom_left"] {
-  top: 115px;
-  left: -15px;
-}
-
-.tile .corner[data-dir="bottom_right"] {
-  top: 115px;
-  left: 135px;
-}
-
-.tile .trade-post {
-  background-image: url(/images/trade/Dock.png);
-  width: 34px;
-  height: 44px;
-  background-size: contain;
-  /* transform: rotate(180deg) translate(0px, 20px); */
-  z-index: 1;
-  position: absolute;
-}
-
-.tile .trade-post.p-top {
-  top: -15px;
-  left: 60px;
-  transform: translate(-2px, 2px);
-}
-
-.tile .trade-post.p-top_left {
-  top: 30px;
-  left: -15px;
-  transform: rotate(-60deg) translate(9px, 2px);
-}
-
-.tile .trade-post.p-top_right {
-  top: 30px;
-  left: 135px;
-  transform: rotate(60deg) translate(-10px, 3px);
-}
-
-.tile .trade-post.p-bottom {
-  top: 155px;
-  left: 60px;
-  transform: rotate(180deg) translate(3px, 15px);
-}
-
-.tile .trade-post.p-bottom_left {
-  top: 115px;
-  left: -15px;
-  transform: rotate(-120deg) translate(7px, 11px);
-}
-
-.tile .trade-post.p-bottom_right {
-  top: 115px;
-  left: 135px;
-  transform: rotate(120deg) translate(-5px, 13px);
-}
-
-.tile .edges {
-  position: absolute;
-}
-
-.tile .edge {
-  width: 10px;
-  height: 50px;
-  background: #fff9;
-  position: absolute;
-  z-index: 1;
-  cursor: pointer;
-  visibility: hidden;
-}
-
-.tile .edge:hover {
-  background: #fff;
-}
-
-.tile .edge[data-dir="top-left"] {
-  transform: rotate(60deg) translate(15px, -29px);
-}
-
-.tile .edge[data-dir="top-right"] {
-  transform: rotate(120deg) translate(-56px, -92px);
-}
-
-.tile .edge[data-dir="top_left-bottom"] {
-  transform: rotate(0deg) translate(-5px, 62px);
-}
-
-.tile .edge[data-dir="top_right-bottom"] {
-  transform: rotate(0deg) translate(145px, 61px);
-}
-
-.tile .edge[data-dir="bottom_left-right"] {
-  transform: rotate(120deg) translate(94px, -91px);
-}
-
-.tile .edge[data-dir="bottom_right-left"] {
-  transform: rotate(60deg) translate(164px, -30px);
+    &[data-dir="top-left"] { transform: rotate(60deg) translate(15px, -29px); }
+    &[data-dir="top-right"] { transform: rotate(120deg) translate(-56px, -92px); }
+    &[data-dir="top_left-bottom"] { transform: rotate(0deg) translate(-5px, 62px); }
+    &[data-dir="top_right-bottom"] { transform: rotate(0deg) translate(145px, 61px); }
+    &[data-dir="bottom_left-right"] { transform: rotate(120deg) translate(94px, -91px); }
+    &[data-dir="bottom_right-left"] { transform: rotate(60deg) translate(164px, -30px); }
+  }
 }

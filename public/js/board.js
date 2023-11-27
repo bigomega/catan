@@ -1,5 +1,4 @@
 import * as CONST from "./const.js"
-const TILE_TYPES = Object.keys(CONST.TILES)
 
 class Edge {
   static #idCounter = 1
@@ -38,9 +37,10 @@ class Corner {
 class Tile {
   static #idCounter = 1
 
-  constructor({ type = 'S', left, top_left, top_right, trade_edge, trade_type } = {}) {
+  constructor({ type = 'S', num, left, top_left, top_right, trade_edge, trade_type } = {}) {
     this.id = Tile.#idCounter ++
-    this.type = TILE_TYPES.includes(type) ? type : 'S'
+    this.type = Object.keys(CONST.TILES).includes(type) ? type : 'S'
+    this.num = num
     this.corners = {
       top: top_left?.corners?.bottom_right || top_right?.corners?.bottom_left,
       top_left: top_left?.corners?.bottom || left?.corners?.top_right,
@@ -94,9 +94,10 @@ class Tile {
         bottom_left: ['bottom', 'bottom_left'],
         bottom_right: ['bottom', 'bottom_right'],
       }
-        ; (EDGE_2_CORNERS[trade_edge] || []).forEach(dir => {
-          this.corners[dir]?.setTrade(trade_type)
-        })
+
+      ; (EDGE_2_CORNERS[trade_edge] || []).forEach(dir => {
+        this.corners[dir]?.setTrade(trade_type)
+      })
     }
     if (this.type == 'D') { this.robbed = true }
   }
@@ -106,7 +107,6 @@ export default class Board {
   constructor(mapkey) {
     this.tiles = []
     this.numbers = [...Array(13)].map(_ => [])
-    const RESOURCE_TYPES = Object.keys(CONST.RESOURCES)
 
     /**
      * ============
@@ -125,27 +125,26 @@ export default class Board {
     for (let i = 0; i < mapkey_list.length; i++) {
       let row_map = mapkey_list[i].trim()
       const prev_row = i > 0 ? this.tiles[i - 1] : null
-      let row_list = []
+      const row_list = []
+      // With the current implementation - ONLY ONE +/- can be used
       if (row_map[0] == '+' || row_map[0] == '-') {
         row_list.diff = +(row_map[0] + '1')
         row_map = row_map.substr(1)
       } else if (i > 0) { // edge case
         row_list.diff = 1
       }
-      row_map = row_map.split('.')
-      for (let j = 0; j < row_map.length; j++) {
-        const tile_map = row_map[j].trim()
+      const row_map_arr = row_map.split('.')
+      for (let j = 0; j < row_map_arr.length; j++) {
+        const tile_map = row_map_arr[j].trim()
         const prev_tile = j > 0 ? row_list[j - 1] : null
-        const row_diff = row_list.diff < 0 ? -1 : 0
+        const row_diff_tmp = row_list.diff < 0 ? -1 : 0
         const adjacent_tiles = {
           left: prev_tile,
-          top_left: prev_row?.[j + row_diff],
-          top_right: prev_row?.[j + row_diff + 1],
+          top_left: prev_row?.[j + row_diff_tmp],
+          top_right: prev_row?.[j + row_diff_tmp + 1],
         }
         if (tile_map[0] == 'S') {
-          // Sea map regex with optional trade
-          const SEA_REGEX = `S\\((?<dir>tl|tr|l|r|bl|br)-(?<res>${RESOURCE_TYPES.join('|')}|\\*)(?<num>\\d*)\\)`
-          const { dir, res, num } = tile_map.match(new RegExp(SEA_REGEX))?.groups || {}
+          const { dir, res, num } = tile_map.match(new RegExp(CONST.SEA_REGEX))?.groups || {}
           const trade_edge = ({
             tl: 'top_left', tr: 'top_right', l: 'left',
             r: 'right', bl: 'bottom_left', br: 'bottom_right',
@@ -153,10 +152,9 @@ export default class Board {
           const tile = new Tile({ type: 'S', trade_edge, trade_type: res, ...adjacent_tiles })
           row_list.push(tile)
         } else {
-          // Resource map regex
-          const { tile_type, num } = tile_map.match(new RegExp(`(?<tile_type>[${TILE_TYPES.join('|')}])(?<num>\\d*)`))?.groups || {}
-          const tile = new Tile({ type: tile_type, ...adjacent_tiles })
-          num > 0 && num < 13 && this.numbers[num].push(tile)
+          const { tile_type, num } = tile_map.match(new RegExp(CONST.RESOURCE_REGEX))?.groups || {}
+          const tile = new Tile({ type: tile_type, num, ...adjacent_tiles })
+          num > 1 && num < 13 && this.numbers[num].push(tile)
           row_list.push(tile)
         }
       }

@@ -16,6 +16,10 @@ export const RESOURCES = {
   W: 'Wheat',
 }
 
+export const SEA_REGEX = `S\\((?<dir>tl|tr|l|r|bl|br)-(?<res>${Object.keys(RESOURCES).join('|')}|\\*)(?<num>\\d*)\\)`
+
+export const RESOURCE_REGEX = `(?<tile_type>[${Object.keys(TILES).join('|')}])(?<num>\\d*)`
+
 const TILE_RES = {
   G: 'S',
   J: 'L',

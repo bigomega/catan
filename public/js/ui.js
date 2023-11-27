@@ -1,5 +1,5 @@
 import * as CONST from "/js/const.js"
-// debugger
+
 class PlayerUI {
   roll() { }
 
@@ -67,7 +67,6 @@ class UI {
         `<div
           class="tile ${tile.type}"
           data-id="T${tile.id}"
-          style="background-image:url('/images/tiles/${CONST.TILES[tile.type]}.png')"
           ${
             (tile.type === 'S' && tile.trade_edge)
             ? `data-trade="${tile.trade_type}" data-trade-dir="${tile.trade_edge}"`
@@ -76,6 +75,15 @@ class UI {
         >
           <div class="corners">${_renderCorners(tile)}</div>
           <div class="edges">${_renderEdges(tile)}</div>
+          ${
+            tile.num
+            ? `<div
+                class="number ${tile.num > 5 && tile.num < 9 ? 'red' : ''}"
+                num="${tile.num}"
+                dots="${'.'.repeat(6 - Math.abs(7 - tile.num))}">
+              </div>`
+            : ''
+          }
         </div>`
       ).join('')
     }
