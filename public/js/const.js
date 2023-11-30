@@ -20,7 +20,7 @@ export const SEA_REGEX = `S\\((?<dir>tl|tr|l|r|bl|br)-(?<res>${Object.keys(RESOU
 
 export const RESOURCE_REGEX = `(?<tile_type>[${Object.keys(TILES).join('|')}])(?<num>\\d*)`
 
-const TILE_RES = {
+export const TILE_RES = {
   G: 'S',
   J: 'L',
   C: 'B',
@@ -28,12 +28,26 @@ const TILE_RES = {
   F: 'W',
 }
 
-const DEVELOPMENT_CARDS = {
-  K: 'Knight',
-  R: 'Road building', Y: 'Year of plenty', M: 'Monopoly',
-  V: 'Victory point',
+export const DEVELOPMENT_CARDS = {
+  dK: 'Knight',
+  dR: 'Road building', dY: 'Year of plenty', dM: 'Monopoly',
+  dL: 'Library', dMr: 'Market', dG: 'Great Hall', dC: 'Chapel', dU: 'University',
 }
 
-const PIECES = {
+export const VICTORY_POINTS = {
+  dL: 1, dMr: 1, dG: 1, dC: 1, dU: 1,
+}
+
+export const PIECES = {
   S: 'Settlement', C: 'City', R: 'Road',
+}
+
+export const TRADE_OFFERS = {
+  '*4': '4:1',
+  '*3': '3:1',
+  S2: 'Sheep 2:1',
+  L2: 'Lumber 2:1',
+  B2: 'Brick 2:1',
+  O2: 'Ore 2:1',
+  W2: 'Wheat 2:1',
 }

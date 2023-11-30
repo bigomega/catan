@@ -11,7 +11,14 @@ Free to play multiplayer catan style board game
   - [x] write a mapkey
   - [x] have basic DS
   - [x] rendering the board
+  - [ ] 1v1, 3player, 4 player modes
+  - [ ] Waiting Screen
   - [ ] rendering other stuff
+    - [ ] Hand
+    - [ ] Dice
+    - [ ] Robber
+    - [ ] House, Village and Roads
+    - [ ] Trade options
   - [ ] game mechanics + end condition
   - [ ] Input options in UI
   - [ ] ...

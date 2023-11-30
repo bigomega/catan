@@ -1,5 +1,5 @@
 // Shuffle function taken from: http://stackoverflow.com/a/2450976/3951475
-function shuffle(array) {
+export function shuffle(array) {
   var currentIndex = array.length, temporaryValue, randomIndex;
 
   // While there remain elements to shuffle...
@@ -16,6 +16,10 @@ function shuffle(array) {
   }
 
   return array;
+}
+
+export function newObject(obj = {}, val = 0) {
+  return Object.keys(obj).reduce((mem, k) => (mem[k] = val, mem), {})
 }
 
 // Binary to Base64

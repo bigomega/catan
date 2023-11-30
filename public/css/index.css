@@ -1,10 +1,11 @@
 :root {
   --tile-width: 151px;
+  --water-color: #1691c6;
 }
 
 body {
   margin: 0;
-  background: #1691c6;
+  background: var(--water-color);
 }
 
 #game {
@@ -64,6 +65,7 @@ body {
         white-space: pre;
         text-align: center;
         font-size: 25px;
+        /* letter-spacing: 1px; */
         line-height: 10px;
         margin-top: 15px;
       }
@@ -77,7 +79,8 @@ body {
       } */
     }
 
-    /* &:has(.number:hover) {
+    /* &:has(.number:hover),
+    &.D:hover {
       filter: sepia(0.9) brightness(0.8);
     } */
   }
@@ -124,7 +127,7 @@ body {
 }
 
 /* --------------------------------------
- * CORNERS (& Trade Piers)
+ * CORNERS (& Trade Docs)
  * -------------
 */
 .board .tile {
@@ -202,3 +205,5 @@ body {
     &[data-dir="bottom_right-left"] { transform: rotate(60deg) translate(164px, -30px); }
   }
 }
+
+/* https: //www.catancollector.com/catan-links/how-to-identify-your-version-of-catan */

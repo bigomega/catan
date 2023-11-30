@@ -107,10 +107,6 @@ class UI {
   }
 
   renderPlayers() {
-    const $players = document.querySelector('.player')
-    $players.innerHTML = `
-      <div class="">${window.player.name}</div>
-    `
   }
 }
 export default UI

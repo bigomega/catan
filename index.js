@@ -20,6 +20,8 @@ app.engine('html', mustacheExpress())
 app.set('view engine', 'html')
 app.set('views', __dirname + '/views')
 
+// TODO: random hexval for game ids
+// TODO: Move to a db for game state maintenance?
 let games_sessions = { next: 1 }
 
 app.get('/', function (req, res) {
@@ -38,7 +40,7 @@ app.get('/game/new', function (req, res) {
   })
   games_sessions.next++
   res.cookie('game_id', game.id, { maxAge: 86400 * 1000, httpOnly: true })
-  res.cookie('player_id', game.players[0].id, { maxAge: 86400 * 1000, httpOnly: true })
+  res.cookie('player_id', 1, { maxAge: 86400 * 1000, httpOnly: true })
   games_sessions[game.id] = game
   // res.send(`<script>window.location.href = "/game/${game.id}"</script>`)
   res.redirect('/game/' + game.id)
@@ -55,7 +57,18 @@ app.get('/game/:id', function(req, res) {
   }
   // res.clearCookie('game_id')
   const player = game.getPlayer(req.cookies.player_id)
-  res.render('index', { game: JSON.stringify(game.toJSON()), player: JSON.stringify(player.toJSON()) })
+  if (game.players.length < game.player_count) {
+    res.render('waiting_room', {
+      players: JSON.stringify(game.getAllPlayers()),
+      player_count: game.player_count,
+    })
+    return
+  }
+  res.render('index', {
+    game: JSON.stringify(game.toJSON()),
+    player: JSON.stringify(player),
+    other_players: {},
+  })
 })
 
 app.get('/login', function (req, res) {
