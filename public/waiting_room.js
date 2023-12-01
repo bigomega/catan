@@ -1,23 +1,19 @@
 import * as CONST from "/js/const.js"
 
-document.querySelector('.players').innerHTML = [...Array(window.player_count)].map((_, i) => {
-  return `<div class="player" id="p${i+1}">
-    <div class="dummy-image"></div>
-    <div class="dummy-name"></div>
-  </div>`
-}).join('')
+window.player_count > 2 && document.querySelector('.player-3').classList.remove('hide')
+window.player_count > 3 && document.querySelector('.player-4').classList.remove('hide')
 
 function getRandomTile() {
-  const keys = Object.keys(CONST.TILES).filter(_ => _ !== 'S')
+  // const keys = Object.keys(CONST.TILES).filter(_ => !['S', 'D'].includes(_))
+  const keys = Object.keys(CONST.TILES).filter(_ => _ !== 'S' && _ !=='D')
   return CONST.TILES[keys[Math.floor(Math.random() * keys.length)]]
 }
 
 function addPlayer(id, name) {
-  document.querySelector('#p' + id).innerHTML = `
-    <img src="/images/tiles/${getRandomTile()}.png"/>
-    <div class="name">${name}</div>
-  `
-
+  document.querySelector('.player-' + id).innerHTML = `<div class="name">${name}</div>`
+  const tile_img = `url('/images/tiles/${getRandomTile()}.png')`
+  document.querySelector('.player-' + id).style.backgroundImage = tile_img
+  document.querySelector('.player-' + id).style.animation = 'none'
   document.querySelector('.title span').innerHTML = +document.querySelector('.title span').innerHTML + 1
 }
 

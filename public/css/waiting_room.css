@@ -1,3 +1,30 @@
+:root {
+  --title-padding: 1.3em 20px 1em;
+  --tile-width: 151px;
+}
+
+@keyframes blink {
+  /* from {
+    opacity: 1;
+  } */
+
+  30% {
+    opacity: .5;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  :root {
+    --title-padding: 2em 20px 1em;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  :root {
+    --title-padding: 2em 10px 2em;
+  }
+}
+
 body {
   height: 100vh;
   padding: 0;
@@ -6,92 +33,71 @@ body {
 
 .container {
   height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
 
   .title {
     font-size: max(4vw, 30px);
-    padding: 1em 0;
+    padding: var(--title-padding);
     text-align: center;
+    font-family: sans-serif;
+    width: 100%;
   }
 
   .players {
+    margin: 135px auto 130px;
+    /* width: 298px; */
+    position: relative;
+    padding-right: 2px;
     display: flex;
-    min-width: 60%;
-    justify-content: space-evenly;
-    flex-wrap: wrap;
-  }
-}
 
+    >div {
+      width: var(--tile-width);
+      margin-right: -2px;
+      height: 176px;
+      display: inline-block;
+      vertical-align: top;
+      background-size: cover;
+      position: relative;
+      background-image: url(/images/tiles/Desert.png);
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: column;
+      justify-content: center;
+      /* animation: 1s infinite alternate blink ease; */
+      animation: blink 3s step-start 0s infinite;
 
-.player {
-  padding: 50px 20px 0;
-  width: 140px;
+      &.hide {
+        display: none;
+      }
 
-
-  & img {
-    width: 100%;
-    margin-top: -30px;
-  }
-
-  .name {
-    text-align: center;
-    margin-top: 10px;
-    font-weight: 600;
-    font-size: max(2vw, 20px);
-    font-family: cursive;
-  }
-
-  .dummy-image {
-    width: 100px;
-    height: 100px;
-    margin: auto;
-    border: 2px solid #ccc;
-    background-color: #dad5ca;
-    opacity: 0.3;
-    background-image: repeating-linear-gradient(45deg, #8f897a 25%, transparent 25%, transparent 75%, #8f897a 75%, #8f897a), repeating-linear-gradient(45deg, #8f897a 25%, #dad5ca 25%, #dad5ca 75%, #8f897a 75%, #8f897a);
-    background-position: 0 0, 25px 25px;
-    background-size: 50px 50px;
-  }
-
-  .dummy-name {
-    width: 100px;
-    height: 20px;
-    background: #dad6c9;
-    opacity: 0.3;
-    margin: 38px auto 0 auto;
-    box-sizing: border-box;
-  }
-}
-
-@media screen and (max-width: 800px) {
-  .player {
-    padding: 40px 10px 0;
-    width: 90px;
-
-    .dummy-image {
-      width: 70px;
-      height: 70px;
-      margin-top: -10px;
+      .name {
+        width: 100%;
+        background: #ffffffa8;
+        margin: 73px 0;
+        padding: 4px 5px;
+        box-sizing: border-box;
+        text-align: center;
+        font-family: cursive;
+        font-weight: bold;
+        letter-spacing: 1px;
+      }
     }
 
-    .dummy-name {
-      width: 60px;
-      height: 15px;
-      margin-top: 35px;
+    .player-3 {
+      position: absolute;
+      top: -131px;
+      left: 74px;
+      animation-delay: 2.7s;
     }
 
-  }
-}
-
-@media screen and (max-width: 450px) {
-  .player {
-    padding: 20px 5px 0;
-    width: 70px;
-
-    .dummy-image {
-      width: 50px;
-      height: 50px;
-      margin-top: -15px;
+    .player-4 {
+      position: absolute;
+      top: 131px;
+      left: 74px;
+      animation-delay: .26s;
     }
-
   }
+
 }
