@@ -8,9 +8,9 @@ DEV_CARDS.push('dR', 'dR', 'dY', 'dY', 'dM', 'dM') // 2 of each power cards
 DEV_CARDS.push('dL', 'dMr', 'dG', 'dC', 'dU') // 5 victory points
 
 export default class Game {
-  constructor({ id, playerName } = {}) {
+  constructor({ id, playerName, player_count = 2 } = {}) {
     this.id = id
-    this.player_count = 4
+    this.player_count = player_count
     this.players = [ new Player(playerName, 1) ]
     // https://alexbeals.com/projects/catan/?game=GqpQiMyykZIHp26cUs8sSnNiDIA
     // TODO: Map Shuffler
@@ -33,13 +33,13 @@ export default class Game {
   }
 
   getPlayer(id) {
-    return this.players[id - 1].toJSON(true)
+    return this.players[id - 1]
   }
   getAllPlayers() {
-    return this.players.map(p => p.toJSON(false))
+    return this.players//.map(p => p.toJSON(false))
   }
   getOpponentPlayers(id) {
-    return this.players.filter((_, i) => i !== (id - 1)).map(p => p.toJSON(false))
+    return this.players.filter((_, i) => i !== (id - 1))//.map(p => p.toJSON(false))
   }
   hasPlayer(id) {
     return id <= this.players.length

@@ -5,7 +5,7 @@ window.player_count > 3 && document.querySelector('.player-4').classList.remove(
 
 function getRandomTile() {
   // const keys = Object.keys(CONST.TILES).filter(_ => !['S', 'D'].includes(_))
-  const keys = Object.keys(CONST.TILES).filter(_ => _ !== 'S' && _ !=='D')
+  const keys = Object.keys(CONST.TILES).filter(_ => _ !== 'S' && _ !== 'D')
   return CONST.TILES[keys[Math.floor(Math.random() * keys.length)]]
 }
 
@@ -18,8 +18,15 @@ function addPlayer(id, name) {
 }
 
 for (let i = 0; i < window.players.length; i++) {
-  const player = window.players[i];
+  const player = window.players[i]
   addPlayer(player.id, player.name)
 }
 
-// TODO: SOCKET IO WAIT FOR PLAYERS
+const socket = io()
+socket.emit('joined', window.game_id)
+socket.on('joined', function(player) {
+  addPlayer(player.id, player.name)
+  if(player.id === window.player_count) {
+    window.location.reload()
+  }
+})

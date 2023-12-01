@@ -59,13 +59,14 @@ app.get('/game/:id', function(req, res) {
   const player = game.getPlayer(req.cookies.player_id)
   if (game.players.length < game.player_count) {
     res.render('waiting_room', {
-      players: JSON.stringify(game.getAllPlayers()),
+      players: JSON.stringify(game.getAllPlayers().map(_ => _.toJSON(0))),
       player_count: game.player_count,
+      game_id,
     })
     return
   }
   res.render('index', {
-    game: JSON.stringify(game.toJSON()),
+    game: JSON.stringify(game),
     player: JSON.stringify(player),
     other_players: {},
   })
@@ -91,6 +92,7 @@ app.get('/login', function (req, res) {
     return res.redirect('/login?notice=Game is full!')
   }
 
+  io.to(game.id).emit('joined', player.toJSON(0))
   res.cookie('game_id', game.id, { maxAge: 86400 * 1000, httpOnly: true })
   res.cookie('player_id', player.id, { maxAge: 86400 * 1000, httpOnly: true })
   res.redirect(`/game/${game.id}`)
@@ -117,14 +119,18 @@ app.get('/clear-sessions/:id?', function(req, res) {
   res.redirect('/all-sessions')
 })
 
+// SOCKET IO ACTIVITIES
 io.on('connection', (socket) => {
-  console.log('User connected - ', socket.id)
+  // console.log('User connected - ', socket.id)
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected - ', socket.id)
+  socket.on('joined', function(game_id) {
+    socket.join(game_id)
+    // socket.broadcast.emit('joined', player)
   })
 
-  socket.on('chat message', console.log)
+  socket.on('disconnect', () => {
+    // console.log('User disconnected - ', socket.id)
+  })
 })
 
 server.listen(PORT, function(){
