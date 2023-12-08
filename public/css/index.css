@@ -1,11 +1,29 @@
+@import './constants.css';
+
 :root {
   --tile-width: 151px;
-  --water-color: #1691c6;
 }
 
 body {
   margin: 0;
   background: var(--water-color);
+}
+
+.splash {
+  background: url(/images/catan-bg.png);
+  background-size: cover;
+  background-position: center;
+  position: fixed;
+  top: 0;
+      width: 100vw;
+        height: 100vh;
+  z-index: 100;
+
+  &.hide {
+    opacity: 0;
+    z-index: -100;
+    transition: opacity .5s .5s linear, z-index 0s 1s linear;
+  }
 }
 
 #game {

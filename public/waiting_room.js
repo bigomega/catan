@@ -27,6 +27,9 @@ socket.emit('joined', window.game_id)
 socket.on('joined', function(player) {
   addPlayer(player.id, player.name)
   if(player.id === window.player_count) {
-    window.location.reload()
+    document.querySelector('.container').classList.add('hide')
+    setTimeout(_ => {
+      window.location.reload()
+    }, 1000)
   }
 })

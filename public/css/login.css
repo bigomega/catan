@@ -20,6 +20,10 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
+
+  background: url(/images/catan-bg.png);
+  background-size: cover;
+  background-position: center;
 }
 
 .actions-container {

@@ -59,7 +59,7 @@ app.get('/game/:id', function(req, res) {
   const player = game.getPlayer(req.cookies.player_id)
   if (game.players.length < game.player_count) {
     res.render('waiting_room', {
-      players: JSON.stringify(game.getAllPlayers().map(_ => _.toJSON(0))),
+      players: JSON.stringify(game.getAllPlayers()),
       player_count: game.player_count,
       game_id,
     })
@@ -67,8 +67,8 @@ app.get('/game/:id', function(req, res) {
   }
   res.render('index', {
     game: JSON.stringify(game),
-    player: JSON.stringify(player),
-    other_players: {},
+    player: JSON.stringify(player.toJSON(1)),
+    opponents: JSON.stringify(game.getOpponentPlayers(player.id).map(_ => _.toJSON())),
   })
 })
 

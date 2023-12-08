@@ -1,5 +1,7 @@
+@import './constants.css';
+
 :root {
-  --title-padding: 1.3em 20px 1em;
+  --title-padding: .8em 20px .2em;
   --tile-width: 151px;
 }
 
@@ -21,28 +23,43 @@
 
 @media screen and (max-width: 450px) {
   :root {
-    --title-padding: 2em 10px 2em;
+    --title-padding: 2em 10px 1em;
   }
 }
 
+html { height: 100%; }
 body {
-  height: 100vh;
+  /* height: 100vh; */
   padding: 0;
   margin: 0;
+  background: url(/images/catan-bg.png);
+  background-size: cover;
+  background-position: center;
 }
 
 .container {
-  height: 100%;
+  /* height: 100%; */
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
 
+  &.hide {
+    opacity: 0;
+    transition: opacity .5s linear;
+  }
+
   .title {
+    color: #fff;
+    text-shadow: 0 0 2px #000, 0 0 2px #000, 0 0 2px #000, 0 0 2px #000, 0 0 2px #000;
     font-size: max(4vw, 30px);
     padding: var(--title-padding);
     text-align: center;
     font-family: sans-serif;
     width: 100%;
+
+    > div:nth-child(2) {
+      font-size: 60%;
+    }
   }
 
   .players {
@@ -51,6 +68,7 @@ body {
     position: relative;
     padding-right: 2px;
     display: flex;
+    filter: drop-shadow(0px 0px 10px #000);
 
     >div {
       width: var(--tile-width);
@@ -73,6 +91,7 @@ body {
       }
 
       .name {
+        color: #fff;
         width: 100%;
         background: #ffffffa8;
         margin: 73px 0;
@@ -83,21 +102,32 @@ body {
         font-weight: bold;
         letter-spacing: 1px;
       }
-    }
 
-    .player-3 {
-      position: absolute;
-      top: -131px;
-      left: 74px;
-      animation-delay: 2.7s;
-    }
+      &.player-1 .name {
+        /* background: color-mix(in srgb, var(--player-1-color) 66%, transparent); */
+        background: var(--player-1-color);
+      }
+      &.player-2 .name {
+        background: var(--player-2-color);
+      }
 
-    .player-4 {
-      position: absolute;
-      top: 131px;
-      left: 74px;
-      animation-delay: .26s;
+      &.player-3 {
+        position: absolute;
+        top: -131px;
+        left: 74px;
+        animation-delay: 2.7s;
+
+        .name { background: var(--player-3-color); color: initial; }
+      }
+
+      &.player-4 {
+        position: absolute;
+        top: 131px;
+        left: 74px;
+        animation-delay: .26s;
+
+        .name { background: var(--player-4-color); color: initial; }
+      }
     }
   }
-
 }

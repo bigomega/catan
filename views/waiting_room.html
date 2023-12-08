@@ -7,7 +7,11 @@
   <link rel="stylesheet" href="/css/waiting_room.css">
 </head>
 <div class="container">
-  <div class="title">Waiting for Players... (<span>0</span>/{{ player_count }})</div>
+  <div class="title">
+    <div>Game ID: {{ game_id }}</div>
+    <div>
+      Waiting for Players... (<span>0</span>/{{ player_count }})</div>
+    </div>
   <div class="players">
     <div class="player-1"></div>
     <div class="player-2"></div>

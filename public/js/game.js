@@ -1,7 +1,8 @@
 import Board from "./board.js"
 
 export default class Game {
-  constructor(mapkey) {
+  constructor({mapkey, id}) {
+    this.id = id
     this.board = new Board(mapkey)
     this.start()
   }

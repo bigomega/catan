@@ -9,13 +9,16 @@ class PlayerUI {
 }
 
 class UI {
-  constructor(board) {
+  constructor(board, player, opponents) {
     this.board = board
+    this.player = player
+    this.opponents = opponents
   }
 
   render() {
     this.renderBoard()
     this.renderPlayers()
+    document.querySelector('.splash').classList.add('hide')
   }
 
   renderBoard() {
@@ -107,6 +110,25 @@ class UI {
   }
 
   renderPlayers() {
+    document.querySelector('.opponents').innerHTML = this.opponents.map(opp => `
+      <div class="player id-${opp.id}">
+        <div class="name">${opp.name}</div>
+        <div class="victory-points"><span>${opp.vp}</span></div>
+        <div class="open-dev-cards"></div>
+        <div class="extra-vps"></div>
+        <div class="hand">
+          <div class="header">Hand 🤲</div>
+          <div class="resources">
+            <div class="title">Resources</div>
+            <div class="count">${opp.resource_count}</div>
+          </div>
+          <div class="development-cards">
+            <div class="title">Development Cards</div>
+            <div class="count">${opp.dev_card_count}</div>
+          </div>
+        </div>
+      </div>
+    `).join('')
   }
 }
 export default UI
