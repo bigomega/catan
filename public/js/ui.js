@@ -17,7 +17,8 @@ class UI {
 
   render() {
     this.renderBoard()
-    this.renderPlayers()
+    this.renderAllPlayers()
+    this.renderCurrentPlayer()
     document.querySelector('.splash').classList.add('hide')
   }
 
@@ -109,8 +110,8 @@ class UI {
     $board.style.width = `calc(var(--tile-width) * ${maxLength})`
   }
 
-  renderPlayers() {
-    document.querySelector('#game > .players').innerHTML = [this.player, ...this.opponents].map(opp => `
+  renderAllPlayers() {
+    document.querySelector('#game > .all-players').innerHTML = [this.player, ...this.opponents].map(opp => `
       <div class="player id-${opp.id}">
         <div class="name">${opp.name}</div>
         <div class="victory-points"><span>${opp.public_vps}</span></div>
@@ -127,6 +128,26 @@ class UI {
         </div>-->
       </div>
     `).join('')
+  }
+
+  renderCurrentPlayer() {
+    document.querySelector('#game > .current-player').classList.add('id-'+this.player.id)
+    document.querySelector('#game > .current-player .actions').innerHTML = `
+      <div class="timer">0:00</div>
+      <div class="roll-dice disabled" title="Roll Dice (SPACE)">🎲🎲</div>
+      <div class="build-road" title="Build Road (R)"><div></div></div>
+      <div class="build-settlement" title="Build Settlement (S)">
+        <img src="/images/pieces/settlement-${this.player.id}.png"/>
+      </div>
+      <div class="build-city" title="Build City (C)">
+        <img src="/images/pieces/city-${this.player.id}.png"/>
+      </div>
+      <div class="dev-card" title="Buy Development Card (D)">
+        <img src="/images/dc-back.png"/>
+      </div>
+      <div class="trade">Trade</div>
+      <div class="end-turn" title="End Turn (E)">End Turn</div>
+    `
   }
 }
 export default UI

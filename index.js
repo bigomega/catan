@@ -12,6 +12,7 @@ const app = express()
 const PORT = 3000 || process.env.PORT
 const server = http.createServer(app)
 const io = new Server(server)
+const SESSION_EXPIRE_HOURS = 5
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 app.use(express.static(path.join(__dirname, 'public')))
@@ -39,8 +40,8 @@ app.get('/game/new', function (req, res) {
     playerName: req.query.name,
   })
   games_sessions.next++
-  res.cookie('game_id', game.id, { maxAge: 86400 * 1000, httpOnly: true })
-  res.cookie('player_id', 1, { maxAge: 86400 * 1000, httpOnly: true })
+  res.cookie('game_id', game.id, { maxAge: SESSION_EXPIRE_HOURS * 60 * 60 * 1000, httpOnly: true })
+  res.cookie('player_id', 1, { maxAge: SESSION_EXPIRE_HOURS * 60 * 60 * 1000, httpOnly: true })
   games_sessions[game.id] = game
   // res.send(`<script>window.location.href = "/game/${game.id}"</script>`)
   res.redirect('/game/' + game.id)
@@ -93,8 +94,8 @@ app.get('/login', function (req, res) {
   }
 
   io.to(game.id).emit('joined', player.toJSON(0))
-  res.cookie('game_id', game.id, { maxAge: 86400 * 1000, httpOnly: true })
-  res.cookie('player_id', player.id, { maxAge: 86400 * 1000, httpOnly: true })
+  res.cookie('game_id', game.id, { maxAge: SESSION_EXPIRE_HOURS * 60 * 60 * 1000, httpOnly: true })
+  res.cookie('player_id', player.id, { maxAge: SESSION_EXPIRE_HOURS * 60 * 60 * 1000, httpOnly: true })
   res.redirect(`/game/${game.id}`)
 })
 

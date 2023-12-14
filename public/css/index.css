@@ -32,13 +32,15 @@ body {
   &.hide {
     opacity: 0;
     z-index: -100;
-    transition: opacity .5s .5s linear, z-index 0s 1s linear;
+    transition: opacity .5s .5s linear, z-index 0s 1s linear, width .5s linear, height .5s linear;
+    /* height: 100%;
+    width: 100%; */
   }
 }
 
 #game {
   /* transform: scale(0.85); */
-  transform-origin: top left;
+  /* transform-origin: top left; */
   margin: 0 auto;
   width: fit-content;
 }
@@ -50,7 +52,7 @@ body {
   }
 }
 
-#game > .players {
+#game > .all-players {
   display: flex;
   justify-content: center;
   font-family: sans-serif;
@@ -183,11 +185,11 @@ body {
  * BOARD
  * -------------
 */
-
 .board {
   position: relative;
   margin: 30px 0;
   box-sizing: border-box;
+  filter: drop-shadow(2px 2px 3px #000a);
 
   .row {
     position: relative;
@@ -211,8 +213,11 @@ body {
       margin-left: 48px;
       margin-top: 60px;
       /* opacity: 0.8; */
+      box-shadow: 3px 3px 5px -1px #000,
+        5px 5px 4px -1px #fffa inset,
+        -8px -8px 8px -6px #000a inset;
       background-color: #E9D49D;
-      border: 2px solid #AD9D75;
+      position: relative;
 
       &::before {
         display: block;
@@ -224,7 +229,8 @@ body {
         font-size: 25px;
         /* letter-spacing: 1px; */
         line-height: 10px;
-        margin-top: 15px;
+        position: relative;
+        top: 15px;
       }
 
       &.red::before {
@@ -255,6 +261,9 @@ body {
   &.F { background-image:url('/images/tiles/Fields.png'); }
   &.D { background-image:url('/images/tiles/Desert.png'); }
 
+  &:not(.S) {
+    /* filter: drop-shadow(0px 0px 1px #000); */
+  }
   /* &.S { background-image:url('/images/tiles/Sea.png'); } */
   &.S {
     /* background-color: red; */
@@ -302,8 +311,37 @@ body {
     cursor: pointer;
     visibility: hidden;
 
-    &:hover {
+    &:not(.taken):hover {
       background: #fff;
+      box-shadow: 0 0 0 2px #000;
+    }
+
+    &.shown { visibility: visible; }
+
+    &.p1[data-taken=S] { background-image: url(/images/pieces/settlement-1.png); }
+    &.p2[data-taken=S] { background-image: url(/images/pieces/settlement-2.png); }
+    &.p3[data-taken=S] { background-image: url(/images/pieces/settlement-3.png); }
+    &.p4[data-taken=S] { background-image: url(/images/pieces/settlement-4.png); }
+
+    &[data-taken=C] {
+      width: 40px;
+      height: 40px;
+      margin-top: -5px;
+      margin-left: -5px;
+      &.p1 { background-image: url(/images/pieces/city-1.png); }
+      &.p2 { background-image: url(/images/pieces/city-2.png); }
+      &.p3 { background-image: url(/images/pieces/city-3.png); }
+      &.p4 { background-image: url(/images/pieces/city-4.png); }
+    }
+
+    &.taken {
+      visibility: visible;
+      border-radius: 0;
+      background-color: transparent;
+      background-size: contain;
+      background-repeat: no-repeat;
+      filter: drop-shadow(1px -1px 0px #000) drop-shadow(-1px 1px 0px #000) drop-shadow(1px 1px 0px #000) drop-shadow(-1px -1px 0px #000);
+      /* filter: drop-shadow(-3px 3px 1px black); */
     }
 
     &[data-dir="top"] { top: -15px; left: 60px; }
@@ -350,8 +388,24 @@ body {
     cursor: pointer;
     visibility: hidden;
 
-    &:hover {
+    &:not(.taken):hover {
       background: #fff;
+      box-shadow: 1px 1px 0px 1px #000;
+    }
+
+    &.shown { visibility: visible; }
+
+    &.taken {
+      opacity: 1;
+      box-shadow: 0px 0px 0px 2px #000;
+      background: #999;
+      visibility: visible;
+      cursor: default;
+
+      &.p1 { background: var(--player-1-color); }
+      &.p2 { background: var(--player-2-color); }
+      &.p3 { background: var(--player-3-color); }
+      &.p4 { background: var(--player-4-color); }
     }
 
     &[data-dir="top-left"] { transform: rotate(60deg) translate(15px, -29px); }
@@ -361,6 +415,137 @@ body {
     &[data-dir="bottom_left-right"] { transform: rotate(120deg) translate(94px, -91px); }
     &[data-dir="bottom_right-left"] { transform: rotate(60deg) translate(164px, -30px); }
   }
+}
+
+#game > .current-player {
+  width: 100%;
+  height: 0px;
+  background: red;
+  position: fixed;
+  bottom: 65px;
+  left: 0;
+  z-index: 20;
+  font-family: sans-serif;
+
+  .actions {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: #fff;
+    height: 40px;
+    padding: 10px;
+    background: var(--sand-color-dark);
+    color: #fff;
+    border-top: 5px solid #000;
+    filter: drop-shadow(0px -2px 10px black);
+
+    > div {
+      margin: 0 5px;
+    }
+
+    .timer {
+      font-family: monospace;
+      font-size: 2em;
+    }
+
+    .roll-dice {
+      padding: 3px 10px;
+      position: relative;
+      top: -20px;
+      font-size: 60px;
+      background: inherit;
+      border-radius: 30px 30px 0 0;
+      border: 3px solid;
+      border-color: inherit;
+      padding-bottom: 20px;
+      cursor: pointer;
+      line-height: 90px;
+      transition: all .25s linear;
+
+      &.disabled {
+        border-radius: 10px 10px 0 0;
+        line-height: 70px;
+        top: 25px;
+        filter: grayscale(1) contrast(0.5);
+        cursor: not-allowed;
+      }
+
+      &:not(.disabled):hover {
+        filter: brightness(1.2);
+      }
+    }
+
+    .build-road {
+      position: relative;
+      width: 40px;
+      cursor: pointer;
+
+      &::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #ffffff;
+        opacity: 0.3;
+        position: absolute;
+        left: 0px;
+        top: 2px;
+        z-index: -1;
+      }
+
+      > div {
+        width: 6px;
+        margin-left: 15px;
+        height: 40px;
+        border: 2px solid #fff;
+        background: var(--sand-color-dark);
+      }
+
+      &:hover {
+        filter: brightness(0.7);
+        > div { border-color: transparent; }
+      }
+    }
+
+    .build-city,
+    .build-settlement
+    {
+      cursor: pointer;
+      & img {
+        width: 40px;
+        filter: drop-shadow(1px 1px 0px #fff) drop-shadow(-1px -1px 0px #fff) drop-shadow(1px -1px 0px #fff) drop-shadow(-1px 1px 0px #fff);
+
+        &:hover { filter: brightness(0.7); }
+      }
+      &.disabled {
+        cursor: not-allowed;
+        & img {
+          filter: grayscale(1) brightness(2);
+          opacity: 0.5;
+        }
+      }
+    }
+
+    .build-settlement img {
+      width: 30px;
+      position: relative;
+      /* top: 5px; */
+    }
+
+    .dev-card img {
+      width: 35px;
+    }
+  }
+  &.id-1 .actions { background: var(--player-1-color); border-color: var(--player-1-color-dark); }
+  &.id-2 .actions { background: var(--player-2-color); border-color: var(--player-2-color-dark); }
+  &.id-3 .actions { background: var(--player-3-color); border-color: var(--player-3-color-dark); }
+  &.id-4 .actions { background: var(--player-4-color); border-color: var(--player-4-color-dark); }
+
+  &.id-1 .actions .build-road > div { background: var(--player-1-color-dark); }
+  &.id-2 .actions .build-road > div { background: var(--player-2-color-dark); }
+  &.id-3 .actions .build-road > div { background: var(--player-3-color-dark); }
+  &.id-4 .actions .build-road > div { background: var(--player-4-color-dark); }
 }
 
 /* https: //www.catancollector.com/catan-links/how-to-identify-your-version-of-catan */
