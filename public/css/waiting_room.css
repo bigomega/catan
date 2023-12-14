@@ -29,12 +29,14 @@
 
 html { height: 100%; }
 body {
-  /* height: 100vh; */
+  height: 100%;
   padding: 0;
   margin: 0;
   background: url(/images/catan-bg.png);
   background-size: cover;
   background-position: center;
+  backdrop-filter: blur(50px);
+  transition: all linear .5s;
 }
 
 .container {
@@ -117,7 +119,7 @@ body {
         left: 74px;
         animation-delay: 2.7s;
 
-        .name { background: var(--player-3-color); color: initial; }
+        .name { background: var(--player-3-color); }
       }
 
       &.player-4 {
@@ -126,7 +128,7 @@ body {
         left: 74px;
         animation-delay: .26s;
 
-        .name { background: var(--player-4-color); color: initial; }
+        .name { background: var(--player-4-color); }
       }
     }
   }

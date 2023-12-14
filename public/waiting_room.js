@@ -17,15 +17,22 @@ function addPlayer(id, name) {
   document.querySelector('.title span').innerHTML = +document.querySelector('.title span').innerHTML + 1
 }
 
+function blurBody(players_joined) {
+  const blur_val = Math.round((window.player_count - players_joined) * 50 / (window.player_count - 1))
+  document.querySelector('body').style.backdropFilter = `blur(${blur_val}px)`
+}
+
 for (let i = 0; i < window.players.length; i++) {
   const player = window.players[i]
   addPlayer(player.id, player.name)
 }
+blurBody(window.players.length)
 
 const socket = io()
 socket.emit('joined', window.game_id)
 socket.on('joined', function(player) {
   addPlayer(player.id, player.name)
+  blurBody(player.id)
   if(player.id === window.player_count) {
     document.querySelector('.container').classList.add('hide')
     setTimeout(_ => {

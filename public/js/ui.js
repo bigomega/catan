@@ -27,7 +27,7 @@ class UI {
     let maxLength = 0
     const renderedCorners = []
     const renderedEdges = []
-    const $board = document.querySelector('.board')
+    const $board = document.querySelector('#game > .board')
 
     function _renderCorners(tile) {
       return Object.keys(tile.corners).map(dir => {
@@ -110,23 +110,21 @@ class UI {
   }
 
   renderPlayers() {
-    document.querySelector('.opponents').innerHTML = this.opponents.map(opp => `
+    document.querySelector('#game > .players').innerHTML = [this.player, ...this.opponents].map(opp => `
       <div class="player id-${opp.id}">
         <div class="name">${opp.name}</div>
-        <div class="victory-points"><span>${opp.vp}</span></div>
-        <div class="open-dev-cards"></div>
+        <div class="victory-points"><span>${opp.public_vps}</span></div>
+        <!--<div class="open-dev-cards"></div>
         <div class="extra-vps"></div>
         <div class="hand">
-          <div class="header">Hand 🤲</div>
+          <div class="header">HAND</div>
           <div class="resources">
-            <div class="title">Resources</div>
             <div class="count">${opp.resource_count}</div>
           </div>
           <div class="development-cards">
-            <div class="title">Development Cards</div>
             <div class="count">${opp.dev_card_count}</div>
           </div>
-        </div>
+        </div>-->
       </div>
     `).join('')
   }

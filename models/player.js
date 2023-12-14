@@ -39,11 +39,13 @@ export default class Player {
     const playerJSON = {
       id: this.id,
       name: this.name,
+      public_vps: 0,
       resource_count: Object.keys(CONST.RESOURCES).reduce((mem, k) => mem + this.closed_cards[k], 0),
       dev_card_count: Object.keys(CONST.RESOURCES).reduce((mem, k) => mem + this.closed_cards[k], 0),
       open_dev_cards: this.open_dev_cards,
       trade_offers: this.trade_offers,
       ...(get_private ? {
+        vps: 0,
         closed_cards: this.closed_cards,
       } : {})
     }
