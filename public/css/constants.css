@@ -4,14 +4,18 @@
   --sand-color-dark: color-mix(in srgb, var(--sand-color) 50%, #000);
 
   /* --player-1-color: #f21313; */
-  --player-1-color: #fb4646;
+  /* --player-1-color: #fb4646; */
+  --player-1-color: #e53a3a;
+
   /* --player-2-color: #05a3f4; */
   /* --player-2-color: #0040c8; */
   /* --player-2-color: #5d60ff; */
   --player-2-color: #2b70ff;
+
   /* --player-3-color: #23ff1e; */
   /* --player-3-color: #0b8e08; */
   --player-3-color: #03a800;
+
   /* --player-4-color: #ffb902; */
   /* --player-4-color: #815d00; */
   --player-4-color: #dc9f00;

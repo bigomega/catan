@@ -66,6 +66,14 @@ class UI {
       }).join('')
     }
 
+    function _renderBeaches(tile) {
+      return Object.keys(tile.adjacent_tiles).map(dir =>
+        (tile.adjacent_tiles[dir] && tile.adjacent_tiles[dir].type !== 'S')
+          ? `<div class="beach beach-${Math.floor(Math.random() * 3) + 1} beach-${dir}"></div>`
+          : ''
+      ).join('')
+    }
+
     function _renderRow(row) {
       return row.map((tile, j) =>
         `<div
@@ -79,6 +87,7 @@ class UI {
         >
           <div class="corners">${_renderCorners(tile)}</div>
           <div class="edges">${_renderEdges(tile)}</div>
+          ${tile.type === 'S' ? `<div class="beaches">${_renderBeaches(tile)}</div>` : ''}
           ${
             tile.num
             ? `<div
@@ -135,14 +144,14 @@ class UI {
     document.querySelector('#game > .current-player .actions').innerHTML = `
       <div class="timer">0:00</div>
       <div class="roll-dice disabled" title="Roll Dice (SPACE)">🎲🎲</div>
-      <div class="build-road" title="Build Road (R)"><div></div></div>
-      <div class="build-settlement" title="Build Settlement (S)">
+      <div class="build-road disabled" title="Build Road (R)"><div></div></div>
+      <div class="build-settlement disabled" title="Build Settlement (S)">
         <img src="/images/pieces/settlement-${this.player.id}.png"/>
       </div>
-      <div class="build-city" title="Build City (C)">
+      <div class="build-city disabled" title="Build City (C)">
         <img src="/images/pieces/city-${this.player.id}.png"/>
       </div>
-      <div class="dev-card" title="Buy Development Card (D)">
+      <div class="dev-card disabled" title="Buy Development Card (D)">
         <img src="/images/dc-back.png"/>
       </div>
       <div class="trade">Trade</div>

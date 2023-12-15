@@ -187,7 +187,7 @@ body {
 */
 .board {
   position: relative;
-  margin: 30px 0;
+  margin: 30px 0px 200px;
   box-sizing: border-box;
   filter: drop-shadow(2px 2px 3px #000a);
 
@@ -284,12 +284,12 @@ body {
   &.S[data-trade="W"]::after { background-image: url(/images/trade/Wheat.png); }
   &.S[data-trade="*"]::after { background-image: url(/images/trade/*.png); }
 
-  &.S[data-trade-dir="bottom_right"]::after { transform: translate(67px, 62px); }
-  &.S[data-trade-dir="bottom_left"]::after { transform: translate(29px, 69px); }
-  &.S[data-trade-dir="top_right"]::after { transform: translate(65px, 16px); }
-  &.S[data-trade-dir="top_left"]::after { transform: translate(30px, 19px); }
-  &.S[data-trade-dir="right"]::after { transform: translate(83px, 44px); }
-  &.S[data-trade-dir="left"]::after { transform: translate(20px, 30px); }
+  &.S[data-trade-dir="bottom_right"]::after { transform: translate(43px, 57px); }
+  &.S[data-trade-dir="bottom_left"]::after { transform: translate(43px, 53px); }
+  &.S[data-trade-dir="top_right"]::after { transform: translate(58px, 36px); }
+  &.S[data-trade-dir="top_left"]::after { transform: translate(40px, 37px); }
+  &.S[data-trade-dir="right"]::after { transform: translate(53px, 37px); }
+  &.S[data-trade-dir="left"]::after { transform: translate(35px, 41px); }
 }
 
 /* --------------------------------------
@@ -340,8 +340,8 @@ body {
       background-color: transparent;
       background-size: contain;
       background-repeat: no-repeat;
-      filter: drop-shadow(1px -1px 0px #000) drop-shadow(-1px 1px 0px #000) drop-shadow(1px 1px 0px #000) drop-shadow(-1px -1px 0px #000);
-      /* filter: drop-shadow(-3px 3px 1px black); */
+      /* filter: drop-shadow(1px -1px 0px #000) drop-shadow(-1px 1px 0px #000) drop-shadow(1px 1px 0px #000) drop-shadow(-1px -1px 0px #000); */
+      filter: drop-shadow(-3px 3px 3px #000);
     }
 
     &[data-dir="top"] { top: -15px; left: 60px; }
@@ -397,15 +397,16 @@ body {
 
     &.taken {
       opacity: 1;
-      box-shadow: 0px 0px 0px 2px #000;
+      box-shadow: 2px 2px 4px 0px #000;
       background: #999;
       visibility: visible;
       cursor: default;
+      border: 1px solid;
 
-      &.p1 { background: var(--player-1-color); }
-      &.p2 { background: var(--player-2-color); }
-      &.p3 { background: var(--player-3-color); }
-      &.p4 { background: var(--player-4-color); }
+      &.p1 { background: var(--player-1-color); box-shadow: 2px 2px 0px 1px color-mix(in srgb, var(--player-1-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
+      &.p2 { background: var(--player-2-color); box-shadow: 2px 2px 0px 1px color-mix(in srgb, var(--player-2-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
+      &.p3 { background: var(--player-3-color); box-shadow: 2px 2px 0px 1px color-mix(in srgb, var(--player-3-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
+      &.p4 { background: var(--player-4-color); box-shadow: 2px 2px 0px 1px color-mix(in srgb, var(--player-4-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
     }
 
     &[data-dir="top-left"] { transform: rotate(60deg) translate(15px, -29px); }
@@ -417,12 +418,42 @@ body {
   }
 }
 
+/* --------------------------------------
+ * BEACHES
+ * -------------
+*/
+.board .tile {
+  .beaches {
+    /* display: none; */
+    position: absolute;
+  }
+
+  .beach {
+    width: 30px;
+    z-index: -1;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+
+  .beach-1 { background-image: url(/images/beach-1.png); height: 104px; }
+  .beach-2 { background-image: url(/images/beach-2.png); height: 102px; }
+  .beach-3 { background-image: url(/images/beach-3.png); height: 106px; }
+
+  .beach-left { top: 38px; left: 0px; }
+  .beach-top_left { top: -16px; left: 30px; transform: rotate(60deg); }
+  .beach-top_right { top: -17px; left: 90px; transform: rotate(120deg); }
+  .beach-right { top: 37px; left: 120px; transform: rotate(180deg); }
+  .beach-bottom_right { top: 89px; left: 91px; transform: rotate(-120deg); }
+  .beach-bottom_left { top: 90px; left: 32px; transform: rotate(-60deg); }
+}
+
+
+
 #game > .current-player {
   width: 100%;
-  height: 0px;
-  background: red;
   position: fixed;
-  bottom: 65px;
+  bottom: 0;
   left: 0;
   z-index: 20;
   font-family: sans-serif;
@@ -486,7 +517,7 @@ body {
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: #ffffff;
+        background: #fff;
         opacity: 0.3;
         position: absolute;
         left: 0px;
@@ -505,6 +536,14 @@ body {
       &:hover {
         filter: brightness(0.7);
         > div { border-color: transparent; }
+      }
+
+      &.disabled {
+        cursor: not-allowed;
+        filter: grayscale(1) brightness(2);
+        opacity: 0.7;
+        > div { border-color: #0003; }
+        &::before { opacity: .1; }
       }
     }
 
@@ -533,8 +572,16 @@ body {
       /* top: 5px; */
     }
 
-    .dev-card img {
-      width: 35px;
+    .dev-card {
+      cursor: pointer;
+      & img {
+        width: 30px;
+      }
+      &.disabled {
+        cursor: not-allowed;
+        filter: grayscale(1);
+        opacity: .5;
+      }
     }
   }
   &.id-1 .actions { background: var(--player-1-color); border-color: var(--player-1-color-dark); }

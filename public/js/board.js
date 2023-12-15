@@ -41,6 +41,10 @@ class Tile {
     this.id = Tile.#idCounter ++
     this.type = Object.keys(CONST.TILES).includes(type) ? type : 'S'
     this.num = num
+    this.adjacent_tiles = { left, top_left, top_right }
+    if(left) { left.adjacent_tiles.right = this }
+    if(top_left) { top_left.adjacent_tiles.bottom_right = this }
+    if(top_right) { top_right.adjacent_tiles.bottom_left = this }
     this.corners = {
       top: top_left?.corners?.bottom_right || top_right?.corners?.bottom_left,
       top_left: top_left?.corners?.bottom || left?.corners?.top_right,
@@ -126,7 +130,7 @@ export default class Board {
       let row_map = mapkey_list[i].trim()
       const prev_row = i > 0 ? this.tiles[i - 1] : null
       const row_list = []
-      // With the current implementation - ONLY ONE +/- can be used
+      // With the current implementation - ONLY ONE +/- can be used for Row Diff
       if (row_map[0] == '+' || row_map[0] == '-') {
         row_list.diff = +(row_map[0] + '1')
         row_map = row_map.substr(1)
