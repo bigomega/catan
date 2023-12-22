@@ -1,4 +1,6 @@
 :root {
+  --tile-width: 151px;
+
   --water-color: #1691c6;
   --sand-color: #e8d49c;
   --sand-color-dark: color-mix(in srgb, var(--sand-color) 50%, #000);
@@ -20,4 +22,16 @@
   /* --player-4-color: #815d00; */
   --player-4-color: #dc9f00;
   /* --player-4-color: #b78400; */
+
+
+
+  --player-1-color-light: color-mix(in srgb, var(--player-1-color) 40%, #fff);
+  --player-2-color-light: color-mix(in srgb, var(--player-2-color) 40%, #fff);
+  --player-3-color-light: color-mix(in srgb, var(--player-3-color) 40%, #fff);
+  --player-4-color-light: color-mix(in srgb, var(--player-4-color) 40%, #fff);
+
+  --player-1-color-dark: color-mix(in srgb, var(--player-1-color) 100%, #000 40%);
+  --player-2-color-dark: color-mix(in srgb, var(--player-2-color) 100%, #000 40%);
+  --player-3-color-dark: color-mix(in srgb, var(--player-3-color) 100%, #000 40%);
+  --player-4-color-dark: color-mix(in srgb, var(--player-4-color) 100%, #000 40%);
 }

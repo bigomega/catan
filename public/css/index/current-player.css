@@ -1,0 +1,164 @@
+@import '../constants.css';
+
+#game > .current-player {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  font-family: sans-serif;
+
+  .actions {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: #fff;
+    height: 40px;
+    padding: 10px;
+    background: var(--sand-color-dark);
+    color: #fff;
+    border-top: 5px solid #000;
+    filter: drop-shadow(0px -2px 10px black);
+
+    > div {
+      margin: 0 5px;
+    }
+
+    .timer {
+      font-family: monospace;
+      font-size: 2em;
+    }
+
+    .roll-dice {
+      padding: 3px 10px;
+      position: relative;
+      top: -20px;
+      font-size: 60px;
+      background: inherit;
+      border-radius: 30px 30px 0 0;
+      border: 3px solid;
+      border-color: inherit;
+      padding-bottom: 20px;
+      cursor: pointer;
+      line-height: 90px;
+      transition: all .25s linear;
+
+      &.disabled {
+        border-radius: 10px 10px 0 0;
+        line-height: 70px;
+        top: 25px;
+        filter: grayscale(1) contrast(0.5);
+        cursor: not-allowed;
+      }
+
+      &:not(.disabled):hover {
+        filter: brightness(1.2);
+      }
+    }
+
+    .build-road {
+      position: relative;
+      width: 40px;
+      cursor: pointer;
+
+      &::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #fff;
+        opacity: 0.3;
+        position: absolute;
+        left: 0px;
+        top: 2px;
+        z-index: -1;
+      }
+
+      > div {
+        width: 6px;
+        margin-left: 15px;
+        height: 40px;
+        border: 2px solid #fff;
+        background: var(--sand-color-dark);
+      }
+
+      &:hover {
+        filter: brightness(0.7);
+        > div { border-color: transparent; }
+      }
+
+      &.disabled {
+        cursor: not-allowed;
+        filter: grayscale(1) brightness(2);
+        opacity: 0.7;
+        > div { border-color: #0003; }
+        &::before { opacity: .1; }
+      }
+    }
+
+    .build-city,
+    .build-settlement
+    {
+      cursor: pointer;
+      & img {
+        width: 40px;
+        filter: drop-shadow(1px 1px 0px #fff) drop-shadow(-1px -1px 0px #fff) drop-shadow(1px -1px 0px #fff) drop-shadow(-1px 1px 0px #fff);
+
+        &:hover { filter: brightness(0.7); }
+      }
+      &.disabled {
+        cursor: not-allowed;
+        & img {
+          filter: grayscale(1) brightness(2);
+          opacity: 0.5;
+        }
+      }
+    }
+
+    .build-settlement img {
+      width: 30px;
+      position: relative;
+      /* top: 5px; */
+    }
+
+    .dev-card {
+      cursor: pointer;
+      & img {
+        width: 30px;
+      }
+      &.disabled {
+        cursor: not-allowed;
+        filter: grayscale(1);
+        opacity: .5;
+      }
+    }
+
+    .end-turn {
+      background: #fff;
+      color: var(--player-2-color);
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+
+      &:not(.disabled):hover {
+        box-shadow: 0px 0 10px 0px #fff;
+      }
+
+      &.disabled {
+        background: #aaa;
+        color: #666;
+        cursor: not-allowed;
+      }
+    }
+  }
+  &.id-1 .actions { background: var(--player-1-color); border-color: var(--player-1-color-dark); }
+  &.id-2 .actions { background: var(--player-2-color); border-color: var(--player-2-color-dark); }
+  &.id-3 .actions { background: var(--player-3-color); border-color: var(--player-3-color-dark); }
+  &.id-4 .actions { background: var(--player-4-color); border-color: var(--player-4-color-dark); }
+
+  &.id-1 .actions .build-road > div { background: var(--player-1-color-dark); }
+  &.id-2 .actions .build-road > div { background: var(--player-2-color-dark); }
+  &.id-3 .actions .build-road > div { background: var(--player-3-color-dark); }
+  &.id-4 .actions .build-road > div { background: var(--player-4-color-dark); }
+}

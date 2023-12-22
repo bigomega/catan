@@ -1,0 +1,130 @@
+@import '../constants.css';
+
+#game > .all-players {
+  display: flex;
+  justify-content: center;
+  font-family: sans-serif;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  .player {
+    background: var(--sand-color);
+    border: 3px solid var(--sand-color-dark);
+    border-top: none;
+    margin: 0 -1.5px;;
+
+    &.id-1 { background: var(--player-1-color-light); border-color: var(--player-1-color-dark); }
+    &.id-2 { background: var(--player-2-color-light); border-color: var(--player-2-color-dark); }
+    &.id-3 { background: var(--player-3-color-light); border-color: var(--player-3-color-dark); }
+    &.id-4 { background: var(--player-4-color-light); border-color: var(--player-4-color-dark); }
+
+    .name {
+      font-size: 2em;
+      text-align: center;
+      font-family: serif;
+      padding: 5px 20px 10px;
+      background: var(--sand-color-dark);
+      color: #fff;
+      border-bottom: 3px solid;
+      border-bottom-color: inherit;
+    }
+    &.id-1 .name { background: var(--player-1-color); }
+    &.id-2 .name { background: var(--player-2-color); }
+    &.id-3 .name { background: var(--player-3-color); }
+    &.id-4 .name { background: var(--player-4-color); }
+
+    .victory-points {
+      border-width: 3px 0;
+      padding: 3px 10px;
+      font-size: 2em;
+      position: relative;
+      display: flex;
+      justify-content: center;
+
+      & span {
+        margin-right: 5px;
+        margin-left: 30px;
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        &::after {
+          content: "";
+          position: absolute;
+          left: -30px;
+          width: 20px;
+          height: 20px;
+          box-shadow: rgb(0, 0, 0) 2px 2px 5px -1px;
+          background: url(/images/catan-bg.png) -27px -12px / 74px;
+          background-position: -27px -12px;
+          border-radius: 50px;
+        }
+      }
+
+      &::after {
+        content: 'Victory\APoints';
+        font-size: 0.8rem;
+        vertical-align: super;
+        opacity: .5;
+        white-space: pre;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+    }
+
+    .hand {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+
+      .header {
+        background: var(--sand-color-dark);
+        color: #fff;
+        padding: 1px 20px;
+        font-size: 0.5em;
+        text-align: center;
+        width: 100%;
+        margin-bottom: 5px;
+      }
+
+      .resources,
+      .development-cards {
+        position: relative;
+        width: 30px;
+        height: 44px;
+
+        &::before {
+          content: '';
+          width: 30px;
+          height: 44px;
+          position: absolute;
+          left: 0px;
+          top: 0;
+          background-image: url(/images/resources-back.png);
+          background-size: cover;
+        }
+
+        .count {
+          position: relative;
+          text-align: center;
+          background: #e8d49c8c;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          color: white;
+          text-shadow: 0 0 2px #000, 0 0 2px #000, 0 0 2px #000, 0 0 2px #000, 0 0 2px #000;
+        }
+      }
+
+      .development-cards::before {
+        background-image: url(/images/dc-back.png);
+      }
+    }
+    &.id-1 .hand .header { background: var(--player-1-color); }
+    &.id-2 .hand .header { background: var(--player-2-color); }
+    &.id-3 .hand .header { background: var(--player-3-color); }
+    &.id-4 .hand .header { background: var(--player-4-color); }
+  }
+}
