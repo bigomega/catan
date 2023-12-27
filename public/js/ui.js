@@ -158,5 +158,14 @@ class UI {
       <div class="end-turn" title="End Turn (E)">End Turn</div>
     `
   }
+
+  alert(message) {
+    document.querySelector('#game > .alert').style.display = 'block'
+    document.querySelector('#game > .alert .parchment').innerHTML = message
+    document.querySelector('#game > .alert .text').innerHTML = message
+    setTimeout(_ => {
+      document.querySelector('#game > .alert').style.display = 'none'
+    }, 3000)
+  }
 }
 export default UI

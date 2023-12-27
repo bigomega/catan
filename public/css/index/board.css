@@ -129,9 +129,13 @@
     cursor: pointer;
     visibility: hidden;
 
-    &:not(.taken):hover {
-      background: #fff;
-      box-shadow: 0 0 0 2px #000;
+    &:not(.taken) {
+      box-shadow: 0 0 3px 1px #000a;
+
+      &:hover {
+        background: #fff;
+        box-shadow: 0 0 0 2px #000;
+      }
     }
 
     &.shown { visibility: visible; }
@@ -206,9 +210,13 @@
     cursor: pointer;
     visibility: hidden;
 
-    &:not(.taken):hover {
-      background: #fff;
-      box-shadow: 1px 1px 0px 1px #000;
+    &:not(.taken) {
+      box-shadow: 0 0 3px 1px #000a;
+
+      &:hover {
+        background: #fff;
+        box-shadow: 1px 1px 0px 1px #000;
+      }
     }
 
     &.shown { visibility: visible; }

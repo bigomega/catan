@@ -12,12 +12,21 @@ Free to play multiplayer catan style board game
   - [x] have basic DS
   - [x] rendering the board
   - [ ] 1v1, 3player, 4 player modes
-  - [ ] Waiting Screen
+  - [x] Game timers
+  - [x] Waiting Screen
+  - [x] Sounds
+    - [x] Start/End
+    - [x] Turn Notification
+    - [x] Knight
+    - [x] Robber
+    - [x] Dice
+    - [x] Build
+    - [ ] ? Get Resource
   - [ ] rendering other stuff
     - [ ] Hand
     - [ ] Dice
     - [ ] Robber
-    - [ ] House, Village and Roads
+    - [x] House, Village and Roads
     - [ ] Trade options
   - [ ] game mechanics + end condition
   - [ ] Input options in UI
@@ -25,7 +34,7 @@ Free to play multiplayer catan style board game
 - [ ] Few hardcoded maps
 - [ ] Introducing trading
 - [ ] Making it multiplayer
-  - [ ] Use socket io
+  - [x] Use socket io
   - [ ] Rooms
     - [ ] create rooms
     - [ ] Invite to rooms
@@ -38,9 +47,9 @@ Free to play multiplayer catan style board game
 
 ### Todo - v1+
 - [ ] Introducing 8 player maps
-- [ ] Time limit on players
+- [x] Time limit on players
 - [ ] Map generator
   - [ ] Try to consume other map generator
 - [ ] Map creator
 - [ ] Seafarers expansion (fairly easy one)
-- [ ] Keyboard shirtcuts
+- [ ] Keyboard shortcuts

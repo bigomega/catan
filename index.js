@@ -6,6 +6,8 @@ import mustacheExpress from 'mustache-express'
 import { Server } from "socket.io"
 import http from "http"
 import Game from "./models/game.js"
+import { parse as parseCookie } from "cookie"
+import * as CONST from "./public/js/const.js"
 // import Board from "./public/js/board.js"
 
 const app = express()
@@ -38,6 +40,8 @@ app.get('/game/new', function (req, res) {
   const game = new Game({
     id: games_sessions.next,
     playerName: req.query.name,
+    config: CONST.GAME_CONFIG,
+    io,
   })
   games_sessions.next++
   res.cookie('game_id', game.id, { maxAge: SESSION_EXPIRE_HOURS * 60 * 60 * 1000, httpOnly: true })
@@ -93,7 +97,6 @@ app.get('/login', function (req, res) {
     return res.redirect('/login?notice=Game is full!')
   }
 
-  io.to(game.id).emit('joined', player.toJSON(0))
   res.cookie('game_id', game.id, { maxAge: SESSION_EXPIRE_HOURS * 60 * 60 * 1000, httpOnly: true })
   res.cookie('player_id', player.id, { maxAge: SESSION_EXPIRE_HOURS * 60 * 60 * 1000, httpOnly: true })
   res.redirect(`/game/${game.id}`)
@@ -120,16 +123,30 @@ app.get('/clear-sessions/:id?', function(req, res) {
   res.redirect('/all-sessions')
 })
 
+// io.engine.use((req, res, next) => {
+//   next()
+// });
+
+io.use((socket, next) => {
+  const { game_id, player_id } = parseCookie(socket.handshake.headers.cookie || '')
+  socket.join(game_id || 'unroomed')
+  next()
+});
+
 // SOCKET IO ACTIVITIES
 io.on('connection', (socket) => {
-  // console.log('User connected - ', socket.id)
+  // console.log('User connected - ', socket.id, socket.rooms)
 
-  socket.on('joined', function(game_id) {
-    socket.join(game_id)
-    // socket.broadcast.emit('joined', player)
+  socket.on(CONST.SOCKET_EVENTS.PLAYER_ONLINE, function(player_id, game_id) {
+    const game = games_sessions[game_id]
+    game.readyPlayers[player_id] = 1
+    if (Object.keys(game.readyPlayers).length === game.player_count) {
+      game.start()
+    }
   })
 
   socket.on('disconnect', () => {
+    // TODO: inform game of the disconnect. pause and continue
     // console.log('User disconnected - ', socket.id)
   })
 })

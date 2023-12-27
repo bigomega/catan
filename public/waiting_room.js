@@ -1,4 +1,4 @@
-import * as CONST from "/js/const.js"
+import * as CONST from "./js/const.js"
 
 window.player_count > 2 && document.querySelector('.player-3').classList.remove('hide')
 window.player_count > 3 && document.querySelector('.player-4').classList.remove('hide')
@@ -29,8 +29,7 @@ for (let i = 0; i < window.players.length; i++) {
 blurBody(window.players.length)
 
 const socket = io()
-socket.emit('joined', window.game_id)
-socket.on('joined', function(player) {
+socket.on(CONST.SOCKET_EVENTS.JOINED_WAITING_ROOM, function(player) {
   addPlayer(player.id, player.name)
   blurBody(player.id)
   if(player.id === window.player_count) {

@@ -1,5 +1,7 @@
-import Game from "/js/game.js"
-import UI from "/js/ui.js"
+import Game from "./js/game.js"
+import UI from "./js/ui.js"
+import * as CONST from "./js/const.js"
+const SOC = CONST.SOCKET_EVENTS
 
 // window.COOKIE = (str =>
 //   str
@@ -11,12 +13,23 @@ import UI from "/js/ui.js"
 //     }, {})
 // )(document.cookie)
 
-var socket = io()
-socket.emit('joined', window.game.id)
+const socket = io()
+const player = window.player
+const opponents = window.opponents
 const game = new Game(window.game)
 console.log(game)
-console.log(window.player)
-console.log(window.opponents)
-const ui = new UI(game.board, window.player, window.opponents)
+console.log(player)
+console.log(opponents)
+const ui = new UI(game.board, player, opponents)
 ui.render()
-// UI.renderPlayers()
+
+// Notify you're online
+socket.emit(SOC.PLAYER_ONLINE, player.id, game.id)
+socket.on(SOC.STATE_CHANGE, function(state) {
+  if(state === CONST.GAME_STATES.STRATEGIZE) {
+    ;(new Audio('/sounds/start-end.mp3')).play()
+  }
+})
+socket.on(SOC.ALERT, function(message) {
+  ui.alert(message)
+})

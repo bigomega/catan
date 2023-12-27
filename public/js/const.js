@@ -51,3 +51,35 @@ export const TRADE_OFFERS = {
   O2: 'Ore 2:1',
   W2: 'Wheat 2:1',
 }
+
+export const ROLL = _ => Math.ceil(Math.random() * 6)
+
+export const GAME_CONFIG = {
+  strategize: { time: 120 },
+  initial_build: { time: 60 },
+  roll: { time: 15 },
+  player_turn: {},
+  win_points: 10,
+}
+
+export const GAME_STATES = {
+  STRATEGIZE: 'strategize',
+  INITIAL_BUILD: 'initial_build',
+  PLAYER_ROLL: 'player_roll',
+  PLAYER_ACTIONS: 'player_actions',
+  END: 'end',
+}
+
+export const GAME_MESSAGES = {
+  strategize: t => `You have ${t} seconds to Strategize!`,
+  initial_build: `Build a house and then a Road next to it`,
+  initial_build_2: `Build a house and then a Road next to it. You get the surrounding resources this time.`,
+}
+
+export const SOCKET_EVENTS = {
+  JOINED_WAITING_ROOM: 'joined_waiting_room',
+  PLAYER_ONLINE: 'player_online',
+  ALERT: 'alert',
+  MINI_ALERT: 'mini_alert',
+  STATE_CHANGE: 'state_change',
+}

@@ -13,8 +13,19 @@
   <div class="current-player">
     <div class="hand"></div>
     <div class="actions"></div>
+    <div class="mini-alert"></div>
+  </div>
+  <div class="alert">
+    <div class="parchment"></div>
+    <div class="text"></div>
   </div>
 </div>
+<svg style="width: 0;height: 0;">
+  <filter id="wavy2">
+    <feTurbulence x="0" y="0" baseFrequency="0.02" numOctaves="5" seed="1"></feTurbulence>
+    <feDisplacementMap in="SourceGraphic" scale="20"></feDisplacementMap>
+  </filter>
+</svg>
 
 <script>
   window.game = {{{game}}};
