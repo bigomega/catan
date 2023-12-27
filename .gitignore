@@ -104,4 +104,4 @@ dist
 .tern-port
 
 # Mac stuff
-*/.DS_Store
+.DS_Store
