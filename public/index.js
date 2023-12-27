@@ -33,6 +33,5 @@ socket.on(SOC.STATE_CHANGE, function(state) {
 socket.on(SOC.SET_TIMER, function(time_in_seconds) {
   ui.setTimer(time_in_seconds)
 })
-socket.on(SOC.ALERT, function(message) {
-  ui.alert(message)
-})
+socket.on(SOC.ALERT, message => ui.alert(message))
+socket.on(SOC.STATUS_BAR, message => ui.setStatus(message))

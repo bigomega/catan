@@ -46,7 +46,9 @@ export default class Game {
     this.state = STATES.STRATEGIZE
     this.notify(SOC.STATE_CHANGE, this.state)
     const time = this.config.strategize.time
-    this.notify(SOC.ALERT, CONST.GAME_MESSAGES.strategize(time))
+    const message = CONST.GAME_MESSAGES.strategize(time)
+    this.notify(SOC.ALERT, message)
+    this.notify(SOC.STATUS_BAR, message)
     this.setTimer(time)
   }
 
@@ -72,7 +74,6 @@ export default class Game {
 
   toJSON(){
     return {
-      state: this.state,
       id: this.id,
       mapkey: this.mapkey,
     }

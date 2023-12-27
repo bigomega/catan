@@ -80,7 +80,7 @@ export const SOCKET_EVENTS = {
   JOINED_WAITING_ROOM: 'joined_waiting_room',
   PLAYER_ONLINE: 'player_online',
   ALERT: 'alert',
-  MINI_ALERT: 'mini_alert',
+  STATUS_BAR: 'status_bar',
   STATE_CHANGE: 'state_change',
   SET_TIMER: 'set_timer',
 }

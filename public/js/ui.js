@@ -160,6 +160,10 @@ class UI {
     `
   }
 
+  setStatus(message) {
+    $('#game .current-player .status-bar').innerHTML = message
+  }
+
   alert(message) {
     $('#game > .alert').classList.add('show')
     $('#game > .alert .parchment').innerHTML = message
