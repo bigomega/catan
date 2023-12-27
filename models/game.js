@@ -51,6 +51,7 @@ export default class Game {
   }
 
   setTimer(time_in_seconds) {
+    this.notify(SOC.SET_TIMER, time_in_seconds)
     setTimeout(this.timeOut.bind(this), time_in_seconds * 1000)
   }
 

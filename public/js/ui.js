@@ -1,4 +1,5 @@
 import * as CONST from "/js/const.js"
+const $ = document.querySelector.bind(document)
 
 class PlayerUI {
   roll() { }
@@ -19,7 +20,7 @@ class UI {
     this.renderBoard()
     this.renderAllPlayers()
     this.renderCurrentPlayer()
-    document.querySelector('.splash').classList.add('hide')
+    $('.splash').classList.add('hide')
   }
 
   renderBoard() {
@@ -28,7 +29,7 @@ class UI {
     let maxLength = 0
     const renderedCorners = []
     const renderedEdges = []
-    const $board = document.querySelector('#game > .board')
+    const $board = $('#game > .board')
 
     function _renderCorners(tile) {
       return Object.keys(tile.corners).map(dir => {
@@ -120,7 +121,7 @@ class UI {
   }
 
   renderAllPlayers() {
-    document.querySelector('#game > .all-players').innerHTML = [this.player, ...this.opponents].map(opp => `
+    $('#game > .all-players').innerHTML = [this.player, ...this.opponents].map(opp => `
       <div class="player id-${opp.id}">
         <div class="name">${opp.name}</div>
         <div class="victory-points"><span>${opp.public_vps}</span></div>
@@ -140,8 +141,8 @@ class UI {
   }
 
   renderCurrentPlayer() {
-    document.querySelector('#game > .current-player').classList.add('id-'+this.player.id)
-    document.querySelector('#game > .current-player .actions').innerHTML = `
+    $('#game > .current-player').classList.add('id-'+this.player.id)
+    $('#game > .current-player .actions').innerHTML = `
       <div class="timer">0:00</div>
       <div class="roll-dice disabled" title="Roll Dice (SPACE)">🎲🎲</div>
       <div class="build-road disabled" title="Build Road (R)"><div></div></div>
@@ -160,12 +161,23 @@ class UI {
   }
 
   alert(message) {
-    document.querySelector('#game > .alert').style.display = 'block'
-    document.querySelector('#game > .alert .parchment').innerHTML = message
-    document.querySelector('#game > .alert .text').innerHTML = message
+    $('#game > .alert').classList.add('show')
+    $('#game > .alert .parchment').innerHTML = message
+    $('#game > .alert .text').innerHTML = message
     setTimeout(_ => {
-      document.querySelector('#game > .alert').style.display = 'none'
+      $('#game > .alert').classList.remove('show')
     }, 3000)
+  }
+
+  setTimer(time_in_seconds) {
+    this.timer && clearInterval(this.timer)
+    this.timer = setInterval(_ => {
+      const seconds = time_in_seconds % 60
+      const minutes = Math.floor(time_in_seconds / 60)
+      const time_text = minutes + ':' + ('0' + seconds).slice(-2)
+      $('#game .current-player .timer').innerHTML = time_text
+      --time_in_seconds < 0 && clearInterval(this.timer)
+    }, 1000)
   }
 }
 export default UI

@@ -30,6 +30,9 @@ socket.on(SOC.STATE_CHANGE, function(state) {
     ;(new Audio('/sounds/start-end.mp3')).play()
   }
 })
+socket.on(SOC.SET_TIMER, function(time_in_seconds) {
+  ui.setTimer(time_in_seconds)
+})
 socket.on(SOC.ALERT, function(message) {
   ui.alert(message)
 })

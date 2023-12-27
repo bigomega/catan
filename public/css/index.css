@@ -34,7 +34,9 @@ body {
   width: fit-content;
 
   > .alert {
-    display: none;
+    opacity: 0;
+    z-index: -10;
+    transition: opacity .25s linear;
     position: fixed;
     top: 20px;
     left: 20px;
@@ -42,7 +44,13 @@ body {
     font-family: papyrus, fantasy;
     font-weight: bold;
     font-size: 2.5em;
+    letter-spacing: 1px;
     text-align: center;
+
+    &.show {
+      z-index: 0;
+      opacity: 1;
+    }
 
     .parchment {
       box-shadow: 2px 3px 20px black, 0 0 125px #8f5922 inset;

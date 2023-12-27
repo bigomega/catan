@@ -82,4 +82,5 @@ export const SOCKET_EVENTS = {
   ALERT: 'alert',
   MINI_ALERT: 'mini_alert',
   STATE_CHANGE: 'state_change',
+  SET_TIMER: 'set_timer',
 }
