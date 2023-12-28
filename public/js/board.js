@@ -49,21 +49,6 @@ class Corner {
     }, [])
   }
 
-  getNeighbours(empty_only) {
-    // let neighbours = []
-    // for (const dir in this.edges) {
-    //   neighbours = neighbours.concat(this.edges[dir]?.jumpCorner(this) || [])
-    // }
-    // return neighbours
-
-    return Object.keys(this.edges).reduce((mem, dir) => {
-      const neighbour = this.edges[dir]?.jumpCorner(this)
-      if (!neighbour) return mem
-      ;(!empty_only || !neighbour.piece) && mem.push(neighbour)
-      return mem
-    }, [])
-  }
-
   hasNoNeighbours() {
     return Object.keys(this.edges).reduce((mem, dir) =>
       mem && !this.edges[dir]?.jumpCorner(this)?.piece
@@ -94,7 +79,7 @@ class Tile {
     }
     /**
      * Just picked corners from existing adjacent tiles
-     * New corners will be created next
+     * New corners for the tile will be created next
      * Creating edge for the new corners and the existing corners
      * and attaching (`setEdge`) it to both corners
      *
@@ -106,14 +91,15 @@ class Tile {
         const newCorner = new Corner
         this.corners[dir] = newCorner
         const OPPOSITES = { top: 'bottom', left: 'right', right: 'left', bottom: 'top' }
-        const c_connections = ({
+        const ALL_CONNECTIONS = { // only for the current Tile
           top: { left: 'top_left', right: 'top_right' },
           top_left: { right: 'top', bottom: 'bottom_left' },
           top_right: { left: 'top', bottom: 'bottom_right' },
           bottom_left: { top: 'top_left', right: 'bottom' },
           bottom_right: { top: 'top_right', left: 'bottom' },
           bottom: { left: 'bottom_left', right: 'bottom_right' },
-        })[dir]
+        }
+        const c_connections = ALL_CONNECTIONS[dir]
         Object.keys(c_connections).forEach(c_dir => {
           const c_loc = c_connections[c_dir]
           // c_dir is direction of other corner from `newCorner`
@@ -164,7 +150,8 @@ export default class Board {
      * Resource -> ResourceKey number
      * ex., +S(r-L2).F3.G5.C6.M12.S
      *
-     * Since decoding always happens from left to right and top to bottom, reuse previous corners
+     * Since decoding always happens from left to right and top to bottom,
+     * we reuse previous corners
      */
     const mapkey_list = mapkey.trim().split('\n')
     for (let i = 0; i < mapkey_list.length; i++) {
@@ -189,15 +176,18 @@ export default class Board {
           top_right: prev_row?.[j + row_diff_tmp + 1],
         }
         if (tile_map[0] == 'S') {
-          const { dir, res, num } = tile_map.match(new RegExp(CONST.SEA_REGEX))?.groups || {}
+          const { dir, res, num } =
+            tile_map.match(new RegExp(CONST.SEA_REGEX))?.groups || {}
           const trade_edge = ({
             tl: 'top_left', tr: 'top_right', l: 'left',
             r: 'right', bl: 'bottom_left', br: 'bottom_right',
           })[dir]
-          const tile = new Tile({ type: 'S', trade_edge, trade_type: res, ...adjacent_tiles })
+          const tile =
+            new Tile({ type: 'S', trade_edge, trade_type: res, ...adjacent_tiles })
           row_list.push(tile)
         } else {
-          const { tile_type, num } = tile_map.match(new RegExp(CONST.RESOURCE_REGEX))?.groups || {}
+          const { tile_type, num } =
+            tile_map.match(new RegExp(CONST.RESOURCE_REGEX))?.groups || {}
           const tile = new Tile({ type: tile_type, num, ...adjacent_tiles })
           num > 1 && num < 13 && this.numbers[num].push(tile)
           row_list.push(tile)
@@ -209,69 +199,31 @@ export default class Board {
     return this
   }
 
+  /**
+   * @description Returns empty corner location without neighbours
+   * @param {number} [player_id]
+   *          -1 : locations with an empty edge
+   *      number : locations with a player road
+   *       falsy : don't care about the edge data
+   * @returns {Tile[]}
+   */
   settlementLocations(player_id) {
-    // not sending player_id ignores the road rule
     const locations = []
     const visited_corners = []
-    this.traverseTiles(tile => {
+    this.tiles.forEach(row => row.forEach(tile => {
       if (tile.type === 'S') return
       for (const corner_dir in tile.corners) {
         const corner = tile.corners[corner_dir]
         if (visited_corners[corner.id]) continue
         visited_corners[corner.id] = 1
         const no_neighbours = corner.hasNoNeighbours()
-        const road_count = corner.getEdges(player_id).length
+        const road_count = !player_id || corner.getEdges(player_id).length
+        // even without the `!pid ||` the `getEdges.len` is truthy when `pid` is fasly
         !corner.piece && no_neighbours && road_count && locations.push(corner)
       }
-    })
-    // c.forEach(_ => document.querySelector(`.corner[data-id=C${_.id}]`).classList.add('shown'))
-    // this.traverseCorners(corner => {
-    //   // how to find the tile? need to skip sea.
-    // })
+    }))
     return locations
   }
-
-  traverseTiles(cb) { this.#traverseTiles(this.head_tile, cb, 1) }
-  #traverseTiles(tile, cb, top_line) {
-    // NOTE: Works on standard (& any LTR) board
-    // from any tile, traverse all the way right
-    // top_line goes bottom-left or bottom-right and does the same
-    if (!tile) return
-    cb(tile)
-    this.#traverseTiles(tile.adjacent_tiles.right, cb)
-    if (!top_line) return
-    tile.adjacent_tiles.bottom_left
-      ? this.#traverseTiles(tile.adjacent_tiles.bottom_left, cb, 1)
-      : this.#traverseTiles(tile.adjacent_tiles.bottom_right, cb, 1)
-    ;
-  }
-
-  // traverseCorners(cb) {
-  //   const start_tile = this.tiles[0]?.[0]
-  //   this.#traverseCorners(start_tile.corners.top_left, cb, 1)
-  // }
-  // #traverseCorners(corner, cb, top_line){
-  //   // Works on standard board, might not on weird custom ones
-  //   // from any corner, go right
-  //   // top_line goes bottom, or left and bottom, or right (skipped) and bottom
-  //   // and keeps going right
-  //   if (!corner) return
-  //   cb(corner)
-  //   this.#traverseCorners(corner.edges.right?.jumpCorner(corner), cb)
-  //   if (!top_line) return
-  //   const bottom_corner = corner.edges.bottom?.jumpCorner(corner)
-  //   const left_corner = corner.edges.left?.jumpCorner(corner)
-  //   const right_corner = corner.edges.right?.jumpCorner(corner)
-  //   if(bottom_corner) {
-  //     this.#traverseCorners(bottom_corner, cb, 1)
-  //   } else if(left_corner) {
-  //     cb(left_corner)
-  //     this.#traverseCorners(left_corner.edges.bottom?.jumpCorner(corner), cb, 1)
-  //   } else if(right_corner) {
-  //     // skip right corner node as the normal line goes through it
-  //     this.#traverseCorners(right_corner.edges.bottom?.jumpCorner(corner), cb, 1)
-  //   }
-  // }
 
   place(item, location) {
     //
