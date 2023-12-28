@@ -1,4 +1,11 @@
 @import '../constants.css';
+
+@keyframes piece-space-blink {
+  50% {
+    background: #b9b8b8aa;
+  }
+}
+
 /* --------------------------------------
  * BOARD
  * -------------
@@ -136,9 +143,22 @@
         background: #fff;
         box-shadow: 0 0 0 2px #000;
       }
+      &:not(:hover) {
+        animation: piece-space-blink 1s infinite;
+      }
     }
 
     &.shown { visibility: visible; }
+
+    &.taken {
+      visibility: visible;
+      border-radius: 0;
+      background-color: transparent;
+      background-size: contain;
+      background-repeat: no-repeat;
+      /* filter: drop-shadow(1px -1px 0px #000) drop-shadow(-1px 1px 0px #000) drop-shadow(1px 1px 0px #000) drop-shadow(-1px -1px 0px #000); */
+      filter: drop-shadow(-3px 3px 3px #000);
+    }
 
     &.p1[data-taken=S] { background-image: url(/images/pieces/settlement-1.png); }
     &.p2[data-taken=S] { background-image: url(/images/pieces/settlement-2.png); }
@@ -154,16 +174,6 @@
       &.p2 { background-image: url(/images/pieces/city-2.png); }
       &.p3 { background-image: url(/images/pieces/city-3.png); }
       &.p4 { background-image: url(/images/pieces/city-4.png); }
-    }
-
-    &.taken {
-      visibility: visible;
-      border-radius: 0;
-      background-color: transparent;
-      background-size: contain;
-      background-repeat: no-repeat;
-      /* filter: drop-shadow(1px -1px 0px #000) drop-shadow(-1px 1px 0px #000) drop-shadow(1px 1px 0px #000) drop-shadow(-1px -1px 0px #000); */
-      filter: drop-shadow(-3px 3px 3px #000);
     }
 
     &[data-dir="top"] { top: -15px; left: 60px; }
@@ -216,6 +226,9 @@
       &:hover {
         background: #fff;
         box-shadow: 1px 1px 0px 1px #000;
+      }
+      &:not(:hover) {
+        animation: piece-space-blink 1s infinite;
       }
     }
 
