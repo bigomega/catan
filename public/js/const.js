@@ -65,15 +65,16 @@ export const GAME_CONFIG = {
 export const GAME_STATES = {
   STRATEGIZE: 'strategize',
   INITIAL_BUILD: 'initial_build',
+  INITIAL_BUILD_2: 'initial_build_2',
   PLAYER_ROLL: 'player_roll',
   PLAYER_ACTIONS: 'player_actions',
   END: 'end',
 }
 
 export const GAME_MESSAGES = {
-  strategize: t => `You have ${t} seconds to Strategize!`,
-  initial_build: `Build a house and then a Road next to it`,
-  initial_build_2: `Build a house and then a Road next to it. You get the surrounding resources this time.`,
+  STRATEGIZE: t => `You have ${t} seconds to Strategize!`,
+  INITIAL_BUILD: `Build your first Settlement and Road`,
+  INITIAL_BUILD_2: `Build your second Settlement and Road. You get the surrounding resources this time.`,
 }
 
 export const SOCKET_EVENTS = {

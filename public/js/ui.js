@@ -175,6 +175,7 @@ class UI {
 
   setTimer(time_in_seconds) {
     this.timer && clearInterval(this.timer)
+    time_in_seconds--
     this.timer = setInterval(_ => {
       const seconds = time_in_seconds % 60
       const minutes = Math.floor(time_in_seconds / 60)

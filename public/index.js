@@ -30,8 +30,11 @@ socket.on(SOC.STATE_CHANGE, function(state) {
     ;(new Audio('/sounds/start-end.mp3')).play()
   }
 })
-socket.on(SOC.SET_TIMER, function(time_in_seconds) {
-  ui.setTimer(time_in_seconds)
-})
+socket.on(SOC.SET_TIMER, t => ui.setTimer(t))
 socket.on(SOC.ALERT, message => ui.alert(message))
-socket.on(SOC.STATUS_BAR, message => ui.setStatus(message))
+socket.on(SOC.STATUS_BAR, (message, player_id) => {
+  ui.setStatus(message)
+  if(player_id === player.id) {
+    ui.alert(message)
+  }
+})
