@@ -5,6 +5,13 @@ Free to play multiplayer catan style board game
 ### Data Structure
 <img src="https://github.com/bigomega/catan/assets/2320747/53b0abb7-78a0-49f3-8de8-0548003b3d81" width="500px"/>
 
+### In Progress
+  - Place first house & road
+  - ~~Alert & Notification Messaging~~
+### Next Steps
+  - Place second house & road
+  - Distribute resource
+  - Render Hand
 
 ## Todo - v1
 - [ ] basic game

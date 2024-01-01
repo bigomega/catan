@@ -23,8 +23,10 @@ app.engine('html', mustacheExpress())
 app.set('view engine', 'html')
 app.set('views', __dirname + '/views')
 
-// TODO: random hexval for game ids
-// TODO: Move to a db for game state maintenance?
+/**
+ * @todo random hexval for game ids
+ * @todo Move to a db for game state maintenance?
+ */
 let games_sessions = { next: 1 }
 
 app.get('/', function (req, res) {
@@ -61,7 +63,7 @@ app.get('/game/:id', function(req, res) {
     return res.redirect('/login?notice=Player not found in the game')
   }
   // res.clearCookie('game_id')
-  const player = game.getPlayer(req.cookies.player_id)
+  // console.log(game.players.length, game.player_count)
   if (game.players.length < game.player_count) {
     res.render('waiting_room', {
       players: JSON.stringify(game.getAllPlayers()),
@@ -70,6 +72,7 @@ app.get('/game/:id', function(req, res) {
     })
     return
   }
+  const player = game.getPlayer(req.cookies.player_id)
   res.render('index', {
     game: JSON.stringify(game),
     player: JSON.stringify(player.toJSON(1)),
@@ -139,14 +142,14 @@ io.on('connection', (socket) => {
 
   socket.on(CONST.SOCKET_EVENTS.PLAYER_ONLINE, function(player_id, game_id) {
     const game = games_sessions[game_id]
-    game.readyPlayers[player_id] = 1
-    if (Object.keys(game.readyPlayers).length === game.player_count) {
+    game.ready_players[player_id] = 1
+    if (Object.keys(game.ready_players).length === game.player_count) {
       game.start()
     }
   })
 
+  /** @todo inform game of the disconnect. pause and continue */
   socket.on('disconnect', () => {
-    // TODO: inform game of the disconnect. pause and continue
     // console.log('User disconnected - ', socket.id)
   })
 })

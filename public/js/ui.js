@@ -1,4 +1,4 @@
-import * as CONST from "/js/const.js"
+import * as CONST from "./const.js"
 const $ = document.querySelector.bind(document)
 
 class PlayerUI {
@@ -10,6 +10,8 @@ class PlayerUI {
 }
 
 class UI {
+  board; player; opponents; timer;
+
   constructor(board, player, opponents) {
     this.board = board
     this.player = player
@@ -109,7 +111,8 @@ class UI {
 
       return `
         <div class="row row-${i + 1}"
-          style="left:calc(${startDiff} * var(--tile-width)/2 + ${startDiff * -1}px); width: calc(var(--tile-width) * ${row.length})"
+          style="left:calc(${startDiff} * var(--tile-width)/2 + ${startDiff * -1}px);
+            width: calc(var(--tile-width) * ${row.length})"
         >
           ${_renderRow(row)}
         </div>
@@ -161,7 +164,7 @@ class UI {
   }
 
   setStatus(message) {
-    $('#game .current-player .status-bar').innerHTML = message
+    $('#game .current-player .status-bar').innerHTML = message.replace(/<br\/?>/g, '. ')
   }
 
   alert(message) {
@@ -171,6 +174,7 @@ class UI {
     setTimeout(_ => {
       $('#game > .alert').classList.remove('show')
     }, 3000)
+    this.setStatus(message)
   }
 
   setTimer(time_in_seconds) {

@@ -1,16 +1,12 @@
 import * as CONST from "../public/js/const.js"
+import GAME_MESSAGES from "../public/js/const_messages.js"
 import * as Helper from "../shuffler/helper.js"
 import Player from "./player.js"
 import Board from "../public/js/board.js"
 
 const ST = CONST.GAME_STATES
 const SOC = CONST.SOCKET_EVENTS
-const MSG = CONST.GAME_MESSAGES
-const DEV_CARDS = []
-DEV_CARDS.push(...[...Array(14)].map(_ => 'dK')) // 14 Knights
-DEV_CARDS.push('dR', 'dR', 'dY', 'dY', 'dM', 'dM') // 2 of each power cards
-DEV_CARDS.push('dL', 'dMr', 'dG', 'dC', 'dU') // 5 victory points
-
+const MSG = Object.keys(GAME_MESSAGES).reduce((m,k) => (m[k]=k,m), {})
 /**
  * -------
  * RULES
@@ -28,41 +24,40 @@ DEV_CARDS.push('dL', 'dMr', 'dG', 'dC', 'dU') // 5 victory points
  */
 
 export default class Game {
-  readyPlayers = {}
-  board = null
-
-  #player_turn = 0
-  get player_turn() { return this.#player_turn }
-  set player_turn(i) { this.#player_turn = i % this.player_count }
-
-  #state = null
-  get state() { return this.#state }
-  set state(s) { this.notify(SOC.STATE_CHANGE, s); this.#state = s }
-
-  constructor({ id, playerName, player_count = 2, config = CONST.GAME_CONFIG, io } = {}) {
-    this.id = id
-    this.players = [ new Player(playerName, 1) ]
-    this.player_count = player_count
-    this.config = config
-    this.io = io
-    // https://alexbeals.com/projects/catan/?game=GqpQiMyykZIHp26cUs8sSnNiDIA
-    // TODO: Map Shuffler
-    this.mapkey = `S(br-S2).S.S(bl-B2).S
+  ready_players = {}
+  player_count = 2
+  config = CONST.GAME_CONFIG
+  dev_cards = Helper.shuffle(CONST.DEVELOPMENT_CARDS_DECK.slice())
+  #active_player = 0
+  /** @todo Map Shuffler */
+  // https://alexbeals.com/projects/catan/?game=GqpQiMyykZIHp26cUs8sSnNiDIA
+  mapkey = `S(br-S2).S.S(bl-B2).S
       -S.M5.J10.J8.S(bl-*3)
       -S(r-O2).J2.C9.G11.C4.S
-      -S.G6.J4.D.F3.F11.S(l-W2)
+      -S.G6.D.D.F3.F11.S(l-W2)
       +S(r-L2).F3.G5.C6.M12.S
       +S.F8.G10.M9.S(tl-*3)
       +S(tr-*3).S.S(tl-*3).S`
+  id; players; #io; #state; board;
 
-    this.dev_cards = Helper.shuffle(DEV_CARDS.slice())
+  get state() { return this.#state }
+  set state(s) { this.emit(SOC.STATE_CHANGE, s); this.#state = s }
+  get active_player() { return this.#active_player }
+  set active_player(i) { this.#active_player = i % this.player_count }
+
+  constructor({ id, player_count, host_name, config, io }) {
+    this.id = id
+    if(player_count) this.player_count = player_count
+    this.players = [ new Player(host_name, 1) ]
+    this.config = config
+    this.#io = io
   }
 
   join(playerName) {
     if (this.players.length >= this.player_count) { return }
     const player = new Player(playerName, this.players.length + 1)
     this.players.push(player)
-    this.notify(SOC.JOINED_WAITING_ROOM, player.toJSON(0))
+    this.emit(SOC.JOINED_WAITING_ROOM, player.toJSON(0))
     return player
   }
 
@@ -71,21 +66,19 @@ export default class Game {
     this.board = new Board(this.mapkey)
     this.state = ST.STRATEGIZE
     const time = this.config.strategize.time
-    const message = MSG.STRATEGIZE(time)
-    this.notify(SOC.ALERT, message)
-    this.notify(SOC.STATUS_BAR, message)
+    this.emitWithPlayer(SOC.ALERT_ALL, MSG.STRATEGIZE, time)
     this.setTimer(time)
   }
 
   next() {
     if (this.state === ST.STRATEGIZE) {
       this.state = ST.INITIAL_BUILD
-      this.notify(SOC.STATUS_BAR, MSG.INITIAL_BUILD, this.player_turn + 1)
+      this.emitWithPlayer(SOC.ALERT_PLAYER, MSG.INITIAL_BUILD)
     }
   }
 
   setTimer(time_in_seconds) {
-    this.notify(SOC.SET_TIMER, time_in_seconds)
+    this.emit(SOC.SET_TIMER, time_in_seconds)
     setTimeout(this.timeOut.bind(this), time_in_seconds * 1000)
   }
 
@@ -93,7 +86,8 @@ export default class Game {
     this.next()
   }
 
-  notify(type, ...data) { this.io.to(this.id + '').emit(type, ...data) }
+  emitWithPlayer(type, ...data) { this.emit(type, this.players[this.active_player], ...data) }
+  emit(type, ...data) { this.#io.to(this.id + '').emit(type, ...data) }
 
   hasPlayer(id) { return id <= this.players.length }
   getPlayer(id) { return this.players[id - 1] }

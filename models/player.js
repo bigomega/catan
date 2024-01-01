@@ -2,16 +2,18 @@ import * as CONST from "../public/js/const.js"
 import * as Helper from "../shuffler/helper.js"
 
 export default class Player {
-  static #names = ['Farmer', 'Builder', 'Trader', 'Blacksmith', 'Knight']
+  static #names = ['Cheran(சே)', 'Cholan(ழ)', 'Paandian(பா)', 'Karikalan(க)']
+  closed_cards = {
+    ...Helper.newObject(CONST.RESOURCES, 0),
+    ...Helper.newObject(CONST.DEVELOPMENT_CARDS, 0),
+  }
+  open_dev_cards = {}
+  trade_offers = Helper.newObject(CONST.TRADE_OFFERS)
+  id; name;
+
   constructor(name, id) {
     this.id = id
-    this.name = name || Player.#names[this.id % Player.#names.length]
-    this.open_dev_cards = {}
-    this.closed_cards = {
-      ...Helper.newObject(CONST.RESOURCES),
-      ...Helper.newObject(CONST.DEVELOPMENT_CARDS),
-    }
-    this.trade_offers = Helper.newObject(CONST.TRADE_OFFERS)
+    this.name = name || Player.#names[this.id - 1]
     this.trade_offers['*4'] = 1
   }
 

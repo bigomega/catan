@@ -16,6 +16,8 @@ export const RESOURCES = {
   W: 'Wheat',
 }
 
+export const RESOURCE_EMOJIS = { S: '🐑', L: '🪵', B: '🧱', O: '🏔', W: '🌾' }
+
 export const SEA_REGEX = `S\\((?<dir>tl|tr|l|r|bl|br)-(?<res>${Object.keys(RESOURCES).join('|')}|\\*)(?<num>\\d*)\\)`
 
 export const RESOURCE_REGEX = `(?<tile_type>[${Object.keys(TILES).join('|')}])(?<num>\\d*)`
@@ -33,6 +35,11 @@ export const DEVELOPMENT_CARDS = {
   dR: 'Road building', dY: 'Year of plenty', dM: 'Monopoly',
   dL: 'Library', dMr: 'Market', dG: 'Great Hall', dC: 'Chapel', dU: 'University',
 }
+
+export const DEVELOPMENT_CARDS_DECK = []
+DEVELOPMENT_CARDS_DECK.push(...[...Array(14)].map(_ => 'dK')) // 14 Knights
+DEVELOPMENT_CARDS_DECK.push('dR','dR', 'dY','dY', 'dM','dM') // 2 of each power cards
+DEVELOPMENT_CARDS_DECK.push('dL', 'dMr', 'dG', 'dC', 'dU') // 5 victory points
 
 export const VICTORY_POINTS = {
   dL: 1, dMr: 1, dG: 1, dC: 1, dU: 1,
@@ -71,17 +78,16 @@ export const GAME_STATES = {
   END: 'end',
 }
 
-export const GAME_MESSAGES = {
-  STRATEGIZE: t => `You have ${t} seconds to Strategize!`,
-  INITIAL_BUILD: `Build your first Settlement and Road`,
-  INITIAL_BUILD_2: `Build your second Settlement and Road. You get the surrounding resources this time.`,
-}
-
 export const SOCKET_EVENTS = {
   JOINED_WAITING_ROOM: 'joined_waiting_room',
   PLAYER_ONLINE: 'player_online',
-  ALERT: 'alert',
-  STATUS_BAR: 'status_bar',
+  ALERT_ALL: 'alert_all',
+  ALERT_PLAYER: 'alert',
+  STATUS_ONLY: 'status_only',
   STATE_CHANGE: 'state_change',
   SET_TIMER: 'set_timer',
+}
+
+export const AUDIO_FILES = {
+  START_END: 'start-end.mp3',
 }

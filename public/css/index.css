@@ -52,6 +52,11 @@ body {
       opacity: 1;
     }
 
+    small {
+      font-size: .5em;
+      text-shadow: none;
+    }
+
     .parchment {
       box-shadow: 2px 3px 20px black, 0 0 125px #8f5922 inset;
       background: #fffef0;

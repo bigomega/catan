@@ -1,7 +1,6 @@
 import Game from "./js/game.js"
 import UI from "./js/ui.js"
-import * as CONST from "./js/const.js"
-const SOC = CONST.SOCKET_EVENTS
+import SocketActions from "./js/socket_actions.js"
 
 // window.COOKIE = (str =>
 //   str
@@ -22,19 +21,4 @@ console.log(player)
 console.log(opponents)
 const ui = new UI(game.board, player, opponents)
 ui.render()
-
-// Notify you're online
-socket.emit(SOC.PLAYER_ONLINE, player.id, game.id)
-socket.on(SOC.STATE_CHANGE, function(state) {
-  if(state === CONST.GAME_STATES.STRATEGIZE) {
-    ;(new Audio('/sounds/start-end.mp3')).play()
-  }
-})
-socket.on(SOC.SET_TIMER, t => ui.setTimer(t))
-socket.on(SOC.ALERT, message => ui.alert(message))
-socket.on(SOC.STATUS_BAR, (message, player_id) => {
-  ui.setStatus(message)
-  if(player_id === player.id) {
-    ui.alert(message)
-  }
-})
+new SocketActions(socket, player, game, ui)
