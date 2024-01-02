@@ -1,12 +1,16 @@
 export default class Edge {
-  static #idCounter = 1
   road
+  static #id_counter = 1
+  static #ref_list = []
 
   constructor(corner1, corner2) {
-    this.id = Edge.#idCounter ++
+    this.id = Edge.#id_counter ++
+    Edge.#ref_list[this.id] = this
     this.corner1 = corner1
     this.corner2 = corner2
   }
+
+  static getRefList() { return this.#ref_list.slice() }
 
   buildRoad(pid) { this.road = pid }
 

@@ -3,12 +3,12 @@ import Corner from "./corner.js"
 import Edge from "./edge.js"
 
 export default class Tile {
-  static #idCounter = 1
-  id; type; num; adjacent_tiles; corners
-  trade_edge; trade_type; robbed
+  id; type; num; adjacent_tiles; corners;
+  trade_edge; trade_type; robbed;
+  static #id_counter = 1
 
   constructor({ type = 'S', num, left, top_left, top_right, trade_edge, trade_type } = {}) {
-    this.id = Tile.#idCounter ++
+    this.id = Tile.#id_counter ++
     this.type = Object.keys(CONST.TILES).includes(type) ? type : 'S'
     this.num = num
     this.adjacent_tiles = { left, top_left, top_right }

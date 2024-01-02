@@ -1,13 +1,17 @@
 import * as CONST from "../const.js"
 
 export default class Corner {
-  static #idCounter = 1
   id; trade; piece; player_id
+  static #id_counter = 1
+  static #ref_list = []
 
   constructor() {
-    this.id = Corner.#idCounter ++
+    this.id = Corner.#id_counter ++
+    Corner.#ref_list[this.id] = this
     this.edges = { top: null, left: null, right: null, bottom: null }
   }
+
+  static getRefList() { return this.#ref_list.slice() }
 
   setEdge(dir, edge) { this.edges[dir] = edge }
   setTrade(type) { this.trade = type }
@@ -15,6 +19,11 @@ export default class Corner {
   buildSettlement(player_id) { this.piece = 'S'; this.player_id = player_id }
   buildCity() { this.piece = 'C' }
 
+  /**
+   * @description -1 for empty edges, pid for pid-roads, all if no pid
+   * @param {number?} [player_id ]
+   * @returns {Edge[]}
+   */
   getEdges(player_id) {
     return Object.keys(this.edges).reduce((mem, dir) => {
       const edge = this.edges[dir]

@@ -8,13 +8,7 @@ export const TILES = {
   D: 'Desert',
 }
 
-export const RESOURCES = {
-  S: 'Sheep',
-  L: 'Lumber',
-  B: 'Brick',
-  O: 'Ore',
-  W: 'Wheat',
-}
+export const RESOURCES = { S: 'Sheep', L: 'Lumber', B: 'Brick', O: 'Ore', W: 'Wheat'}
 
 export const RESOURCE_EMOJIS = { S: '🐑', L: '🪵', B: '🧱', O: '🏔', W: '🌾' }
 
@@ -22,13 +16,7 @@ export const SEA_REGEX = `S\\((?<dir>tl|tr|l|r|bl|br)-(?<res>${Object.keys(RESOU
 
 export const RESOURCE_REGEX = `(?<tile_type>[${Object.keys(TILES).join('|')}])(?<num>\\d*)`
 
-export const TILE_RES = {
-  G: 'S',
-  J: 'L',
-  C: 'B',
-  M: 'O',
-  F: 'W',
-}
+export const TILE_RES = { G: 'S',  J: 'L',  C: 'B',  M: 'O',  F: 'W'}
 
 export const DEVELOPMENT_CARDS = {
   dK: 'Knight',
@@ -41,13 +29,11 @@ DEVELOPMENT_CARDS_DECK.push(...[...Array(14)].map(_ => 'dK')) // 14 Knights
 DEVELOPMENT_CARDS_DECK.push('dR','dR', 'dY','dY', 'dM','dM') // 2 of each power cards
 DEVELOPMENT_CARDS_DECK.push('dL', 'dMr', 'dG', 'dC', 'dU') // 5 victory points
 
-export const VICTORY_POINTS = {
-  dL: 1, dMr: 1, dG: 1, dC: 1, dU: 1,
-}
+export const VICTORY_POINTS = { dL: 1, dMr: 1, dG: 1, dC: 1, dU: 1 }
 
-export const PIECES = {
-  S: 'Settlement', C: 'City', R: 'Road',
-}
+export const LOCS = { CORNER: 'C', EDGE: 'E', TILE: 'T' }
+
+export const PIECES = { S: 'Settlement', C: 'City', R: 'Road' }
 
 export const TRADE_OFFERS = {
   '*4': '4:1',
@@ -79,13 +65,20 @@ export const GAME_STATES = {
 }
 
 export const SOCKET_EVENTS = {
+  // Client Sends…
   JOINED_WAITING_ROOM: 'joined_waiting_room',
   PLAYER_ONLINE: 'player_online',
+  CLICK_LOC: 'clicked_location',
+  // Server Sends…
   ALERT_ALL: 'alert_all',
-  ALERT_PLAYER: 'alert',
-  STATUS_ONLY: 'status_only',
+  ALERT_PLAYER: 'alert_player',
+  STATUS_ONLY: 'update_status_only',
   STATE_CHANGE: 'state_change',
   SET_TIMER: 'set_timer',
+  SHOW_LOCS: 'show_actionable_locations',
+  BUILD: 'build',
+  UPDATE_VP: 'update_victory_points',
+  HIDE_LOCS: 'hide_all_shown_locations',
 }
 
 export const AUDIO_FILES = {

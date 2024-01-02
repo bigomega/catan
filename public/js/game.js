@@ -13,8 +13,10 @@ export default class Game {
     // if their total points == victory, End
   }
 
-  place(player, item, location) {
-    //
+  build({ type, pid, piece, loc }) {
+    /**
+     * @todo Update DS (but why?)
+     */
   }
 
   roll(player) {

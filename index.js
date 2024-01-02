@@ -141,16 +141,16 @@ io.use((socket, next) => {
   next()
 });
 
+const SOC = CONST.SOCKET_EVENTS
 // SOCKET IO ACTIVITIES
 io.on('connection', (socket) => {
   // console.log('User connected - ', socket.id, socket.rooms)
 
-  socket.on(CONST.SOCKET_EVENTS.PLAYER_ONLINE, function(player_id, game_id) {
-    const game = GAME_SESSIONS[game_id]
-    game.ready_players[player_id] = 1
-    if (Object.keys(game.ready_players).length === game.player_count) {
-      game.start()
-    }
+  ;[SOC.PLAYER_ONLINE, SOC.CLICK_LOC].forEach(soc => {
+    socket.on(soc, ({ player_id, game_id }, ...data) => {
+      const game = GAME_SESSIONS[game_id]
+      game.onSocEvents(soc, player_id, ...data)
+    })
   })
 
   /** @todo inform game of the disconnect. pause and continue */

@@ -10,13 +10,16 @@ class PlayerUI {
 }
 
 class UI {
-  board; player; opponents; timer;
+  board; player; opponents; timer; socket_actions;
+  $board = $('#game > .board')
 
   constructor(board, player, opponents) {
     this.board = board
     this.player = player
     this.opponents = opponents
   }
+
+  setSocketActions(sa) { this.socket_actions = sa }
 
   render() {
     this.renderBoard()
@@ -31,7 +34,6 @@ class UI {
     let maxLength = 0
     const renderedCorners = []
     const renderedEdges = []
-    const $board = $('#game > .board')
 
     function _renderCorners(tile) {
       return Object.keys(tile.corners).map(dir => {
@@ -52,19 +54,26 @@ class UI {
     function _renderEdges(tile) {
       return Object.keys(tile.corners).map(dir => {
         const corner = tile.corners[dir]
-        const relevant_edges = ({
+        const relevant_edges = {
           top: ['left', 'right'],
-          top_left: ['right', 'bottom'],
-          top_right: ['left', 'bottom'],
-          bottom_left: ['top', 'right'],
-          bottom_right: ['top', 'left'],
+          top_left: ['bottom'],
+          top_right: ['bottom'],
+          // bottom_left: ['top', 'right'],
+          // bottom_right: ['top', 'left'],
           bottom: ['left', 'right'],
-        })[dir]
-        return relevant_edges.map(e_dir => {
+        }[dir]
+        return relevant_edges?.map(e_dir => {
           const edge = corner.edges[e_dir]
           if (!edge || renderedEdges.includes(edge.id)) { return '' }
           renderedEdges.push(edge.id)
-          return `<div class="edge" data-id="E${edge.id}" data-dir="${dir + '-' + e_dir}"></div>`
+          let css_dir = dir + '-' + e_dir
+          if (e_dir === 'bottom') {
+            css_dir = {
+              'top_left': 'left',
+              'top_right': 'right',
+            }[dir]
+          }
+          return `<div class="edge" data-id="E${edge.id}" data-dir="${css_dir}"></div>`
         }).join('')
       }).join('')
     }
@@ -104,7 +113,7 @@ class UI {
       ).join('')
     }
 
-    $board.innerHTML = this.board.tiles.map((row, i) => {
+    this.$board.innerHTML = this.board.tiles.map((row, i) => {
       startDiff += (row.diff || 0)
       if (startDiff < maxLeft) { maxLeft = startDiff }
       if (row.length > maxLength) { maxLength = row.length }
@@ -119,8 +128,28 @@ class UI {
       `
     }).join('')
 
-    $board.style.paddingLeft = `calc(var(--tile-width) / 2 * ${maxLeft * -1})`
-    $board.style.width = `calc(var(--tile-width) * ${maxLength})`
+    this.$board.style.paddingLeft = `calc(var(--tile-width) / 2 * ${maxLeft * -1})`
+    this.$board.style.width = `calc(var(--tile-width) * ${maxLength})`
+    this.setupEvents()
+  }
+
+  setupEvents() {
+    this.$board.querySelectorAll('.corner').forEach($corner => {
+      $corner.addEventListener('click', e => {
+        if (e.target.classList.contains('shown')) {
+          const id = e.target.dataset.id?.replace(/^C/, '')
+          this.socket_actions.sendLocationClick(CONST.LOCS.CORNER, id)
+        }
+      })
+    })
+    this.$board.querySelectorAll('.edge').forEach($edge => {
+      $edge.addEventListener('click', e => {
+        if (e.target.classList.contains('shown')) {
+          const id = e.target.dataset.id?.replace(/^E/, '')
+          this.socket_actions.sendLocationClick(CONST.LOCS.EDGE, id)
+        }
+      })
+    })
   }
 
   renderAllPlayers() {
@@ -187,6 +216,41 @@ class UI {
       $('#game .current-player .timer').innerHTML = time_text
       --time_in_seconds < 0 && clearInterval(this.timer)
     }, 1000)
+  }
+
+  showCorners(ids = []) {
+    ids.forEach(id => {
+      $(`.corner[data-id=C${id}]`)?.classList.add('shown')
+    })
+  }
+
+  showEdges(ids = []) {
+    ids.forEach(id => {
+      $(`.edge[data-id=E${id}]`)?.classList.add('shown')
+    })
+  }
+
+  showTiles(ids) {}
+
+  hideAllShown() {
+    this.$board.querySelectorAll('.corner.shown, .edge.shown').forEach($el => {
+      $el.classList.remove('shown')
+    })
+  }
+
+  build({ type, pid, piece, loc }) {
+    if (type === CONST.LOCS.CORNER) {
+      const $corner = $(`.corner[data-id=C${loc}]`)
+      if(!$corner) return
+      $corner.classList.remove('shown')
+      $corner.dataset.taken = piece
+      piece === 'S' && $corner.classList.add('taken', `p${pid}`)
+    } else if (type === CONST.LOCS.EDGE) {
+      const $edge = $(`.edge[data-id=E${loc}]`)
+      if(!$edge) return
+      $edge.classList.remove('shown')
+      $edge.classList.add('taken', 'p' + pid)
+    }
   }
 }
 export default UI

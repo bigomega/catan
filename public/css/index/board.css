@@ -133,7 +133,6 @@
     border-radius: 30px;
     position: absolute;
     z-index: 2;
-    cursor: pointer;
     visibility: hidden;
 
     &:not(.taken) {
@@ -148,7 +147,7 @@
       }
     }
 
-    &.shown { visibility: visible; }
+    &.shown { visibility: visible; cursor: pointer; }
 
     &.taken {
       visibility: visible;
@@ -157,7 +156,8 @@
       background-size: contain;
       background-repeat: no-repeat;
       /* filter: drop-shadow(1px -1px 0px #000) drop-shadow(-1px 1px 0px #000) drop-shadow(1px 1px 0px #000) drop-shadow(-1px -1px 0px #000); */
-      filter: drop-shadow(-3px 3px 3px #000);
+      /* filter: drop-shadow(-3px 3px 3px #000); */
+      filter: drop-shadow(-3px 3px 2px #000) drop-shadow(-3px 3px 4px var(--sand-color)) drop-shadow(-3px 3px 5px var(--sand-color));
     }
 
     &.p1[data-taken=S] { background-image: url(/images/pieces/settlement-1.png); }
@@ -212,8 +212,8 @@
   }
 
   .edge {
-    width: 10px;
-    height: 50px;
+    width: 7px;
+    height: 40px;
     background: #fff9;
     position: absolute;
     z-index: 1;
@@ -232,7 +232,7 @@
       }
     }
 
-    &.shown { visibility: visible; }
+    &.shown { visibility: visible; width: 10px; height: 50px; }
 
     &.taken {
       opacity: 1;
@@ -242,18 +242,18 @@
       cursor: default;
       border: 1px solid;
 
-      &.p1 { background: var(--player-1-color); box-shadow: 2px 2px 0px 1px color-mix(in srgb, var(--player-1-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
-      &.p2 { background: var(--player-2-color); box-shadow: 2px 2px 0px 1px color-mix(in srgb, var(--player-2-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
-      &.p3 { background: var(--player-3-color); box-shadow: 2px 2px 0px 1px color-mix(in srgb, var(--player-3-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
-      &.p4 { background: var(--player-4-color); box-shadow: 2px 2px 0px 1px color-mix(in srgb, var(--player-4-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
+      &.p1 { background: var(--player-1-color); box-shadow: 1px 1px 0px 1px color-mix(in srgb, var(--player-1-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
+      &.p2 { background: var(--player-2-color); box-shadow: 1px 1px 0px 1px color-mix(in srgb, var(--player-2-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
+      &.p3 { background: var(--player-3-color); box-shadow: 1px 1px 0px 1px color-mix(in srgb, var(--player-3-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
+      &.p4 { background: var(--player-4-color); box-shadow: 1px 1px 0px 1px color-mix(in srgb, var(--player-4-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
     }
 
     &[data-dir="top-left"] { transform: rotate(60deg) translate(15px, -29px); }
     &[data-dir="top-right"] { transform: rotate(120deg) translate(-56px, -92px); }
-    &[data-dir="top_left-bottom"] { transform: rotate(0deg) translate(-5px, 62px); }
-    &[data-dir="top_right-bottom"] { transform: rotate(0deg) translate(145px, 61px); }
-    &[data-dir="bottom_left-right"] { transform: rotate(120deg) translate(94px, -91px); }
-    &[data-dir="bottom_right-left"] { transform: rotate(60deg) translate(164px, -30px); }
+    &[data-dir="left"] { transform: rotate(0deg) translate(-5px, 62px); }
+    &[data-dir="right"] { transform: rotate(0deg) translate(145px, 61px); }
+    &[data-dir="bottom-left"] { transform: rotate(120deg) translate(94px, -91px); }
+    &[data-dir="bottom-right"] { transform: rotate(60deg) translate(166px, -30px); }
   }
 }
 

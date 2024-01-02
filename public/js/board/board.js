@@ -2,9 +2,9 @@ import * as CONST from "../const.js"
 import Tile from './tile.js'
 
 export default class Board {
+  head_tile
   tiles = []
   numbers = [...Array(13)].map(_ => [])
-  head_tile
 
   constructor(mapkey) {
     /**
@@ -69,12 +69,14 @@ export default class Board {
   }
 
   /**
-   * @description Returns empty corner location without neighbours
+   * @description Returns empty corner location without any corner neighbours
    * @param {number} [player_id]
-   *          -1 : locations with an empty edge
-   *      number : locations with a player road
-   *       falsy : don't care about the edge data
-   * @returns {Tile[]}
+   *          -1 : locations with at least one empty edge
+   *          id : locations with at least one player(id) road
+   * @returns {Corner[]}
+   */
+  /**
+   * @todo Redo this with Corner to Tile link + Corner.getRefList()
    */
   settlementLocations(player_id) {
     const locations = []
@@ -86,8 +88,8 @@ export default class Board {
         if (visited_corners[corner.id]) continue
         visited_corners[corner.id] = 1
         const no_neighbours = corner.hasNoNeighbours()
-        const road_count = !player_id || corner.getEdges(player_id).length
-        // even without the `!pid ||` the `getEdges.len` is truthy when `pid` is fasly
+        const road_count = corner.getEdges(player_id).length
+        // C.getEdges(pid) handles the "-1" case
         !corner.piece && no_neighbours && road_count && locations.push(corner)
       }
     }))
