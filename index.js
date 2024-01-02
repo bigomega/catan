@@ -8,7 +8,6 @@ import http from "http"
 import Game from "./models/game.js"
 import { parse as parseCookie } from "cookie"
 import * as CONST from "./public/js/const.js"
-// import Board from "./public/js/board.js"
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -27,10 +26,10 @@ app.set('views', __dirname + '/views')
  * @todo random hexval for game ids
  * @todo Move to a db for game state maintenance?
  */
-let games_sessions = { next: 1 }
+const GAME_SESSIONS = { next: 1 }
 
 app.get('/', function (req, res) {
-  if (req.cookies.game_id && games_sessions[req.cookies.game_id]) {
+  if (req.cookies.game_id && GAME_SESSIONS[req.cookies.game_id]) {
     res.redirect('/game/' + req.cookies.game_id)
   } else {
     res.redirect('/login')
@@ -40,25 +39,25 @@ app.get('/', function (req, res) {
 app.get('/game/new', function (req, res) {
   // New Game
   const game = new Game({
-    id: games_sessions.next,
+    id: GAME_SESSIONS.next,
     playerName: req.query.name,
     config: CONST.GAME_CONFIG,
     io,
   })
-  games_sessions.next++
+  GAME_SESSIONS.next++
   res.cookie('game_id', game.id, { maxAge: SESSION_EXPIRE_HOURS * 60 * 60 * 1000, httpOnly: true })
   res.cookie('player_id', 1, { maxAge: SESSION_EXPIRE_HOURS * 60 * 60 * 1000, httpOnly: true })
-  games_sessions[game.id] = game
+  GAME_SESSIONS[game.id] = game
   // res.send(`<script>window.location.href = "/game/${game.id}"</script>`)
   res.redirect('/game/' + game.id)
 })
 
 app.get('/game/:id', function(req, res) {
   const game_id = req.params.id
-  if (!game_id || game_id !== req.cookies.game_id || !games_sessions[game_id]) {
+  if (!game_id || game_id !== req.cookies.game_id || !GAME_SESSIONS[game_id]) {
     return res.redirect('/login?notice=Game id not found')
   }
-  const game = games_sessions[game_id]
+  const game = GAME_SESSIONS[game_id]
   if (!req.cookies.player_id || !game.hasPlayer(req.cookies.player_id)) {
     return res.redirect('/login?notice=Player not found in the game')
   }
@@ -82,18 +81,20 @@ app.get('/game/:id', function(req, res) {
 
 app.get('/login', function (req, res) {
   const { gameid, name, notice } = req.query
+  res.clearCookie('game_id')
+  res.clearCookie('player_id')
   if(notice) {
     return res.render('login', { notice })
   }
   if (!gameid) {
     return res.render('login')
   }
-  if (!games_sessions[gameid]) {
+  if (!GAME_SESSIONS[gameid]) {
     return res.render('login', { notice: 'Game not found!' })
   }
 
   // Joining a game
-  const game = games_sessions[gameid]
+  const game = GAME_SESSIONS[gameid]
   const player = game.join(name)
 
   if(!player) {
@@ -112,17 +113,18 @@ app.get('/logout', function (req, res) {
 })
 
 app.get('/all-sessions', function (req, res) {
-  const loggable_json = JSON.parse(JSON.stringify(games_sessions))
+  const loggable_json = JSON.parse(JSON.stringify(GAME_SESSIONS))
   // console.log(loggable_json)
   res.json(loggable_json)
 })
 
 app.get('/clear-sessions/:id?', function(req, res) {
   if (req.params.id) {
-    delete games_sessions[req.params.id]
+    delete GAME_SESSIONS[req.params.id]
     return res.redirect('/all-sessions')
   }
-  games_sessions = { next: 1 }
+  Object.keys(GAME_SESSIONS).forEach(gid => delete GAME_SESSIONS[gid])
+  GAME_SESSIONS.next = 1
   res.redirect('/all-sessions')
 })
 
@@ -130,9 +132,12 @@ app.get('/clear-sessions/:id?', function(req, res) {
 //   next()
 // });
 
+const SOCK_INFO = {}
 io.use((socket, next) => {
   const { game_id, player_id } = parseCookie(socket.handshake.headers.cookie || '')
   socket.join(game_id || 'unroomed')
+  GAME_SESSIONS[game_id]?.setSocketID(player_id, socket.id)
+  SOCK_INFO[socket.id] = { game_id, player_id }
   next()
 });
 
@@ -141,7 +146,7 @@ io.on('connection', (socket) => {
   // console.log('User connected - ', socket.id, socket.rooms)
 
   socket.on(CONST.SOCKET_EVENTS.PLAYER_ONLINE, function(player_id, game_id) {
-    const game = games_sessions[game_id]
+    const game = GAME_SESSIONS[game_id]
     game.ready_players[player_id] = 1
     if (Object.keys(game.ready_players).length === game.player_count) {
       game.start()
@@ -150,7 +155,9 @@ io.on('connection', (socket) => {
 
   /** @todo inform game of the disconnect. pause and continue */
   socket.on('disconnect', () => {
-    // console.log('User disconnected - ', socket.id)
+    const { game_id, player_id } = SOCK_INFO[socket.id]
+    GAME_SESSIONS[game_id]?.removeSocketID(player_id, socket.id)
+    delete SOCK_INFO[socket.id]
   })
 })
 

@@ -61,6 +61,12 @@ export default class Game {
     return player
   }
 
+  setSocketID(pid, sid) { this.players[pid - 1].socket_id = sid }
+  removeSocketID(pid, sid) {
+    if(sid === this.players[pid - 1].socket_id )
+      delete this.players[pid - 1].socket_id
+  }
+
   start() {
     if(this.state) return
     this.board = new Board(this.mapkey)

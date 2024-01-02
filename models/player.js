@@ -9,7 +9,7 @@ export default class Player {
   }
   open_dev_cards = {}
   trade_offers = Helper.newObject(CONST.TRADE_OFFERS)
-  id; name;
+  id; name; socket_id;
 
   constructor(name, id) {
     this.id = id
