@@ -38,7 +38,7 @@ class UI {
     function _renderCorners(tile) {
       return Object.keys(tile.corners).map(dir => {
         const corner = tile.corners[dir]
-        // if(corner.id == 4) {debugger}
+        // if (corner.id == 4) {debugger}
         let $_trade = ''
         if (tile.type === 'S' && tile.trade_edge && corner.trade) {
           $_trade = `<div class="trade-post p-${dir}"></div>`
@@ -241,13 +241,13 @@ class UI {
   build({ type, pid, piece, loc }) {
     if (type === CONST.LOCS.CORNER) {
       const $corner = $(`.corner[data-id=C${loc}]`)
-      if(!$corner) return
+      if (!$corner) return
       $corner.classList.remove('shown')
       $corner.dataset.taken = piece
       piece === 'S' && $corner.classList.add('taken', `p${pid}`)
     } else if (type === CONST.LOCS.EDGE) {
       const $edge = $(`.edge[data-id=E${loc}]`)
-      if(!$edge) return
+      if (!$edge) return
       $edge.classList.remove('shown')
       $edge.classList.add('taken', 'p' + pid)
     }

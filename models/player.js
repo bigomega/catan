@@ -2,7 +2,7 @@ import * as CONST from "../public/js/const.js"
 import * as Helper from "../shuffler/helper.js"
 
 export default class Player {
-  id; name; socket_id;
+  id; name; socket_id; onChange;
   static #names = ['Cheran(சே)', 'Cholan(ழ)', 'Paandian(பா)', 'Karikalan(க)']
   public_vps = 0
   pieces = Object.keys(CONST.PIECES).reduce((mem, p_k) => (mem[p_k] = [], mem), {})
@@ -13,9 +13,10 @@ export default class Player {
   open_dev_cards = {}
   trade_offers = Helper.newObject(CONST.TRADE_OFFERS)
 
-  constructor(name, id) {
+  constructor(name, id, onChange) {
     this.id = id
     this.name = name || Player.#names[this.id - 1]
+    this.onChange = onChange
     this.trade_offers['*4'] = 1
   }
 
@@ -37,6 +38,7 @@ export default class Player {
     if (piece === 'C') {
       this.pieces[piece] = this.pieces[piece].filter(l => l !== location)
       this.public_vps++
+      this.onChange(this.id, 'public_vps')
     }
     piece === 'S' && this.public_vps++
   }

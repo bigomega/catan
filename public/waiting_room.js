@@ -32,7 +32,7 @@ const socket = io()
 socket.on(CONST.SOCKET_EVENTS.JOINED_WAITING_ROOM, function(player) {
   addPlayer(player.id, player.name)
   blurBody(player.id)
-  if(player.id === window.player_count) {
+  if (player.id === window.player_count) {
     document.querySelector('.container').classList.add('hide')
     setTimeout(_ => {
       window.location.reload()

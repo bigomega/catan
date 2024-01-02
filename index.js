@@ -83,7 +83,7 @@ app.get('/login', function (req, res) {
   const { gameid, name, notice } = req.query
   res.clearCookie('game_id')
   res.clearCookie('player_id')
-  if(notice) {
+  if (notice) {
     return res.render('login', { notice })
   }
   if (!gameid) {
@@ -97,7 +97,7 @@ app.get('/login', function (req, res) {
   const game = GAME_SESSIONS[gameid]
   const player = game.join(name)
 
-  if(!player) {
+  if (!player) {
     return res.redirect('/login?notice=Game is full!')
   }
 

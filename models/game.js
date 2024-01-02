@@ -27,7 +27,7 @@ const MSG = Object.keys(GAME_MESSAGES).reduce((m,k) => (m[k]=k,m), {})
  */
 
 export default class Game {
-  #io; #state; board; id; players;
+  #io; #state; #timer; board; id; players;
   #active_player = 0
   ready_players = {}
   player_count = 2
@@ -52,15 +52,15 @@ export default class Game {
 
   constructor({ id, player_count, host_name, config, io }) {
     this.id = id
-    if(player_count) this.player_count = player_count
-    this.players = [ new Player(host_name, 1) ]
+    if (player_count) this.player_count = player_count
+    this.players = [ new Player(host_name, 1, this.onPlayerChange) ]
     this.config = config
     this.#io = io
   }
 
   join(playerName) {
     if (this.players.length >= this.player_count) { return }
-    const player = new Player(playerName, this.players.length + 1)
+    const player = new Player(playerName, this.players.length + 1, this.onPlayerChange)
     this.players.push(player)
     this.emit(SOC.JOINED_WAITING_ROOM, player.toJSON(0))
     return player
@@ -75,7 +75,7 @@ export default class Game {
   }
 
   start() {
-    if(this.state) return
+    if (this.state) return
     this.board = new Board(this.mapkey)
     this.state = ST.STRATEGIZE
     const time = this.config.strategize.time
@@ -83,75 +83,121 @@ export default class Game {
     this.setTimer(time)
   }
 
-  resolveActions() {}
-
   next() {
+    this.clearTimer()
+    const abort_from_resolve = this.resolveActions()
+    if (abort_from_resolve) return
     if (this.state === ST.STRATEGIZE) {
       this.state = ST.INITIAL_BUILD
-      this.emitWithPlayer(SOC.ALERT_PLAYER, MSG.INITIAL_BUILD)
-      const c_ids = this.board.settlementLocations(-1).map(c => c.id)
-      this.emitTo(this.getActivePlayerSoc(), SOC.SHOW_LOCS, { corners: c_ids })
-      this.expected_actions.push({
-        type: CONST.LOCS.CORNER,
-        piece: 'S',
-        from: c_ids,
-        pid: this.active_player,
-      })
+      this._showInitialSettlement()
     } else if (this.state === ST.INITIAL_BUILD) {
-      //
+      if (this.active_player === this.player_count) {
+        this.state = ST.INITIAL_BUILD_2
+      } else {
+        this.active_player++
+      }
+      this._showInitialSettlement()
+    } else if (this.state === ST.INITIAL_BUILD_2) {
+      if (this.active_player === 1) {
+        this.state = ST.PLAYER_ROLL
+        this.setTimer(this.config.roll.time)
+      } else {
+        this.active_player--
+        this._showInitialSettlement()
+      }
     }
   }
 
-  onLocationClick(pid, loc_type, loc) {
+  resolveActions() {
+    let abort_next_execution = false
+    const future_fns = []
+    this.expected_actions.forEach(expected => {
+      const from = expected.from || []
+      const location = from[Math.floor(Math.random() * from.length)]
+      if (expected.type === CONST.LOCS.CORNER) {
+        this.build(expected.pid, expected.type, location, expected.piece)
+        if (this.state === ST.INITIAL_BUILD || this.state === ST.INITIAL_BUILD_2) {
+          future_fns.push(_ => this._showInitialRoad(expected.pid, location))
+          abort_next_execution = true
+        }
+      } else if (expected.type === CONST.LOCS.EDGE) {
+        this.build(expected.pid, expected.type, location, expected.piece)
+      }
+    })
+    this.expected_actions = []
+    // This is to avoid expected_actions being modified before reset
+    future_fns.forEach(fn => fn())
+    return abort_next_execution
+  }
+
+  onLocationClick(pid, type, loc) {
     loc = +loc
     let exp_index = -1
     const expected = this.expected_actions.find((obj, i) => {
-      const check = obj.type === loc_type && obj.pid === pid
+      const check = obj.type === type && obj.pid === pid
       if (check) exp_index = i
       return check
     })
-    if(!expected) return
+    if (!expected) return
     if (!expected.from?.includes(loc)) return
+    const INITIAL_BUILD = this.state === ST.INITIAL_BUILD || this.state === ST.INITIAL_BUILD_2
+    if (type === CONST.LOCS.CORNER) {
+      this.build(pid, type, loc, expected.piece)
+      this.expected_actions.splice(exp_index, 1)
+      INITIAL_BUILD && this._showInitialRoad(pid, loc)
+    } else if (type === CONST.LOCS.EDGE) {
+      this.build(pid, type, loc)
+      this.expected_actions.splice(exp_index, 1)
+      INITIAL_BUILD && this.next()
+    } else if (type === CONST.LOCS.TILE) {}
+  }
+
+  _showInitialSettlement() {
+    const msg_key = this.state === ST.INITIAL_BUILD ? MSG.INITIAL_BUILD : MSG.INITIAL_BUILD_2
+    this.emitWithPlayer(SOC.ALERT_PLAYER, msg_key)
+    const c_ids = this.board.settlementLocations(-1).map(c => c.id)
+    this.emitTo(this.getActivePlayerSoc(), SOC.SHOW_LOCS, { corners: c_ids })
+    this.expected_actions.push({
+      type: CONST.LOCS.CORNER,
+      piece: 'S',
+      from: c_ids,
+      pid: this.active_player,
+    })
+    this.setTimer(this.config.initial_build.time)
+  }
+
+  _showInitialRoad(pid, c_loc) {
+    const e_ids = Corner.getRefList()[c_loc]?.getEdges(-1).map(e => e.id)
+    this.emitTo(this.getPlayerSoc(pid), SOC.SHOW_LOCS, { edges: e_ids })
+    this.expected_actions.push({ type: CONST.LOCS.EDGE, piece: 'R', from: e_ids, pid })
+    this.setTimer(this.config.initial_build.time)
+  }
+
+  build(pid, type, loc, piece) {
     const player = this.getPlayer(pid)
     const p_soc = this.getPlayerSoc(pid)
-    if (loc_type === CONST.LOCS.CORNER) {
+    if (type === CONST.LOCS.CORNER) {
       const corner = Corner.getRefList()[loc]
-      corner?.buildSettlement(pid)
-      player.build(loc, expected.piece)
-      this.emit(SOC.BUILD, { type: CONST.LOCS.CORNER, pid, piece: expected.piece, loc })
-      this.emit(SOC.UPDATE_VP, pid, player.public_vps)
-      this.emitTo(p_soc, SOC.HIDE_LOCS)
-      this.map_changes[CONST.LOCS.CORNER][loc] = { piece: expected.piece, pid }
-      this.expected_actions.splice(exp_index, 1)
-      /**
-       * KINDA HACK?
-       * During Initial Build, after settlement, help build a road
-       */
-      if(this.state === ST.INITIAL_BUILD || this.state === ST.INITIAL_BUILD_2) {
-        const e_ids = corner.getEdges(-1).map(e => e.id)
-        this.emitTo(p_soc, SOC.SHOW_LOCS, { edges: e_ids })
-        this.expected_actions.push({ type: CONST.LOCS.EDGE, piece: 'R', from: e_ids, pid })
-      }
-    } else if (loc_type === CONST.LOCS.EDGE) {
+      piece === 'S' ? corner?.buildSettlement(pid) : corner?.buildCity(pid)
+      player.build(loc, piece)
+      // this.emit(SOC.UPDATE_VP, pid, player.public_vps)
+      this.map_changes[CONST.LOCS.CORNER][loc] = { piece, pid }
+    } else if (type === CONST.LOCS.EDGE) {
       const edge = Edge.getRefList()[loc]
       edge?.buildRoad(pid)
-      player.build(loc, expected.piece)
-      this.emit(SOC.BUILD, { type: CONST.LOCS.EDGE, pid, piece: expected.piece, loc })
-      this.emitTo(p_soc, SOC.HIDE_LOCS)
+      player.build(loc, piece)
       this.map_changes[CONST.LOCS.EDGE][loc] = pid
-      this.expected_actions.splice(exp_index, 1)
-    } else if (loc_type === CONST.LOCS.TILE) {}
+    }
+    this.emit(SOC.BUILD, { type, pid, piece, loc })
+    this.emitTo(p_soc, SOC.HIDE_LOCS)
   }
 
   setTimer(time_in_seconds) {
-    this.emit(SOC.SET_TIMER, time_in_seconds)
-    setTimeout(this.timeOut.bind(this), time_in_seconds * 1000)
+    this.clearTimer()
+    this.emit(SOC.SET_TIMER, time_in_seconds, this.active_player)
+    this.#timer = setTimeout(this.next.bind(this), time_in_seconds * 1000)
   }
-
-  timeOut() {
-    this.resolveActions()
-    this.next()
-  }
+  clearTimer() { clearTimeout(this.#timer) }
 
   onSocEvents(soc, pid, ...data) {
     ;({
@@ -164,6 +210,8 @@ export default class Game {
       [SOC.CLICK_LOC]: this.onLocationClick.bind(this),
     })[soc]?.(pid, ...data)
   }
+
+  onPlayerChange(pid, key) {}
 
   emitWithPlayer(type, ...data) { this.emit(type, this.players[this.#active_player], ...data) }
   emit(type, ...data) { this.#io.to(this.id + '').emit(type, ...data) }
