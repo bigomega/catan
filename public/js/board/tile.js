@@ -2,6 +2,8 @@ import * as CONST from "../const.js"
 import Corner from "./corner.js"
 import Edge from "./edge.js"
 
+const OPPOSITES = { top: 'bottom', left: 'right', right: 'left', bottom: 'top' }
+
 export default class Tile {
   id; type; num; adjacent_tiles; corners;
   trade_edge; trade_type; robbed;
@@ -27,17 +29,18 @@ export default class Tile {
      * Just picked corners from existing adjacent tiles
      * New corners for the tile will be created next
      * Creating edge for the new corners and the existing corners
-     * and attaching (`setEdge`) it to both corners
+     * and attaching (`addEdge`) it to both corners
      *
      * There are always 3 Edges to a corner -> left, right, top/bottom
      */
     Object.keys(this.corners).forEach(dir => {
       // dir is direction of corner from the tile
-      if (!this.corners[dir]) {
-        const newCorner = new Corner
+      if (this.corners[dir]) {
+        this.corners[dir].addTile(this)
+      } else {
+        const newCorner = new Corner(this)
         this.corners[dir] = newCorner
-        const OPPOSITES = { top: 'bottom', left: 'right', right: 'left', bottom: 'top' }
-        const ALL_CONNECTIONS = { // only for the current Tile
+        const ALL_CONNECTIONS = { // only within the current Tile
           top: { left: 'top_left', right: 'top_right' },
           top_left: { right: 'top', bottom: 'bottom_left' },
           top_right: { left: 'top', bottom: 'bottom_right' },
@@ -49,11 +52,11 @@ export default class Tile {
         Object.keys(c_connections).forEach(c_dir => {
           const c_loc = c_connections[c_dir]
           // c_dir is direction of other corner from `newCorner`
-          // c_loc is the location of other corner from tile view (same as dir)
+          // c_loc is the location of other corner from tile view (simillar to dir)
           if (this.corners[c_loc]) {
             const edge = new Edge(newCorner, this.corners[c_loc])
-            newCorner.setEdge(c_dir, edge)
-            this.corners[c_loc].setEdge(OPPOSITES[c_dir], edge)
+            newCorner.addEdge(c_dir, edge)
+            this.corners[c_loc].addEdge(OPPOSITES[c_dir], edge)
           }
         })
       }

@@ -1,4 +1,5 @@
 import * as CONST from "../const.js"
+import Corner from "./corner.js"
 import Tile from './tile.js'
 
 export default class Board {
@@ -81,18 +82,15 @@ export default class Board {
   settlementLocations(player_id) {
     const locations = []
     const visited_corners = []
-    this.tiles.forEach(row => row.forEach(tile => {
-      if (tile.type === 'S') return
-      for (const corner_dir in tile.corners) {
-        const corner = tile.corners[corner_dir]
-        if (visited_corners[corner.id]) continue
-        visited_corners[corner.id] = 1
-        const no_neighbours = corner.hasNoNeighbours()
-        const road_count = corner.getEdges(player_id).length
-        // C.getEdges(pid) handles the "-1" case
-        !corner.piece && no_neighbours && road_count && locations.push(corner)
-      }
-    }))
+    Corner.getRefList().forEach(corner => {
+      if (!corner.tiles.filter(t => t.type !== 'S').length) return
+      if (visited_corners[corner.id]) return
+      visited_corners[corner.id] = 1
+      const no_neighbours = corner.hasNoNeighbours()
+      const road_count = corner.getEdges(player_id).length
+      // C.getEdges(pid) handles the "-1" case
+      !corner.piece && no_neighbours && road_count && locations.push(corner)
+    })
     return locations
   }
 
