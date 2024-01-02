@@ -46,7 +46,10 @@ export default class Game {
       +S(tr-*3).S.S(tl-*3).S`
 
   get state() { return this.#state }
-  set state(s) { this.emit(SOC.STATE_CHANGE, s, this.active_player); this.#state = s }
+  set state(s) {
+    this.emit(SOC.STATE_CHANGE, s, this.getActivePlayer())
+    this.#state = s
+  }
   get active_player() { return this.#active_player + 1 }
   set active_player(pid) { this.#active_player = (pid - 1) % this.player_count }
 
@@ -219,6 +222,7 @@ export default class Game {
 
   hasPlayer(id) { return id <= this.players.length }
   getPlayer(id) { return this.players[id - 1] }
+  getActivePlayer() { return this.players[this.#active_player] }
   getAllPlayers() { return this.players/*.map(p => p.toJSON(false))*/ }
   getOpponentPlayers(id) {
     return this.players.filter((_, i) => i !== (id - 1))//.map(p => p.toJSON(false))

@@ -83,4 +83,7 @@ export const SOCKET_EVENTS = {
 
 export const AUDIO_FILES = {
   START_END: 'start-end.mp3',
+  BOP: 'bop.mp3',
+  DICE: 'dice.mp3',
+  PLAYER_TURN: 'player-turn.mp3',
 }
