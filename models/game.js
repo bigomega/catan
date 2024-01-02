@@ -2,7 +2,7 @@ import * as CONST from "../public/js/const.js"
 import GAME_MESSAGES from "../public/js/const_messages.js"
 import * as Helper from "../shuffler/helper.js"
 import Player from "./player.js"
-import Board from "../public/js/board.js"
+import Board from "../public/js/board/board.js"
 
 const ST = CONST.GAME_STATES
 const SOC = CONST.SOCKET_EVENTS
