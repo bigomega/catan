@@ -2,7 +2,7 @@ import * as CONST from "../public/js/const.js"
 import * as Helper from "../shuffler/helper.js"
 
 export default class Player {
-  id; name; socket_id; onChange;
+  id; name; socket_id; onChange; last_status;
   static #names = ['Cheran(சே)', 'Cholan(ழ)', 'Paandian(பா)', 'Karikalan(க)']
   public_vps = 0
   pieces = Object.keys(CONST.PIECES).reduce((mem, p_k) => (mem[p_k] = [], mem), {})
@@ -58,6 +58,8 @@ export default class Player {
     return picked_res
   }
 
+  setLastStatus(message) { this.last_status = message }
+
   toJSON(get_private) {
     const playerJSON = {
       id: this.id,
@@ -67,6 +69,7 @@ export default class Player {
       dev_card_count: Object.keys(CONST.DEVELOPMENT_CARDS).reduce((mem, k) => mem + this.closed_cards[k], 0),
       open_dev_cards: this.open_dev_cards,
       trade_offers: this.trade_offers,
+      last_status: this.last_status,
       ...(get_private ? {
         private_vps: 0,
         closed_cards: this.closed_cards,

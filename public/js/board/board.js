@@ -3,11 +3,13 @@ import Corner from "./corner.js"
 import Tile from './tile.js'
 
 export default class Board {
-  head_tile
+  head_tile; existing_changes;
   tiles = []
   numbers = [...Array(13)].map(_ => [])
 
-  constructor(mapkey) {
+  constructor(mapkey, existing_changes) {
+    this.mapkey = mapkey
+    this.existing_changes = existing_changes
     /**
      * ============
      * MAP DECODING

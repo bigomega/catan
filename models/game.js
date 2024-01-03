@@ -34,7 +34,9 @@ export default class Game {
   dice_value = [1, 1]
   config = CONST.GAME_CONFIG
   dev_cards = Helper.shuffle(CONST.DEVELOPMENT_CARDS_DECK.slice())
+  /** @prop expected_actions @example [{ type, pid, ...data }] */
   expected_actions = []
+  /** @prop map_changes @example { E: { [loc]: pid }, C: { [loc] : { piece, pid } } } */
   map_changes = Object.values(CONST.LOCS).reduce((mem, k) => (mem[k] = {}, mem), {})
   /** @todo Map Shuffler */
   // https://alexbeals.com/projects/catan/?game=GqpQiMyykZIHp26cUs8sSnNiDIA
@@ -166,23 +168,24 @@ export default class Game {
     return abort_next_execution
   }
 
-  onSocEvents(soc, pid, ...data) {
+  onSocEvents(soc, p_id, ...data) {
     ;({
-      [SOC.PLAYER_ONLINE]: _ => {
+      [SOC.PLAYER_ONLINE]: pid => {
         this.ready_players[pid] = 1
         if (Object.keys(this.ready_players).length === this.player_count) {
           this.start()
         }
       },
       [SOC.CLICK_LOC]: this.onLocationClick.bind(this),
-      [SOC.ROLL_DICE]: _ => {
+      [SOC.ROLL_DICE]: pid => {
         if (this.active_player !== pid) return
         if (this.state !== ST.PLAYER_ROLL) return
         this.dice_value = [CONST.ROLL(), CONST.ROLL()]
         this.expected_actions.findAndRemove({ type: ST.PLAYER_ROLL, pid })
         this.next()
       },
-    })[soc]?.(pid, ...data)
+      [SOC.SAVE_STATUS]: (pid, message) => this.getPlayer(pid).setLastStatus(message),
+    })[soc]?.(p_id, ...data)
   }
 
   onLocationClick(pid, type, loc) {
@@ -282,7 +285,7 @@ export default class Game {
 
   setTimer(time_in_seconds) {
     this.clearTimer()
-    this.emit(SOC.SET_TIMER, time_in_seconds, this.active_player)
+    this.emitWithPlayer(SOC.SET_TIMER, time_in_seconds, this.active_player)
     this.#timer = setTimeout(this.next.bind(this), time_in_seconds * 1000)
   }
   clearTimer() { clearTimeout(this.#timer) }
@@ -300,9 +303,11 @@ export default class Game {
     }
   }
 
-  emitWithPlayer(type, ...data) { this.emit(type, this.players[this.#active_player], ...data) }
   emit(type, ...data) { this.#io.to(this.id + '').emit(type, ...data) }
   emitTo(sid, type, ...data) { this.#io.to(sid).emit(type, ...data) }
+  emitWithPlayer(type, ...data) {
+    this.#io.to(this.id + '').emit(type, this.players[this.#active_player], ...data)
+  }
 
   hasPlayer(id) { return id <= this.players.length }
   getPlayer(id) { return this.players[id - 1] }

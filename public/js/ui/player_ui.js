@@ -2,31 +2,37 @@ import * as CONST from "../const.js"
 const $ = document.querySelector.bind(document)
 
 export default class PlayerUI {
-  #socket_actions; player; timer;
+  #socket_actions; player; timer; hand;
   $timer; $dice;
   $el = $('#game > .current-player')
   $hand = this.$el.querySelector('.hand')
   $action_bar = this.$el.querySelector('.actions')
   $status_bar = this.$el.querySelector('.status-bar')
-  hand = {}
 
-  constructor(player) { this.player = player }
+  constructor(player) {
+    this.player = player
+    this.hand = this.#cleanHandData(this.player.closed_cards)
+  }
 
   setSocketActions(sa) {
     this.#socket_actions = sa
   }
 
   render() {
-    // this.renderHand({S:3,L:9,B:2,O:2,W:2,dK:2,dR:1,dY:1,dM:1,dL:0,dMr:0,dG:1,dC:0,dU:1})
-    // this.renderHand({S:2,L:1,B:7,O:0,W:2,dK:3,dR:0,dY:0,dM:2,dL:0,dMr:0,dG:0,dC:0,dU:1})
-    // this.renderHand({S:11,L:0,B:2,O:0,W:4,dK:0,dR:0,dY:0,dM:0,dL:0,dMr:0,dG:0,dC:0,dU:0})
     this.renderActionBar()
+    this.renderHand()
+    this.$status_bar.innerHTML = this.player.last_status || '...'
   }
 
+  /**
+   * -----------------
+   *   ACTION BAR UI
+   * -----------------
+   */
   renderActionBar() {
     this.$el.classList.add('id-' + this.player.id)
     this.$action_bar.innerHTML = `
-      <div class="timer">0:00</div>
+      <div class="timer disabled">0:00</div>
       <div class="roll-dice disabled" title="Roll Dice (SPACE)">🎲🎲</div>
       <div class="build-road disabled" title="Build Road (R)"><div></div></div>
       <div class="build-settlement disabled" title="Build Settlement (S)">
@@ -56,53 +62,49 @@ export default class PlayerUI {
     })
   }
 
-  updateHand(player, { card_type, count, taken }) {
-    if (taken) {
-      //
-    } else {
-      if (this.hand[card_type]) { this.hand[card_type] += count }
-      else { this.hand[card_type] = count }
-    }
-    this.renderHand()
+  toggleDice(active) {
+    this.$dice.classList[active ? 'remove' : 'add']('disabled')
   }
 
-  #getHandGroups(card_obj) {
-    /**
-     * @todo Move this logic to updateHand()
-     * Keep your hand clean there
-     */
-    // const groups_obj = Object.assign({}, card_obj)
-    // let VPS = 0
-    // // VPs Grouping and Cleaning empty
-    // Object.keys(groups_obj).forEach(key => {
-    //   if (!groups_obj[key]) {
-    //     delete groups_obj[key]
-    //   } else if (key in CONST.DC_VICTORY_POINTS) {
-    //     VPS += groups_obj[key]
-    //     delete groups_obj[key]
-    //   }
-    // })
-    // if (VPS) groups_obj.VPS = VPS
+  resetRenderTimer(pid, time_in_seconds) {
+    this.timer && clearInterval(this.timer)
+    this.$timer.classList[this.player.id === pid ? 'remove' : 'add']('disabled')
+    time_in_seconds--
+    this.timer = setInterval(_ => {
+      const seconds = time_in_seconds % 60
+      const minutes = Math.floor(time_in_seconds / 60)
+      const time_text = minutes + ':' + ('0' + seconds).slice(-2)
+      this.$timer.innerHTML = time_text
+      --time_in_seconds < 0 && clearInterval(this.timer)
+    }, 1000)
+  }
 
-    return Object.keys(card_obj)
-      .reduce((mem, key) => (mem.push([key, card_obj[key]]), mem), [])
+  build(location) { }
+  useDevelopmentCard(type, attr) { }
+
+  /**
+   * ------------
+   *   HAND UI
+   * ------------
+   */
+
+  renderHand() {
+    const hand_groups = Object.keys(this.hand)
+      .reduce((mem, key) => (mem.push([key, this.hand[key]]), mem), [])
       .sort((a, b) => a[0].length - b[0].length)
-  }
-
-  renderHand(given_hand = this.hand) {
-    const hand_groups = this.#getHandGroups(given_hand)
-    const group_length = hand_groups.length
-    const hardcorded_curve_translate = [
+    ;
+    const group_size = hand_groups.length
+    const CURVE_TRANSLATE = [
       [0], [0,0], [10,0,20], [20,0,0,30], [30,5,0,9,40],
       [40,10,0,0,18,50], [50,15,3,0,6,27,60], [55,20,6,0,0,12,36,65],
       [55,20,6,0,-5,0,12,36,65], [55,20,6,0,-5,-5,0,12,36,65],
-    ][group_length - 1]
+    ][group_size - 1]
 
     this.$hand.innerHTML = hand_groups.map(([type, count], i) => {
-      const group_rotation = -15 + (30 / ( group_length - 1 )) * i
-      const group_translate = hardcorded_curve_translate[i]
-      let group_margin = group_length < 4
-        ? 50 : (group_length > 6 ? (group_length > 8 ? -50 : -30) : 0)
+      const group_rotation = -15 + (30 / ( group_size - 1 )) * i
+      const group_translate = CURVE_TRANSLATE[i]
+      let group_margin = group_size < 4
+        ? 50 : (group_size > 6 ? (group_size > 8 ? -50 : -30) : 0)
       return `
         <div
           class="card-group" data-type="${type}" data-count="${count}"
@@ -128,32 +130,52 @@ export default class PlayerUI {
     // this.$hand
   }
 
+  #cleanHandData(cards_obj) {
+    const clean_obj = Object.assign({}, cards_obj)
+    Object.keys(clean_obj).forEach(key => {
+      if (!clean_obj[key]) { delete clean_obj[key] }
+    })
+    return this.#combineVps(clean_obj)
+  }
+
+  #combineVps(cards_obj) {
+    let vps = 0
+    Object.keys(CONST.DC_VICTORY_POINTS).forEach(vp_key => {
+      if (cards_obj[vp_key]) {
+        vps += cards_obj[vp_key]
+        delete cards_obj[vp_key]
+      }
+    })
+    if (vps) { cards_obj.dVps = vps }
+    return cards_obj
+  }
+
+  updateHand(player, { card_type, count, taken }) {
+    if (!count) return
+    let type = card_type
+    if (card_type in CONST.DC_VICTORY_POINTS) { type = 'dVps' }
+    if (taken && this.hand[type]) {
+      if (this.hand[type] - count > -1) { this.hand[type] -= count }
+      if (!this.hand[type]) { delete this.hand[type] }
+    } else if (!taken) {
+      if (this.hand[type]) { this.hand[type] += count }
+      else { this.hand[type] = count }
+    }
+    this.renderHand()
+    // this.updateHandUI()
+  }
+
+  /**
+   * -----------------
+   *   STATUS BAR UI
+   * -----------------
+   */
   setStatus(message) {
     this.$status_bar.innerHTML = message.replace(/<br\/?>/g, '. ')
+    this.#socket_actions.saveStatus(this.$status_bar.innerHTML)
   }
   appendStatus(message) {
     this.$status_bar.innerHTML += message.replace(/<br\/?>/g, '. ')
+    this.#socket_actions.saveStatus(this.$status_bar.innerHTML)
   }
-
-  toggleDice(active) {
-    this.$dice.classList[active ? 'remove' : 'add']('disabled')
-  }
-
-  setTimer(time_in_seconds) {
-    this.timer && clearInterval(this.timer)
-    time_in_seconds--
-    this.timer = setInterval(_ => {
-      const seconds = time_in_seconds % 60
-      const minutes = Math.floor(time_in_seconds / 60)
-      const time_text = minutes + ':' + ('0' + seconds).slice(-2)
-      this.$timer.innerHTML = time_text
-      --time_in_seconds < 0 && clearInterval(this.timer)
-    }, 1000)
-  }
-
-  roll() { }
-
-  build(location) { }
-
-  useDevelopmentCard(type, attr) { }
 }

@@ -18,20 +18,6 @@ const GAME_MESSAGES = {
     self: _ => `Roll your Dice 🎲🎲<br><small>You can optionally play a development card before.</small>`,
     other: pname => `${pname} is rolling 🎲🎲`,
   },
-  ROLL_VALUE: {
-    self: (n, m) => `You rolled a <b>${n + m}</b> 🎲 (${n} & ${m}).`,
-    other: (n, m, pname) => `${pname} rolled a <b>${n + m}</b> 🎲 (${n} & ${m}).`,
-  },
-  RES_TO_EMOJI: {
-    self: res_obj => ' :: ' + Object.keys(res_obj).map(k => {
-      return res_obj[k] + CONST.RESOURCE_EMOJIS[k]
-    }).join(', '),
-    other: _ => '',
-  },
-  _PROXY: {
-    self: _ => _,
-    other: _ => _,
-  },
   PLAYER_TURN: {
     self: _ => `It's your turn to take actions. "End Turn" when you're done.`,
     other: pname => `It's ${pname}'s turn to act.`,
@@ -53,6 +39,20 @@ const GAME_MESSAGES = {
     others: pname => `${pname} has won the game.`,
   },
   // --- STATUS UPDATES ---
+  ROLL_VALUE: {
+    self: (n, m) => `You rolled a <b>${n + m}</b> 🎲 (${n} & ${m}).`,
+    other: (n, m, pname) => `${pname} rolled a <b>${n + m}</b> 🎲 (${n} & ${m}).`,
+  },
+  RES_TO_EMOJI: {
+    self: res_obj => ' :: ' + Object.keys(res_obj).map(k => {
+      return res_obj[k] + CONST.RESOURCE_EMOJIS[k]
+    }).join(', '),
+    other: _ => '',
+  },
+  _PROXY: {
+    self: _ => _,
+    other: _ => _,
+  },
   RESOURCE_COLLECTION: {
     self: _ => `You have receieved ${'TK'}.`,
     other: pname => `${pname} has receieved ${'TK'}.`,

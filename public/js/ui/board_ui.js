@@ -1,3 +1,5 @@
+import Corner from "../board/corner.js"
+import Edge from "../board/edge.js"
 import * as CONST from "../const.js"
 const $ = document.querySelector.bind(document)
 
@@ -109,9 +111,28 @@ export default class BoardUI {
       `
     }).join('')
 
+    this.#updateExisting()
+
     this.$el.style.paddingLeft = `calc(var(--tile-width) / 2 * ${maxLeft * -1})`
     this.$el.style.width = `calc(var(--tile-width) * ${maxLength})`
     this.#setupEvents()
+  }
+
+  #updateExisting() {
+    const existing_changes = this.board.existing_changes
+    if (!existing_changes) return
+    Object.keys(existing_changes).forEach(type => {
+      if (type === CONST.LOCS.EDGE) {
+        Object.keys(existing_changes[type] || {}).forEach(loc => {
+          this.build({ type, loc, pid: existing_changes[type][loc] })
+        })
+      } else if (type === CONST.LOCS.CORNER) {
+        Object.keys(existing_changes[type] || {}).forEach(loc => {
+          const { piece, pid } = existing_changes[type][loc]
+          this.build({ type, loc, piece, pid })
+        })
+      }
+    })
   }
 
   #setupEvents() {
@@ -150,18 +171,26 @@ export default class BoardUI {
     })
   }
 
+  /**
+   * Also updates the board DS (game.js is a deadbeat)
+   */
   build({ type, pid, piece, loc }) {
     if (type === CONST.LOCS.CORNER) {
       const $corner = this.#getCorner(loc)
       if (!$corner) return
+      const corner = Corner.getRefList()[loc]
       $corner.classList.remove('shown')
       $corner.dataset.taken = piece
-      piece === 'S' && $corner.classList.add('taken', `p${pid}`)
+      if (piece === 'S') {
+        $corner.classList.add('taken', `p${pid}`)
+        corner?.buildSettlement(pid)
+      } else { corner?.buildCity() }
     } else if (type === CONST.LOCS.EDGE) {
       const $edge = this.#getEdge(loc)
       if (!$edge) return
       $edge.classList.remove('shown')
       $edge.classList.add('taken', 'p' + pid)
+      Edge.getRefList()[loc]?.buildRoad(pid)
     }
   }
 }

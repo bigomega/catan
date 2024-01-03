@@ -37,7 +37,7 @@ export default class SocketActions {
         },
       })[state]?.()
     })
-    socket.on(SOC.SET_TIMER, t => ui.setTimer(t))
+    socket.on(SOC.SET_TIMER, (p, t) => ui.setTimer(p.id, t))
 
     socket.on(SOC.ALERT_ALL, (alert_player, msg_key, ...data) => {
       ui.alert(this.getMessage(alert_player, msg_key, ...data))
@@ -73,7 +73,6 @@ export default class SocketActions {
         }
       }
       ui.build(obj)
-      // game.build(obj)
     })
 
     socket.on(SOC.UPDATE_PLAYER, (update_player, key, context) => {
@@ -125,5 +124,9 @@ export default class SocketActions {
 
   sendDiceClick() {
     this.socket.emit(SOC.ROLL_DICE, this.game_config)
+  }
+
+  saveStatus(message) {
+    this.socket.emit(SOC.SAVE_STATUS, this.game_config, message)
   }
 }

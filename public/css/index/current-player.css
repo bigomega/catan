@@ -8,17 +8,18 @@
   z-index: 20;
   font-family: sans-serif;
 
+  /* ---- HAND ---- */
   .hand {
     display: flex;
     justify-content: center;
     position: absolute;
-    bottom: 0px;
+    bottom: -120px;
     width: 100%;
     filter: drop-shadow(0px 0px 15px #000);
 
     .card-group {
       position: relative;
-      bottom: 0px;
+      bottom: 120px;
       margin-right: 20px;
       transition: all .05s linear;
 
@@ -26,7 +27,7 @@
       @media screen and (max-width: 700px) { margin-right: -90px !important; }
 
       &:hover {
-        bottom: 80px;
+        bottom: 200px;
       }
 
       .card {
@@ -56,7 +57,7 @@
         &[data-type=dR] { background-size: 1077px; background-position: -16px -245px; }
         &[data-type=dY] { background-size: 1097px; background-position: -338px -247px; }
         &[data-type=dM] { background-size: 1077px; background-position: -177px -239px; }
-        &[data-type=VPS] { background-size: 1047px; background-position: -314px -460px; }
+        &[data-type=dVps] { background-size: 1047px; background-position: -314px -460px; }
       }
 
       .card-count {
@@ -79,6 +80,7 @@
     }
   }
 
+  /* ---- ACTIONS ---- */
   .actions {
     display: flex;
     justify-content: space-around;
@@ -98,6 +100,11 @@
     .timer {
       font-family: monospace;
       font-size: 2em;
+
+      &.disabled {
+        color: #0004;
+        font-weight: 600;
+      }
     }
 
     .roll-dice {

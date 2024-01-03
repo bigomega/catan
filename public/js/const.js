@@ -70,6 +70,7 @@ export const SOCKET_EVENTS = {
   PLAYER_ONLINE: 'player_online',
   CLICK_LOC: 'clicked_location',
   ROLL_DICE: 'roll_the_dice',
+  SAVE_STATUS: 'save_last_status',
   // Server Sends…
   ALERT_ALL: 'alert_all',
   ALERT_PLAYER: 'alert_player',

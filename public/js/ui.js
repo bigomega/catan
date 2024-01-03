@@ -52,7 +52,7 @@ export default class UI {
   // Player & AllPlayers UI
   setStatus(message) { this.player_ui.setStatus(message) }
   appendStatus(message) { this.player_ui.appendStatus(message) }
-  setTimer(t) { this.player_ui.setTimer(t) }
+  setTimer(pid, t) { this.player_ui.resetRenderTimer(pid, t) }
   updatePlayer(update_player, key, context) {
     this.all_players_ui.updatePlayer(update_player, key, context)
     if (this.player.id === update_player.id && key === 'closed_cards') {
