@@ -74,6 +74,7 @@ export const SOCKET_EVENTS = {
   ALERT_ALL: 'alert_all',
   ALERT_PLAYER: 'alert_player',
   STATUS_ONLY: 'update_status_only',
+  APPEND_STATUS: 'append_to_status',
   STATE_CHANGE: 'state_change',
   SET_TIMER: 'set_timer',
   SHOW_LOCS: 'show_actionable_locations',

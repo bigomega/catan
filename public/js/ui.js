@@ -51,6 +51,7 @@ export default class UI {
 
   // Player & AllPlayers UI
   setStatus(message) { this.player_ui.setStatus(message) }
+  appendStatus(message) { this.player_ui.appendStatus(message) }
   setTimer(t) { this.player_ui.setTimer(t) }
   updatePlayer(update_player, key, context) {
     this.all_players_ui.updatePlayer(update_player, key, context)

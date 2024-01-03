@@ -17,9 +17,9 @@ export default class PlayerUI {
   }
 
   render() {
-    // this.renderHand({closed_cards:{S:3,L:9,B:2,O:2,W:2,dK:2,dR:1,dY:1,dM:1,dL:0,dMr:0,dG:1,dC:0,dU:1}})
-    // this.renderHand({closed_cards:{S:2,L:1,B:7,O:0,W:2,dK:3,dR:0,dY:0,dM:2,dL:0,dMr:0,dG:0,dC:0,dU:1}})
-    // this.renderHand({closed_cards:{S:1,L:1,B:2,O:0,W:4,dK:0,dR:0,dY:0,dM:0,dL:0,dMr:0,dG:0,dC:0,dU:0}})
+    // this.renderHand({S:3,L:9,B:2,O:2,W:2,dK:2,dR:1,dY:1,dM:1,dL:0,dMr:0,dG:1,dC:0,dU:1})
+    // this.renderHand({S:2,L:1,B:7,O:0,W:2,dK:3,dR:0,dY:0,dM:2,dL:0,dMr:0,dG:0,dC:0,dU:1})
+    // this.renderHand({S:11,L:0,B:2,O:0,W:4,dK:0,dR:0,dY:0,dM:0,dL:0,dMr:0,dG:0,dC:0,dU:0})
     this.renderActionBar()
   }
 
@@ -130,6 +130,9 @@ export default class PlayerUI {
 
   setStatus(message) {
     this.$status_bar.innerHTML = message.replace(/<br\/?>/g, '. ')
+  }
+  appendStatus(message) {
+    this.$status_bar.innerHTML += message.replace(/<br\/?>/g, '. ')
   }
 
   toggleDice(active) {

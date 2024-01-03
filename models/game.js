@@ -129,7 +129,7 @@ export default class Game {
       if (dice_total === 7) {
         // Robber
       } else {
-        this.distributeResources({ number: dice_total })
+        this.distributeResources({ tile_number: dice_total })
         this.state = ST.PLAYER_ACTIONS
         this.setTimer(this.config.player_turn.time)
       }
@@ -247,14 +247,28 @@ export default class Game {
     this.emitTo(p_soc, SOC.HIDE_LOCS)
   }
 
-  distributeResources({ number, c_id }) {
-    if (number) {
-      this.board.numbers[number]?.forEach(tile => {
+  distributeResources({ tile_number, c_id }) {
+    if (tile_number) {
+      const all_resources = []
+      this.board.numbers[tile_number]?.forEach(tile => {
         const res = CONST.TILE_RES[tile.type]
         tile.getOccupiedCorners().forEach(corner => {
           const count = corner.piece === 'C' ? 2 : 1
+          all_resources.push({ pid: corner.player_id, res, count })
           this.getPlayer(corner.player_id)?.giveCard(res, count)
         })
+      })
+      const pids_resources = all_resources.reduce((mem, { pid, res, count }) => {
+        if (mem[pid]) {
+          if (mem[pid][res]) { mem[pid][res] += count }
+          else { mem[pid][res] = count }
+        } else {
+          mem[pid] = { [res]: count }
+        }
+        return mem
+      }, {})
+      Object.keys(pids_resources).forEach(pid => {
+        this.emitTo(this.getPlayerSoc(pid), SOC.APPEND_STATUS, this.getPlayer(pid), MSG.RES_TO_EMOJI, pids_resources[pid])
       })
     } else if (c_id) {
       const corner = Corner.getRefList()[c_id]

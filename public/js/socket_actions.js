@@ -49,6 +49,10 @@ export default class SocketActions {
     socket.on(SOC.STATUS_ONLY, (alert_player, msg_key, ...data) => {
       ui.setStatus(this.getMessage(alert_player, msg_key, ...data))
     })
+    socket.on(SOC.APPEND_STATUS, (alert_player, msg_key, ...data) => {
+      console.log(this.getMessage(alert_player, msg_key, ...data));
+      ui.appendStatus(this.getMessage(alert_player, msg_key, ...data))
+    })
 
     socket.on(SOC.SHOW_LOCS, locations => {
       locations.corners && ui.showCorners(locations.corners)
