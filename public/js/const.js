@@ -29,7 +29,7 @@ DEVELOPMENT_CARDS_DECK.push(...[...Array(14)].map(_ => 'dK')) // 14 Knights
 DEVELOPMENT_CARDS_DECK.push('dR','dR', 'dY','dY', 'dM','dM') // 2 of each power cards
 DEVELOPMENT_CARDS_DECK.push('dL', 'dMr', 'dG', 'dC', 'dU') // 5 victory points
 
-export const VICTORY_POINTS = { dL: 1, dMr: 1, dG: 1, dC: 1, dU: 1 }
+export const DC_VICTORY_POINTS = { dL: 1, dMr: 1, dG: 1, dC: 1, dU: 1 }
 
 export const LOCS = { CORNER: 'C', EDGE: 'E', TILE: 'T' }
 

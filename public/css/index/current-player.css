@@ -8,6 +8,75 @@
   z-index: 20;
   font-family: sans-serif;
 
+  .hand {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    filter: drop-shadow(0px 0px 15px #000);
+
+    .card-group {
+      position: relative;
+      bottom: 0px;
+      margin-right: 20px;
+      transition: all .05s linear;
+
+      @media screen and (max-width: 900px) { margin-right: -70px !important; }
+      @media screen and (max-width: 700px) { margin-right: -90px !important; }
+
+      &:hover {
+        bottom: 80px;
+      }
+
+      .card {
+        /* cursor: pointer; */
+        width: 140px;
+        height: 212px;
+        /* margin-bottom: -100px; */
+        background-color: #ebd290;
+        border-radius: 15px;
+        border: 1px solid #5a460e;
+        box-shadow: 3px 0px 3px -1px #0006;
+        background-image: url(/images/cards_sprite.png);
+
+        &:not(:first-child) {
+          position: absolute;
+          bottom: 0px;
+        }
+
+        &[data-type=S] { background-size: 1100px; background-position: -176px -13px; }
+        &[data-type=L] { background-size: 1109px; background-position: -639px -9px; }
+        &[data-type=B] { background-size: 1077px; background-position: -12px -15px; }
+        &[data-type=O] { background-size: 1074px; background-position: -326px -5px; }
+        &[data-type=W] { background-size: 1097px; background-position: -484px -9px; }
+        &[data-type=dK] { background-size: 1167px; background-position: -1003px -21px; }
+        &[data-type=dR] { background-size: 1077px; background-position: -16px -245px; }
+        &[data-type=dY] { background-size: 1097px; background-position: -338px -247px; }
+        &[data-type=dM] { background-size: 1077px; background-position: -177px -239px; }
+        &[data-type=VPS] { background-size: 1047px; background-position: -314px -460px; }
+      }
+
+      .card-count {
+        cursor: default;
+        position: absolute;
+        top: -14px;
+        left: 43px;
+        background: #fff;
+        background: #5a460e;
+        color: #ebd290;
+        border-radius: 50px;
+        /* padding: 2px 8px; */
+        width: 25px;
+        height: 22px;
+        text-align: center;
+        padding-top: 3px;
+        /* color: #5a460e; */
+        border: 1px solid #ebd290;
+      }
+    }
+  }
+
   .actions {
     display: flex;
     justify-content: space-around;

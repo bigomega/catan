@@ -48,10 +48,9 @@ export default class UI {
   setStatus(message) { this.player_ui.setStatus(message) }
   setTimer(t) { this.player_ui.setTimer(t) }
   updatePlayer(update_player, key) {
-    console.log(update_player, key)
     this.all_players_ui.updatePlayer(update_player, key)
-    if (this.player === update_player.id) {
-      // this.player_ui.
+    if (this.player.id === update_player.id && key === 'closed_cards') {
+      this.player_ui.renderHand(update_player)
     }
   }
 
