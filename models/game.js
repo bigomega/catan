@@ -228,16 +228,16 @@ export default class Game {
     })[soc]?.(pid, ...data)
   }
 
-  onPlayerUpdate(pid, key) {
+  onPlayerUpdate(pid, key, ...context) {
     const public_json = this.getPlayer(pid)?.toJSON()
     if (['closed_cards'].includes(key)) {
       const private_json = this.getPlayer(pid)?.toJSON(1)
-      this.emitTo(this.getPlayerSoc(pid), SOC.UPDATE_PLAYER, private_json, key)
+      this.emitTo(this.getPlayerSoc(pid), SOC.UPDATE_PLAYER, private_json, key, ...context)
       this.getOtherPlayerSocs(pid).forEach(sid => {
-        this.emitTo(sid, SOC.UPDATE_PLAYER, public_json, key)
+        this.emitTo(sid, SOC.UPDATE_PLAYER, public_json, key, ...context)
       })
     } else {
-      this.emit(SOC.UPDATE_PLAYER, public_json, key)
+      this.emit(SOC.UPDATE_PLAYER, public_json, key, ...context)
     }
   }
 

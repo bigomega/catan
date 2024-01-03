@@ -8,7 +8,7 @@ export default class PlayerUI {
   $hand = this.$el.querySelector('.hand')
   $action_bar = this.$el.querySelector('.actions')
   $status_bar = this.$el.querySelector('.status-bar')
-  hand_groups = []
+  hand = {}
 
   constructor(player) { this.player = player }
 
@@ -51,35 +51,49 @@ export default class PlayerUI {
     //
   }
 
-  #getHandGroups(card_obj) {
-    const groups_obj = Object.assign({}, card_obj)
-    let VPS = 0
-    // VPs Grouping and Cleaning empty
-    Object.keys(groups_obj).forEach(key => {
-      if (!groups_obj[key]) {
-        delete groups_obj[key]
-      } else if (key in CONST.DC_VICTORY_POINTS) {
-        VPS += groups_obj[key]
-        delete groups_obj[key]
-      }
-    })
-    if (VPS) groups_obj.VPS = VPS
+  updateHand(player, { card_type, count, taken }) {
+    if (taken) {
+      //
+    } else {
+      if (this.hand[card_type]) { this.hand[card_type] += count }
+      else { this.hand[card_type] = count }
+    }
+    this.renderHand()
+  }
 
-    return Object.keys(groups_obj)
-      .reduce((mem, key) => (mem.push([key, groups_obj[key]]), mem), [])
+  #getHandGroups(card_obj) {
+    /**
+     * @todo Move this logic to updateHand()
+     * Keep your hand clean there
+     */
+    // const groups_obj = Object.assign({}, card_obj)
+    // let VPS = 0
+    // // VPs Grouping and Cleaning empty
+    // Object.keys(groups_obj).forEach(key => {
+    //   if (!groups_obj[key]) {
+    //     delete groups_obj[key]
+    //   } else if (key in CONST.DC_VICTORY_POINTS) {
+    //     VPS += groups_obj[key]
+    //     delete groups_obj[key]
+    //   }
+    // })
+    // if (VPS) groups_obj.VPS = VPS
+
+    return Object.keys(card_obj)
+      .reduce((mem, key) => (mem.push([key, card_obj[key]]), mem), [])
       .sort((a, b) => a[0].length - b[0].length)
   }
 
-  renderHand({ closed_cards }) {
-    this.hand_groups = this.#getHandGroups(closed_cards)
-    const group_length = this.hand_groups.length
+  renderHand(given_hand = this.hand) {
+    const hand_groups = this.#getHandGroups(given_hand)
+    const group_length = hand_groups.length
     const hardcorded_curve_translate = [
       [0], [0,0], [10,0,20], [20,0,0,30], [30,5,0,9,40],
       [40,10,0,0,18,50], [50,15,3,0,6,27,60], [55,20,6,0,0,12,36,65],
       [55,20,6,0,-5,0,12,36,65], [55,20,6,0,-5,-5,0,12,36,65],
     ][group_length - 1]
 
-    this.$hand.innerHTML = this.hand_groups.map(([type, count], i) => {
+    this.$hand.innerHTML = hand_groups.map(([type, count], i) => {
       const group_rotation = -15 + (30 / ( group_length - 1 )) * i
       const group_translate = hardcorded_curve_translate[i]
       let group_margin = group_length < 4

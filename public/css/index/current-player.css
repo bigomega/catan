@@ -47,7 +47,7 @@
 
         &[data-type=S] { background-size: 1100px; background-position: -176px -13px; }
         &[data-type=L] { background-size: 1109px; background-position: -639px -9px; }
-        &[data-type=B] { background-size: 1077px; background-position: -12px -15px; }
+        &[data-type=B] { background-size: 1077px; background-position: -12px -15px; filter: saturate(1.4) contrast(1.1) brightness(0.85); }
         &[data-type=O] { background-size: 1074px; background-position: -326px -5px; }
         &[data-type=W] { background-size: 1097px; background-position: -484px -9px; }
         &[data-type=dK] { background-size: 1167px; background-position: -1003px -21px; }

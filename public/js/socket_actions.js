@@ -5,6 +5,7 @@ const MSGKEY = Object.keys(GAME_MESSAGES).reduce((m, k) => (m[k] = k, m), {})
 
 export default class SocketActions {
   socket; player; game; ui;
+  #au_bop_delay = 0
   game_config = {}
 
   constructor(socket, player, game, ui) {
@@ -50,13 +51,24 @@ export default class SocketActions {
     })
     socket.on(SOC.BUILD, obj => {
       if (obj.pid === this.player.id) {
-        this.playAudio(CONST.AUDIO_FILES.BOP)
+        if (obj.piece === 'S') {
+          this.playAudio(CONST.AUDIO_FILES.BUILD_SETTLEMENT)
+        } else if (obj.piece === 'C') {
+          this.playAudio(CONST.AUDIO_FILES.BUILD_CITY)
+        } else {
+          this.playAudio(CONST.AUDIO_FILES.BUILD_ROAD)
+        }
       }
       ui.build(obj)
       // game.build(obj)
     })
-    socket.on(SOC.UPDATE_PLAYER, (update_player, key) => {
-      ui.updatePlayer(update_player, key)
+    socket.on(SOC.UPDATE_PLAYER, (update_player, key, context) => {
+      if (key === 'closed_cards' && update_player.id === this.player.id) {
+        for (let i = 0; i < context.count; i++) {
+          this.playAudio(CONST.AUDIO_FILES.BOP)
+        }
+      }
+      ui.updatePlayer(update_player, key, context)
     })
   }
 
@@ -67,6 +79,12 @@ export default class SocketActions {
   }
 
   playAudio(file) {
+    if (file === CONST.AUDIO_FILES.BOP) {
+      if (new Date - this.#au_bop_delay < 200) {
+        return setTimeout(_ => this.playAudio(file).bind(this), 200)
+      }
+      this.#au_bop_delay = new Date
+    }
     try {
       ; (new Audio('/sounds/' + file)).play()
     } catch (e) {

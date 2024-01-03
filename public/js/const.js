@@ -83,6 +83,9 @@ export const SOCKET_EVENTS = {
 
 export const AUDIO_FILES = {
   START_END: 'start-end.mp3',
+  BUILD_ROAD: 'build-road.mp3',
+  BUILD_SETTLEMENT: 'build-settlement.mp3',
+  BUILD_CITY: 'build-city.mp3',
   BOP: 'bop.mp3',
   DICE: 'dice.mp3',
   PLAYER_TURN: 'player-turn.mp3',

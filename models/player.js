@@ -26,13 +26,13 @@ export default class Player {
 
   giveCard(card_type, count) {
     this.closed_cards[card_type] += count
-    this.onChange(this.id, 'closed_cards')
+    this.onChange(this.id, 'closed_cards', { card_type, count })
   }
 
   takeCard(card_type, count) {
     if (this.closed_cards[card_type] - count < 0) { throw "Cannot take more" }
     this.closed_cards[card_type] -= count
-    this.onChange(this.id, 'closed_cards')
+    this.onChange(this.id, 'closed_cards', { card_type, count, taken: true })
   }
 
   build(location, piece) {
