@@ -30,6 +30,7 @@ const MSG = Object.keys(GAME_MESSAGES).reduce((m,k) => (m[k]=k,m), {})
  * @todo Needs Cleanup
  */
 export default class Game {
+  // SOC_EVENTS;
   #io; #state; #timer; board; id; players;
   #active_player = 0
   ready_players = {}
@@ -65,19 +66,6 @@ export default class Game {
     this.players = [ new Player(host_name, 1, this.onPlayerUpdate.bind(this)) ]
     this.config = config
     this.#io = io
-    this.#setupExpectedArrayFns()
-  }
-
-  #setupExpectedArrayFns() {
-    this.expected_actions.findAndRemove = obj => {
-      const obj_keys = Object.keys(obj)
-      if (!obj_keys.length) return
-      const index = this.expected_actions.findIndex(o2 =>
-        obj_keys.reduce((mem, k) => mem && (obj[k] === o2[k]), true)
-      )
-      index > -1 && this.expected_actions.splice(index, 1)
-      return this.expected_actions
-    }
   }
 
   join(playerName) {
@@ -91,10 +79,7 @@ export default class Game {
   setSocketID(pid, sid) {
     this.getPlayer(pid) && this.getPlayer(pid).setSocket(sid)
   }
-  removeSocketID(pid, sid) {
-    if (sid === this.getPlayer(pid)?.socket_id)
-      this.getPlayer(pid).deleteSocket()
-  }
+  removeSocketID(pid, sid) { this.getPlayer(pid).deleteSocket(sid) }
 
   start() {
     if (this.state) return
@@ -105,48 +90,83 @@ export default class Game {
     this.setTimer(time)
   }
 
+  /**
+   * ------------------------
+   * ------ STATE MANAGEMENT
+   * ------------------------
+   */
   next() {
     this.clearTimer()
-    const abort_from_resolve = this.resolveActions()
-    if (abort_from_resolve) return
-    if (this.state === ST.STRATEGIZE) {
-      this.state = ST.INITIAL_BUILD
-      this._showInitialSettlement()
-    } else if (this.state === ST.INITIAL_BUILD) {
-      if (this.active_player === this.player_count) {
-        this.state = ST.INITIAL_BUILD_2
-      } else {
-        this.active_player++
-      }
-      this._showInitialSettlement()
-    } else if (this.state === ST.INITIAL_BUILD_2) {
-      if (this.active_player === 1) {
-        this.state = ST.PLAYER_ROLL
-        this.expected_actions.push({ type: ST.PLAYER_ROLL, pid: this.active_player })
-        this.setTimer(this.config.roll.time)
-      } else {
-        this.active_player--
+    if (this._resolvePendingActions()) return
+
+    ;({
+      [ST.STRATEGIZE]: _ => {
+        this._switchState()
         this._showInitialSettlement()
-      }
-    } else if (this.state === ST.PLAYER_ROLL) {
-      this.emitWithPlayer(SOC.DICE_VALUE, this.dice_value)
-      const dice_total = this.dice_value[0] + this.dice_value[1]
-      if (dice_total === 7) {
-        // Robber
-      } else {
-        this.distributeResources({ tile_number: dice_total })
-        this.state = ST.PLAYER_ACTIONS
-        this.setTimer(this.config.player_turn.time)
-      }
-    } else if (this.state === ST.PLAYER_ACTIONS) {
-      this.active_player++
-      this.state = ST.PLAYER_ROLL
-      this.expected_actions.push({ type: ST.PLAYER_ROLL, pid: this.active_player })
-      this.setTimer(this.config.roll.time)
-    }
+      },
+      [ST.INITIAL_BUILD]: _ => {
+        this._isFinalPlayer() ? this._switchState() : this._nextPlayer()
+        this._showInitialSettlement()
+      },
+      [ST.INITIAL_BUILD_2]: _ => {
+        if (!this.#active_player) {
+          this.startRoll()
+          return
+        }
+        this._previousPlayer()
+        this._showInitialSettlement()
+      },
+      [ST.PLAYER_ROLL]: _ => this.handleRoll(),
+      [ST.PLAYER_ACTIONS]: _ => {
+        this._nextPlayer()
+        this.startRoll()
+      },
+    })[this.state]?.()
   }
 
-  resolveActions() {
+  _switchState() {
+    const state_order =[ST.STRATEGIZE, ST.INITIAL_BUILD, ST.INITIAL_BUILD_2, ST.PLAYER_ROLL,
+      ST.PLAYER_ACTIONS, ST.PLAYER_ROLL]
+    this.state = state_order[state_order.indexOf(this.state) + 1]
+  }
+  _isFinalPlayer() { return this.active_player === this.player_count }
+
+  // INITIAL BUILD PHASE 1 & 2
+  _showInitialSettlement() {
+    const msg_key = this.state === ST.INITIAL_BUILD ? MSG.INITIAL_BUILD : MSG.INITIAL_BUILD_2
+    this.emitWithPlayer(SOC.ALERT_PLAYER, msg_key)
+    const c_ids = this.board.settlementLocations(-1).map(c => c.id)
+    this.emitTo(this.getActivePlayerSoc(), SOC.SHOW_LOCS, { corners: c_ids })
+    this.expected_actions.push({
+      type: CONST.LOCS.CORNER,
+      piece: 'S',
+      from: c_ids,
+      pid: this.active_player,
+    })
+    this.setTimer(this.config.initial_build.time)
+  }
+
+  startRoll() {
+    this._switchState()
+    this.expected_actions.push({ type: ST.PLAYER_ROLL, pid: this.active_player })
+    this.setTimer(this.config.roll.time)
+  }
+  handleRoll() {
+    this.emitWithPlayer(SOC.DICE_VALUE, this.dice_value)
+    const dice_total = this.dice_value[0] + this.dice_value[1]
+    if (dice_total === 7) {
+      // Robber
+    } else {
+      this._distributeTileResources(dice_total)
+      this._switchState()
+      this.setTimer(this.config.player_turn.time)
+    }
+  }
+  _nextPlayer() { this.active_player++ }
+  _previousPlayer() { this.active_player-- }
+
+  // Resolve Unresolved Expected Actions
+  _resolvePendingActions() {
     let abort_next_execution = false
     const future_fns = []
     this.expected_actions.forEach(expected => {
@@ -154,7 +174,7 @@ export default class Game {
       const location = from[Math.floor(Math.random() * from.length)]
       if (expected.type === CONST.LOCS.CORNER) {
         this.build(expected.pid, expected.type, location, expected.piece)
-        this.state === ST.INITIAL_BUILD_2 && this.distributeResources({ c_id: location })
+        this.state === ST.INITIAL_BUILD_2 && this._distributeCornerResources(location)
         if (this.state === ST.INITIAL_BUILD || this.state === ST.INITIAL_BUILD_2) {
           future_fns.push(_ => this._showInitialRoad(expected.pid, location))
           abort_next_execution = true
@@ -171,28 +191,61 @@ export default class Game {
     return abort_next_execution
   }
 
-  onSocEvents(soc, p_id, ...data) {
-    ;({
-      [SOC.PLAYER_ONLINE]: pid => {
-        this.ready_players[pid] = 1
-        if (Object.keys(this.ready_players).length === this.player_count) {
-          this.start()
-        }
-      },
-      [SOC.CLICK_LOC]: this.onLocationClick.bind(this),
-      [SOC.ROLL_DICE]: pid => {
-        if (this.active_player !== pid) return
-        if (this.state !== ST.PLAYER_ROLL) return
-        this.dice_value = [CONST.ROLL(), CONST.ROLL()]
-        this.expected_actions.findAndRemove({ type: ST.PLAYER_ROLL, pid })
-        this.next()
-      },
-      [SOC.SAVE_STATUS]: (pid, message) => this.getPlayer(pid).setLastStatus(message),
-    })[soc]?.(p_id, ...data)
+  _distributeTileResources(tile_number) {
+    const all_resources = []
+    this.board.numbers[tile_number]?.forEach(tile => {
+      const res = CONST.TILE_RES[tile.type]
+      tile.getOccupiedCorners().forEach(corner => {
+        const count = corner.piece === 'C' ? 2 : 1
+        all_resources.push({ pid: corner.player_id, res, count })
+        this.getPlayer(corner.player_id)?.giveCard(res, count)
+      })
+    })
+    const pids_resources = all_resources.reduce((mem, { pid, res, count }) => {
+      if (mem[pid]) {
+        if (mem[pid][res]) { mem[pid][res] += count }
+        else { mem[pid][res] = count }
+      } else {
+        mem[pid] = { [res]: count }
+      }
+      return mem
+    }, {})
+    Object.keys(pids_resources).forEach(pid => {
+      this.emitTo(this.getPlayerSoc(pid), SOC.APPEND_STATUS, this.getPlayer(pid), MSG.RES_TO_EMOJI, pids_resources[pid])
+    })
   }
 
-  onLocationClick(pid, type, loc) {
+  /**
+   * -------------------------------
+   * -------- SOCKET EVENT HANDLER
+   * -------------------------------
+   */
+  SOC_EVENTS = {
+    [SOC.PLAYER_ONLINE]: pid => {
+      this.ready_players[pid] = 1
+      if (Object.keys(this.ready_players).length === this.player_count) {
+        this.start()
+      }
+    },
+
+    [SOC.CLICK_LOC]: this._onLocationClick.bind(this),
+
+    [SOC.ROLL_DICE]: pid => {
+      if (this.active_player !== pid) return
+      if (this.state !== ST.PLAYER_ROLL) return
+      this.dice_value = [CONST.ROLL(), CONST.ROLL()]
+      this.expected_actions = this.expected_actions.filter(_ =>
+        !(_.type === ST.PLAYER_ROLL && _.pid == pid))
+      this.next()
+    },
+
+    [SOC.SAVE_STATUS]: (pid, message) => this.getPlayer(pid).setLastStatus(message),
+  }
+  onSocEvents(soc, pid, ...data) { this.SOC_EVENTS[soc]?.(pid, ...data) }
+
+  _onLocationClick(pid, type, loc) {
     loc = +loc
+    const is_initial_build = [ST.INITIAL_BUILD, ST.INITIAL_BUILD_2].includes(this.state)
     let exp_index = -1
     const expected = this.expected_actions.find((obj, i) => {
       const check = obj.type === type && obj.pid === pid
@@ -201,35 +254,19 @@ export default class Game {
     })
     if (!expected) return
     if (!expected.from?.includes(loc)) return
-    const INITIAL_BUILD = this.state === ST.INITIAL_BUILD || this.state === ST.INITIAL_BUILD_2
     if (type === CONST.LOCS.CORNER) {
       this.build(pid, type, loc, expected.piece)
       this.expected_actions.splice(exp_index, 1)
       // Intiatal Build Stuff
-      this.state === ST.INITIAL_BUILD_2 && this.distributeResources({ c_id: loc })
-      INITIAL_BUILD && this._showInitialRoad(pid, loc)
+      this.state === ST.INITIAL_BUILD_2 && this._distributeCornerResources(loc)
+      is_initial_build && this._showInitialRoad(pid, loc)
     } else if (type === CONST.LOCS.EDGE) {
       this.build(pid, type, loc, 'R')
       this.expected_actions.splice(exp_index, 1)
       // Intiatal Build Stuff
-      INITIAL_BUILD && this.next()
+      is_initial_build && this.next()
     } else if (type === CONST.LOCS.TILE) {}
   }
-
-  _showInitialSettlement() {
-    const msg_key = this.state === ST.INITIAL_BUILD ? MSG.INITIAL_BUILD : MSG.INITIAL_BUILD_2
-    this.emitWithPlayer(SOC.ALERT_PLAYER, msg_key)
-    const c_ids = this.board.settlementLocations(-1).map(c => c.id)
-    this.emitTo(this.getActivePlayerSoc(), SOC.SHOW_LOCS, { corners: c_ids })
-    this.expected_actions.push({
-      type: CONST.LOCS.CORNER,
-      piece: 'S',
-      from: c_ids,
-      pid: this.active_player,
-    })
-    this.setTimer(this.config.initial_build.time)
-  }
-
   _showInitialRoad(pid, c_loc) {
     const e_ids = Corner.getRefList()[c_loc]?.getEdges(-1).map(e => e.id)
     this.emitTo(this.getPlayerSoc(pid), SOC.SHOW_LOCS, { edges: e_ids })
@@ -237,36 +274,20 @@ export default class Game {
     this.setTimer(this.config.initial_build.time)
   }
 
-  getValidRoadLocs(pid) {
-    // console.log(this.getPlayer(pid).pieces);
-    const valid_locs = this.getPlayer(pid).pieces.R?.reduce((mem, r_loc) => {
-      // console.log(r_loc)
-      const edge = Edge.getRefList()[r_loc]
-      const c1_eids = edge?.corner1.getEdges(-1).map(e => e.id)
-      const c2_eids = edge?.corner2.getEdges(-1).map(e => e.id)
-      // console.log(c1_eids, c2_eids)
-      return mem.concat(c1_eids, c2_eids)
-    }, [])
-    // remove duplicates
-    return [...new Set(valid_locs)]
-  }
-  getValidSettlementLocs(pid) {
-    const reachable_locs = this.getPlayer(pid).pieces.R?.reduce((mem, r_loc) => {
-      const edge = Edge.getRefList()[r_loc]
-      return mem.concat(edge?.corner1.id, edge?.corner1.id)
-    }, [])
-    const visited_corners = []
-    const valid_locs = reachable_locs.filter(c_id => {
-      if (visited_corners.includes(c_id)) { return false }
-      visited_corners.push(c_id)
-      const corner = Corner.getRefList()[c_id]
-      if (corner.piece) { return false }
-      return corner?.hasNoNeighbours()
+  _distributeCornerResources(c_id) {
+    const corner = Corner.getRefList()[c_id]
+    if (!corner || !corner.player_id) return
+    const player = this.getPlayer(corner.player_id)
+    corner.tiles.forEach(tile => {
+      CONST.TILE_RES[tile.type] && player.giveCard(CONST.TILE_RES[tile.type], 1)
     })
-    return valid_locs
   }
-  getValidCityLocs(pid) { return this.getPlayer(pid).pieces.S }
 
+  /**
+   * --------------------------------------------------
+   * ----- MISC - BUILD, TIMER, HELPER - EMIT, PLAYER
+   * --------------------------------------------------
+   */
   build(pid, type, loc, piece) {
     const player = this.getPlayer(pid)
     const p_soc = this.getPlayerSoc(pid)
@@ -283,39 +304,6 @@ export default class Game {
     }
     this.emit(SOC.BUILD, { type, pid, piece, loc })
     this.emitTo(p_soc, SOC.HIDE_LOCS)
-  }
-
-  distributeResources({ tile_number, c_id }) {
-    if (tile_number) {
-      const all_resources = []
-      this.board.numbers[tile_number]?.forEach(tile => {
-        const res = CONST.TILE_RES[tile.type]
-        tile.getOccupiedCorners().forEach(corner => {
-          const count = corner.piece === 'C' ? 2 : 1
-          all_resources.push({ pid: corner.player_id, res, count })
-          this.getPlayer(corner.player_id)?.giveCard(res, count)
-        })
-      })
-      const pids_resources = all_resources.reduce((mem, { pid, res, count }) => {
-        if (mem[pid]) {
-          if (mem[pid][res]) { mem[pid][res] += count }
-          else { mem[pid][res] = count }
-        } else {
-          mem[pid] = { [res]: count }
-        }
-        return mem
-      }, {})
-      Object.keys(pids_resources).forEach(pid => {
-        this.emitTo(this.getPlayerSoc(pid), SOC.APPEND_STATUS, this.getPlayer(pid), MSG.RES_TO_EMOJI, pids_resources[pid])
-      })
-    } else if (c_id) {
-      const corner = Corner.getRefList()[c_id]
-      if (!corner || !corner.player_id) return
-      const player = this.getPlayer(corner.player_id)
-      corner.tiles.forEach(tile => {
-        CONST.TILE_RES[tile.type] && player.giveCard(CONST.TILE_RES[tile.type], 1)
-      })
-    }
   }
 
   setTimer(time_in_seconds) {

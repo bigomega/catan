@@ -1,5 +1,7 @@
 import * as CONST from "../public/js/const.js"
 import * as Helper from "../shuffler/helper.js"
+import Corner from "../public/js/board/corner.js"
+import Edge from "../public/js/board/edge.js"
 
 export default class Player {
   id; name; socket_id; onChange; last_status;
@@ -23,7 +25,7 @@ export default class Player {
 
   getSocket() { return this.socket_id }
   setSocket(sid) { this.socket_id = sid }
-  deleteSocket() { delete this.socket_id }
+  deleteSocket(sid) { if (sid == this.socket_id) { delete this.socket_id } }
 
   giveCard(card_type, count) {
     this.closed_cards[card_type] += count
@@ -61,6 +63,30 @@ export default class Player {
   }
 
   setLastStatus(message) { this.last_status = message }
+
+  getValidRoadLocs() {
+    const valid_locs = this.pieces.R.reduce((mem, r_loc) => {
+      const edge = Edge.getRefList()[r_loc]
+      const c1_eids = edge?.corner1.getEdges(-1).map(e => e.id)
+      const c2_eids = edge?.corner2.getEdges(-1).map(e => e.id)
+      return mem.concat(c1_eids, c2_eids)
+    }, [])
+    // remove duplicates
+    return [...new Set(valid_locs)]
+  }
+
+  getValidSettlementLocs() {
+    const reachable_locs = this.pieces.R.reduce((mem, r_loc) => {
+      const edge = Edge.getRefList()[r_loc]
+      return mem.concat(edge?.corner1.id, edge?.corner1.id)
+    }, [])
+    return [...new Set(reachable_locs)].filter(c_id => {
+      if (Corner.getRefList()[c_id]?.piece) { return false }
+      return Corner.getRefList()[c_id]?.hasNoNeighbours()
+    })
+  }
+
+  getValidCityLocs(pid) { return this.getPlayer(pid).pieces.S }
 
   toJSON(get_private) {
     const playerJSON = {
