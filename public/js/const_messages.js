@@ -19,8 +19,12 @@ const GAME_MESSAGES = {
     other: pname => `${pname} is rolling 🎲🎲`,
   },
   ROLL_VALUE: {
-    self: (n, m) => `You rolled a <b>${n + m}</b> (${n} and ${m}).`,
-    other: (n, m, pname) => `${pname} rolled a <b>${n + m}</b> (${n} and ${m}).`,
+    self: (n, m) => `You rolled a <b>${n + m}</b> 🎲 (${n} & ${m}).`,
+    other: (n, m, pname) => `${pname} rolled a <b>${n + m}</b> 🎲 (${n} & ${m}).`,
+  },
+  PLAYER_TURN: {
+    self: _ => `It's your turn to take actions. "End Turn" when you're done.`,
+    other: pname => `It's ${pname}'s turn to act.`,
   },
   KNIGHT_ARMY: {
     self: _ => `You now own the Knight Army ⚔️`,

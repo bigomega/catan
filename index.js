@@ -146,7 +146,7 @@ const SOC = CONST.SOCKET_EVENTS
 io.on('connection', (socket) => {
   // console.log('User connected - ', socket.id, socket.rooms)
 
-  ;[SOC.PLAYER_ONLINE, SOC.CLICK_LOC].forEach(soc => {
+  ;[SOC.PLAYER_ONLINE, SOC.CLICK_LOC, SOC.ROLL_DICE].forEach(soc => {
     socket.on(soc, ({ player_id, game_id }, ...data) => {
       const game = GAME_SESSIONS[game_id]
       game.onSocEvents(soc, player_id, ...data)

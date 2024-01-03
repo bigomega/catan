@@ -3,7 +3,7 @@ const $ = document.querySelector.bind(document)
 
 export default class PlayerUI {
   #socket_actions; player; timer;
-  $timer;
+  $timer; $dice;
   $el = $('#game > .current-player')
   $hand = this.$el.querySelector('.hand')
   $action_bar = this.$el.querySelector('.actions')
@@ -39,16 +39,21 @@ export default class PlayerUI {
         <img src="/images/dc-back.png"/>
       </div>
       <div class="trade">Trade</div>
-      <div class="end-turn" title="End Turn (E)">End Turn</div>
+      <div class="end-turn disabled" title="End Turn (E)">End Turn</div>
     `
     this.#setRefs()
     this.#setupActionEvents()
   }
   #setRefs() {
-    this.$timer = this.$el.querySelector('.timer')
+    this.$timer = this.$action_bar.querySelector('.timer')
+    this.$dice = this.$action_bar.querySelector('.roll-dice')
   }
   #setupActionEvents() {
-    //
+    this.$dice.addEventListener('click', e => {
+      if(e.target.classList.contains('disabled')) return
+      this.#socket_actions.sendDiceClick()
+      e.target.classList.add('disabled')
+    })
   }
 
   updateHand(player, { card_type, count, taken }) {
@@ -125,6 +130,10 @@ export default class PlayerUI {
 
   setStatus(message) {
     this.$status_bar.innerHTML = message.replace(/<br\/?>/g, '. ')
+  }
+
+  toggleDice(active) {
+    this.$dice.classList[active ? 'remove' : 'add']('disabled')
   }
 
   setTimer(time_in_seconds) {

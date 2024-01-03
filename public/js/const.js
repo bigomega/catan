@@ -69,6 +69,7 @@ export const SOCKET_EVENTS = {
   JOINED_WAITING_ROOM: 'joined_waiting_room',
   PLAYER_ONLINE: 'player_online',
   CLICK_LOC: 'clicked_location',
+  ROLL_DICE: 'roll_the_dice',
   // Server Sends…
   ALERT_ALL: 'alert_all',
   ALERT_PLAYER: 'alert_player',
@@ -79,6 +80,7 @@ export const SOCKET_EVENTS = {
   BUILD: 'build',
   HIDE_LOCS: 'hide_all_shown_locations',
   UPDATE_PLAYER: 'update_player_data',
+  DICE_VALUE: 'value_of_rolled_dice',
 }
 
 export const AUDIO_FILES = {

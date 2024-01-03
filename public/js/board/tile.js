@@ -79,4 +79,12 @@ export default class Tile {
     }
     if (this.type === 'D') { this.robbed = true }
   }
+
+  getAllCorners() {
+    return Object.keys(this.corners).map(dir => this.corners[dir])
+  }
+
+  getOccupiedCorners() {
+    return this.getAllCorners().filter(c => c.player_id)
+  }
 }

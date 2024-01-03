@@ -5,7 +5,7 @@ import PlayerUI from "./ui/player_ui.js";
 const $ = document.querySelector.bind(document)
 
 export default class UI {
-  #socket_actions; board; player; opponents;
+  #socket_actions; board; player; opponents; alert_timer;
   player_ui; board_ui;
   $splash = $('.splash')
   $alert = $('#game > .alert')
@@ -38,10 +38,15 @@ export default class UI {
     this.$alert.classList.add('show')
     this.$alert_parchment.innerHTML = message
     this.$alert_text.innerHTML = message
-    setTimeout(_ => {
+    clearTimeout(this.alert_timer)
+    this.alert_timer = setTimeout(_ => {
       this.$alert.classList.remove('show')
-    }, 3000)
+    }, CONST.GAME_CONFIG.alert.time * 1000)
     this.setStatus(message)
+  }
+
+  showDiceValue() {
+    // Animation + Visuals
   }
 
   // Player & AllPlayers UI
@@ -53,6 +58,7 @@ export default class UI {
       this.player_ui.updateHand(update_player, context)
     }
   }
+  toggleDice(bool) { this.player_ui.toggleDice(bool) }
 
   // Board UI
   showCorners(ids) { this.board_ui.showCorners(ids) }

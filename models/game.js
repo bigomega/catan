@@ -31,6 +31,7 @@ export default class Game {
   #active_player = 0
   ready_players = {}
   player_count = 2
+  dice_value = [1, 1]
   config = CONST.GAME_CONFIG
   dev_cards = Helper.shuffle(CONST.DEVELOPMENT_CARDS_DECK.slice())
   expected_actions = []
@@ -59,6 +60,19 @@ export default class Game {
     this.players = [ new Player(host_name, 1, this.onPlayerUpdate.bind(this)) ]
     this.config = config
     this.#io = io
+    this.#setupExpectedArrayFns()
+  }
+
+  #setupExpectedArrayFns() {
+    this.expected_actions.findAndRemove = obj => {
+      const obj_keys = Object.keys(obj)
+      if (!obj_keys.length) return
+      const index = this.expected_actions.findIndex(o2 =>
+        obj_keys.reduce((mem, k) => mem && (obj[k] === o2[k]), true)
+      )
+      index > -1 && this.expected_actions.splice(index, 1)
+      return this.expected_actions
+    }
   }
 
   join(playerName) {
@@ -103,11 +117,27 @@ export default class Game {
     } else if (this.state === ST.INITIAL_BUILD_2) {
       if (this.active_player === 1) {
         this.state = ST.PLAYER_ROLL
+        this.expected_actions.push({ type: ST.PLAYER_ROLL, pid: this.active_player })
         this.setTimer(this.config.roll.time)
       } else {
         this.active_player--
         this._showInitialSettlement()
       }
+    } else if (this.state === ST.PLAYER_ROLL) {
+      this.emitWithPlayer(SOC.DICE_VALUE, this.dice_value)
+      const dice_total = this.dice_value[0] + this.dice_value[1]
+      if (dice_total === 7) {
+        // Robber
+      } else {
+        this.distributeResources({ number: dice_total })
+        this.state = ST.PLAYER_ACTIONS
+        this.setTimer(this.config.player_turn.time)
+      }
+    } else if (this.state === ST.PLAYER_ACTIONS) {
+      this.active_player++
+      this.state = ST.PLAYER_ROLL
+      this.expected_actions.push({ type: ST.PLAYER_ROLL, pid: this.active_player })
+      this.setTimer(this.config.roll.time)
     }
   }
 
@@ -126,12 +156,33 @@ export default class Game {
         }
       } else if (expected.type === CONST.LOCS.EDGE) {
         this.build(expected.pid, expected.type, location, expected.piece)
+      } else if (expected.type === ST.PLAYER_ROLL) {
+        this.dice_value = [CONST.ROLL(), CONST.ROLL()]
       }
     })
-    this.expected_actions = []
+    this.expected_actions.splice(0, this.expected_actions.length)
     // This is to avoid expected_actions being modified before reset
     future_fns.forEach(fn => fn())
     return abort_next_execution
+  }
+
+  onSocEvents(soc, pid, ...data) {
+    ;({
+      [SOC.PLAYER_ONLINE]: _ => {
+        this.ready_players[pid] = 1
+        if (Object.keys(this.ready_players).length === this.player_count) {
+          this.start()
+        }
+      },
+      [SOC.CLICK_LOC]: this.onLocationClick.bind(this),
+      [SOC.ROLL_DICE]: _ => {
+        if (this.active_player !== pid) return
+        if (this.state !== ST.PLAYER_ROLL) return
+        this.dice_value = [CONST.ROLL(), CONST.ROLL()]
+        this.expected_actions.findAndRemove({ type: ST.PLAYER_ROLL, pid })
+        this.next()
+      },
+    })[soc]?.(pid, ...data)
   }
 
   onLocationClick(pid, type, loc) {
@@ -196,15 +247,21 @@ export default class Game {
     this.emitTo(p_soc, SOC.HIDE_LOCS)
   }
 
-  distributeResources({number, c_id}) {
+  distributeResources({ number, c_id }) {
     if (number) {
-      //
+      this.board.numbers[number]?.forEach(tile => {
+        const res = CONST.TILE_RES[tile.type]
+        tile.getOccupiedCorners().forEach(corner => {
+          const count = corner.piece === 'C' ? 2 : 1
+          this.getPlayer(corner.player_id)?.giveCard(res, count)
+        })
+      })
     } else if (c_id) {
       const corner = Corner.getRefList()[c_id]
       if (!corner || !corner.player_id) return
       const player = this.getPlayer(corner.player_id)
       corner.tiles.forEach(tile => {
-        tile.type !== 'S' && player.giveCard(CONST.TILE_RES[tile.type], 1)
+        CONST.TILE_RES[tile.type] && player.giveCard(CONST.TILE_RES[tile.type], 1)
       })
     }
   }
@@ -215,18 +272,6 @@ export default class Game {
     this.#timer = setTimeout(this.next.bind(this), time_in_seconds * 1000)
   }
   clearTimer() { clearTimeout(this.#timer) }
-
-  onSocEvents(soc, pid, ...data) {
-    ;({
-      [SOC.PLAYER_ONLINE]: _ => {
-        this.ready_players[pid] = 1
-        if (Object.keys(this.ready_players).length === this.player_count) {
-          this.start()
-        }
-      },
-      [SOC.CLICK_LOC]: this.onLocationClick.bind(this),
-    })[soc]?.(pid, ...data)
-  }
 
   onPlayerUpdate(pid, key, ...context) {
     const public_json = this.getPlayer(pid)?.toJSON()
