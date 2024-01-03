@@ -3,7 +3,7 @@ const $ = document.querySelector.bind(document)
 
 export default class PlayerUI {
   #socket_actions; player; timer; hand;
-  $timer; $dice;
+  $timer; $dice; $build_road; $build_settlement; $build_city; $buy_dev_card; $end_turn;
   $el = $('#game > .current-player')
   $hand = this.$el.querySelector('.hand')
   $action_bar = this.$el.querySelector('.actions')
@@ -13,13 +13,17 @@ export default class PlayerUI {
     this.player = player
     this.hand = this.#cleanHandData(this.player.closed_cards)
   }
-
-  setSocketActions(sa) {
-    this.#socket_actions = sa
-  }
+  setSocketActions(sa) { this.#socket_actions = sa }
 
   render() {
     this.renderActionBar()
+    // this.hand.S = 8
+    // this.hand.dK = 3
+    // // delete this.hand.O
+    // this.hand.dM = 1
+    // this.hand.dR = 1
+    // this.hand.dY = 1
+    // this.hand.dVps = 2
     this.renderHand()
     this.$status_bar.innerHTML = this.player.last_status || '...'
   }
@@ -44,7 +48,7 @@ export default class PlayerUI {
       <div class="dev-card disabled" title="Buy Development Card (D)">
         <img src="/images/dc-back.png"/>
       </div>
-      <div class="trade">Trade</div>
+      <div class="trade disabled">Trade</div>
       <div class="end-turn disabled" title="End Turn (E)">End Turn</div>
     `
     this.#setRefs()
@@ -53,22 +57,55 @@ export default class PlayerUI {
   #setRefs() {
     this.$timer = this.$action_bar.querySelector('.timer')
     this.$dice = this.$action_bar.querySelector('.roll-dice')
+    this.$build_road = this.$action_bar.querySelector('.build-road')
+    this.$build_settlement = this.$action_bar.querySelector('.build-settlement')
+    this.$build_city = this.$action_bar.querySelector('.build-city')
+    this.$buy_dev_card = this.$action_bar.querySelector('.dev-card')
+    this.$end_turn = this.$action_bar.querySelector('.end-turn')
   }
   #setupActionEvents() {
+    // Dice Click
     this.$dice.addEventListener('click', e => {
       if(e.target.classList.contains('disabled')) return
       this.#socket_actions.sendDiceClick()
       e.target.classList.add('disabled')
     })
+    // Road, Settlement & City Click
+    const getEventCb = piece => e => {
+      if (e.target.classList.contains('disabled')) return
+      // this.#socket_actions.askForLocations(piece)
+    }
+    this.$build_road.addEventListener('click', getEventCb('R'))
+    this.$build_settlement.addEventListener('click', getEventCb('S'))
+    this.$build_city.addEventListener('click', getEventCb('C'))
   }
 
-  toggleDice(active) {
-    this.$dice.classList[active ? 'remove' : 'add']('disabled')
+  keyTo$El(key) {
+    return ({
+      R: this.$build_road, S: this.$build_settlement,
+      C: this.$build_city, DEV_C: this.$buy_dev_card,
+    })[key]
+  }
+
+  checkAndToggleActions(toggle) {
+    if (toggle) {
+      this.toggleAction(this.$end_turn, true)
+      Object.keys(CONST.COST).forEach(key => {
+        const can_buy = Object.keys(CONST.COST[key]).reduce((mem, res_key) => {
+          return mem && (this.hand[res_key] >= CONST.COST[key][res_key])
+        }, true)
+        this.toggleAction(this.keyTo$El(key), can_buy)
+      })
+    } else {
+      for (const $el of this.$action_bar.children) {
+        this.toggleAction($el)
+      }
+    }
   }
 
   resetRenderTimer(pid, time_in_seconds) {
     this.timer && clearInterval(this.timer)
-    this.$timer.classList[this.player.id === pid ? 'remove' : 'add']('disabled')
+    this.toggleAction(this.$timer, this.player.id === pid)
     time_in_seconds--
     this.timer = setInterval(_ => {
       const seconds = time_in_seconds % 60
@@ -77,6 +114,11 @@ export default class PlayerUI {
       this.$timer.innerHTML = time_text
       --time_in_seconds < 0 && clearInterval(this.timer)
     }, 1000)
+  }
+
+  toggleDice(active) { this.toggleAction(this.$dice, active) }
+  toggleAction($el, toggle) {
+    $el?.classList[toggle ? 'remove' : 'add']('disabled')
   }
 
   build(location) { }
@@ -93,7 +135,7 @@ export default class PlayerUI {
       .reduce((mem, key) => (mem.push([key, this.hand[key]]), mem), [])
       .sort((a, b) => a[0].length - b[0].length)
     ;
-    const group_size = hand_groups.length
+    const group_size = hand_groups.length // cannot be more than 10
     const CURVE_TRANSLATE = [
       [0], [0,0], [10,0,20], [20,0,0,30], [30,5,0,9,40],
       [40,10,0,0,18,50], [50,15,3,0,6,27,60], [55,20,6,0,0,12,36,65],
@@ -162,7 +204,7 @@ export default class PlayerUI {
       else { this.hand[type] = count }
     }
     this.renderHand()
-    // this.updateHandUI()
+    // this.updateHandUI() // Not possible as the curve styling is JS based
   }
 
   /**

@@ -60,6 +60,7 @@ export default class UI {
     }
   }
   toggleDice(bool) { this.player_ui.toggleDice(bool) }
+  toggleActions(bool) { this.player_ui.checkAndToggleActions(bool) }
 
   // Board UI
   showCorners(ids) { this.board_ui.showCorners(ids) }

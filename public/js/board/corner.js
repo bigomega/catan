@@ -26,7 +26,7 @@ export default class Corner {
   }
 
   /**
-   * @description -1 for empty edges, pid for pid-roads, all if no pid
+   * @description -1 for empty edges, pid for pid-roads, null for all
    * @param {number?} [player_id ]
    * @returns {Edge[]}
    */

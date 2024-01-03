@@ -78,9 +78,6 @@ export default class Board {
    *          id : locations with at least one player(id) road
    * @returns {Corner[]}
    */
-  /**
-   * @todo Redo this with Corner to Tile link + Corner.getRefList()
-   */
   settlementLocations(player_id) {
     const locations = []
     const visited_corners = []

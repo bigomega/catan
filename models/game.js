@@ -26,6 +26,9 @@ const MSG = Object.keys(GAME_MESSAGES).reduce((m,k) => (m[k]=k,m), {})
  * Yes. Both players who possess roads into an intersection have the option of building the third road out, regardless of whether a settlement is there or whose it is.
  */
 
+/**
+ * @todo Needs Cleanup
+ */
 export default class Game {
   #io; #state; #timer; board; id; players;
   #active_player = 0
@@ -157,7 +160,7 @@ export default class Game {
           abort_next_execution = true
         }
       } else if (expected.type === CONST.LOCS.EDGE) {
-        this.build(expected.pid, expected.type, location, expected.piece)
+        this.build(expected.pid, expected.type, location, 'R')
       } else if (expected.type === ST.PLAYER_ROLL) {
         this.dice_value = [CONST.ROLL(), CONST.ROLL()]
       }
@@ -202,11 +205,13 @@ export default class Game {
     if (type === CONST.LOCS.CORNER) {
       this.build(pid, type, loc, expected.piece)
       this.expected_actions.splice(exp_index, 1)
+      // Intiatal Build Stuff
       this.state === ST.INITIAL_BUILD_2 && this.distributeResources({ c_id: loc })
       INITIAL_BUILD && this._showInitialRoad(pid, loc)
     } else if (type === CONST.LOCS.EDGE) {
-      this.build(pid, type, loc)
+      this.build(pid, type, loc, 'R')
       this.expected_actions.splice(exp_index, 1)
+      // Intiatal Build Stuff
       INITIAL_BUILD && this.next()
     } else if (type === CONST.LOCS.TILE) {}
   }
@@ -231,6 +236,36 @@ export default class Game {
     this.expected_actions.push({ type: CONST.LOCS.EDGE, piece: 'R', from: e_ids, pid })
     this.setTimer(this.config.initial_build.time)
   }
+
+  getValidRoadLocs(pid) {
+    // console.log(this.getPlayer(pid).pieces);
+    const valid_locs = this.getPlayer(pid).pieces.R?.reduce((mem, r_loc) => {
+      // console.log(r_loc)
+      const edge = Edge.getRefList()[r_loc]
+      const c1_eids = edge?.corner1.getEdges(-1).map(e => e.id)
+      const c2_eids = edge?.corner2.getEdges(-1).map(e => e.id)
+      // console.log(c1_eids, c2_eids)
+      return mem.concat(c1_eids, c2_eids)
+    }, [])
+    // remove duplicates
+    return [...new Set(valid_locs)]
+  }
+  getValidSettlementLocs(pid) {
+    const reachable_locs = this.getPlayer(pid).pieces.R?.reduce((mem, r_loc) => {
+      const edge = Edge.getRefList()[r_loc]
+      return mem.concat(edge?.corner1.id, edge?.corner1.id)
+    }, [])
+    const visited_corners = []
+    const valid_locs = reachable_locs.filter(c_id => {
+      if (visited_corners.includes(c_id)) { return false }
+      visited_corners.push(c_id)
+      const corner = Corner.getRefList()[c_id]
+      if (corner.piece) { return false }
+      return corner?.hasNoNeighbours()
+    })
+    return valid_locs
+  }
+  getValidCityLocs(pid) { return this.getPlayer(pid).pieces.S }
 
   build(pid, type, loc, piece) {
     const player = this.getPlayer(pid)

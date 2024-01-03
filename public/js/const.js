@@ -35,6 +35,13 @@ export const LOCS = { CORNER: 'C', EDGE: 'E', TILE: 'T' }
 
 export const PIECES = { S: 'Settlement', C: 'City', R: 'Road' }
 
+export const COST = {
+  R: { L: 1, B: 1 },
+  S: { L: 1, B: 1, W: 1, S: 1 },
+  C: { W: 2, O: 3 },
+  DEV_C: { W: 1, S: 1, O: 1 },
+}
+
 export const TRADE_OFFERS = {
   '*4': '4:1',
   '*3': '3:1',
@@ -78,7 +85,7 @@ export const SOCKET_EVENTS = {
   APPEND_STATUS: 'append_to_status',
   STATE_CHANGE: 'state_change',
   SET_TIMER: 'set_timer',
-  SHOW_LOCS: 'show_actionable_locations',
+  SHOW_LOCS: 'show_actionable_locations', // sent privately
   BUILD: 'build',
   HIDE_LOCS: 'hide_all_shown_locations',
   UPDATE_PLAYER: 'update_player_data',

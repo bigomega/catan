@@ -5,6 +5,7 @@ export default class Player {
   id; name; socket_id; onChange; last_status;
   static #names = ['Cheran(சே)', 'Cholan(ழ)', 'Paandian(பா)', 'Karikalan(க)']
   public_vps = 0
+  /** @example { R: [12, 5, 56], S: [2, 8], C: [] } */
   pieces = Object.keys(CONST.PIECES).reduce((mem, p_k) => (mem[p_k] = [], mem), {})
   closed_cards = {
     ...Helper.newObject(CONST.RESOURCES, 0),
@@ -38,7 +39,8 @@ export default class Player {
   build(location, piece) {
     if (!(piece in CONST.PIECES)) return
     if (piece === 'C') {
-      this.pieces[piece] = this.pieces[piece].filter(l => l !== location)
+      const i = this.pieces.S.indexOf(location)
+      i >= 0 && this.pieces.S.splice(i, 1)
     }
     this.pieces[piece].push(location)
     if (piece === 'C' || piece === 'S') {
@@ -64,6 +66,7 @@ export default class Player {
     const playerJSON = {
       id: this.id,
       name: this.name,
+      pieces: this.pieces,
       public_vps: this.public_vps,
       resource_count: Object.keys(CONST.RESOURCES).reduce((mem, k) => mem + this.closed_cards[k], 0),
       dev_card_count: Object.keys(CONST.DEVELOPMENT_CARDS).reduce((mem, k) => mem + this.closed_cards[k], 0),

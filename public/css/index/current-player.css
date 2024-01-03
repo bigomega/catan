@@ -21,7 +21,7 @@
       position: relative;
       bottom: 120px;
       margin-right: 20px;
-      transition: all .05s linear;
+      transition: all .1s linear;
 
       @media screen and (max-width: 900px) { margin-right: -70px !important; }
       @media screen and (max-width: 700px) { margin-right: -90px !important; }
@@ -38,7 +38,7 @@
         background-color: #ebd290;
         border-radius: 15px;
         border: 1px solid #5a460e;
-        box-shadow: 3px 0px 3px -1px #0006;
+        box-shadow: 3px 0px 5px -3px #0006;
         background-image: url(/images/cards_sprite.png);
 
         &:not(:first-child) {
@@ -203,9 +203,8 @@
 
     .dev-card {
       cursor: pointer;
-      & img {
-        width: 30px;
-      }
+      & img { width: 30px; }
+      &:hover { filter: brightness(0.7); }
       &.disabled {
         cursor: not-allowed;
         filter: grayscale(1);
@@ -213,9 +212,20 @@
       }
     }
 
+    .trade {
+      cursor: pointer;
+      &:not(.disabled):hover {
+        text-shadow: 0px 0 10px #fff;
+      }
+      &.disabled {
+        cursor: not-allowed;
+        filter: brightness(0.7);
+      }
+    }
+
     .end-turn {
       background: #fff;
-      color: var(--player-2-color);
+      color: var(--sand-color-dark);
       padding: 5px 10px;
       border-radius: 3px;
       cursor: pointer;
@@ -240,6 +250,11 @@
   &.id-2 .actions .build-road > div { background: var(--player-2-color-dark); }
   &.id-3 .actions .build-road > div { background: var(--player-3-color-dark); }
   &.id-4 .actions .build-road > div { background: var(--player-4-color-dark); }
+
+  &.id-1 .actions .end-turn { color: var(--player-1-color); }
+  &.id-2 .actions .end-turn { color: var(--player-2-color); }
+  &.id-3 .actions .end-turn { color: var(--player-3-color); }
+  &.id-4 .actions .end-turn { color: var(--player-4-color); }
 
   .status-bar {
     background: #d7c1a7;

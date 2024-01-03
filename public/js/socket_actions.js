@@ -23,6 +23,7 @@ export default class SocketActions {
         [CONST.GAME_STATES.STRATEGIZE]: _ => this.playAudio(AUDIO.START_END),
         [CONST.GAME_STATES.INITIAL_BUILD]: _ => {},
         [CONST.GAME_STATES.PLAYER_ROLL]: _ => {
+          ui.toggleActions(false)
           const message = this.getMessage(active_player, MSGKEY.ROLL_TURN)
           if (active_player.id === this.player.id) {
             ui.alert(message)
@@ -33,6 +34,9 @@ export default class SocketActions {
           }
         },
         [CONST.GAME_STATES.PLAYER_ACTIONS]: _ => {
+          if (active_player.id === this.player.id) {
+            ui.toggleActions(true)
+          }
           // ui.setStatus(this.getMessage(active_player, MSGKEY.PLAYER_TURN))
         },
       })[state]?.()
@@ -55,6 +59,7 @@ export default class SocketActions {
     })
 
     socket.on(SOC.SHOW_LOCS, locations => {
+      ui.hideAllShown()
       locations.corners && ui.showCorners(locations.corners)
       locations.edges && ui.showEdges(locations.edges)
     })
