@@ -20,7 +20,10 @@ export default class Corner {
   setTrade(type) { this.trade = type }
 
   buildSettlement(player_id) { this.piece = 'S'; this.player_id = player_id }
-  buildCity() { this.piece = 'C' }
+  buildCity() {
+    if (this.piece !== 'S') throw 'Cannot Build City without Settlement'
+    this.piece = 'C'
+  }
 
   /**
    * @description -1 for empty edges, pid for pid-roads, all if no pid

@@ -56,14 +56,14 @@ export default class Game {
   constructor({ id, player_count, host_name, config, io }) {
     this.id = id
     if (player_count) this.player_count = player_count
-    this.players = [ new Player(host_name, 1, this.onPlayerChange) ]
+    this.players = [ new Player(host_name, 1, this.onPlayerUpdate.bind(this)) ]
     this.config = config
     this.#io = io
   }
 
   join(playerName) {
     if (this.players.length >= this.player_count) { return }
-    const player = new Player(playerName, this.players.length + 1, this.onPlayerChange)
+    const player = new Player(playerName, this.players.length + 1, this.onPlayerUpdate.bind(this))
     this.players.push(player)
     this.emit(SOC.JOINED_WAITING_ROOM, player.toJSON(0))
     return player
@@ -119,6 +119,7 @@ export default class Game {
       const location = from[Math.floor(Math.random() * from.length)]
       if (expected.type === CONST.LOCS.CORNER) {
         this.build(expected.pid, expected.type, location, expected.piece)
+        this.state === ST.INITIAL_BUILD_2 && this.distributeResources({ c_id: location })
         if (this.state === ST.INITIAL_BUILD || this.state === ST.INITIAL_BUILD_2) {
           future_fns.push(_ => this._showInitialRoad(expected.pid, location))
           abort_next_execution = true
@@ -147,6 +148,7 @@ export default class Game {
     if (type === CONST.LOCS.CORNER) {
       this.build(pid, type, loc, expected.piece)
       this.expected_actions.splice(exp_index, 1)
+      this.state === ST.INITIAL_BUILD_2 && this.distributeResources({ c_id: loc })
       INITIAL_BUILD && this._showInitialRoad(pid, loc)
     } else if (type === CONST.LOCS.EDGE) {
       this.build(pid, type, loc)
@@ -181,9 +183,8 @@ export default class Game {
     const p_soc = this.getPlayerSoc(pid)
     if (type === CONST.LOCS.CORNER) {
       const corner = Corner.getRefList()[loc]
-      piece === 'S' ? corner?.buildSettlement(pid) : corner?.buildCity(pid)
+      piece === 'S' ? corner?.buildSettlement(pid) : corner?.buildCity()
       player.build(loc, piece)
-      // this.emit(SOC.UPDATE_VP, pid, player.public_vps)
       this.map_changes[CONST.LOCS.CORNER][loc] = { piece, pid }
     } else if (type === CONST.LOCS.EDGE) {
       const edge = Edge.getRefList()[loc]
@@ -193,6 +194,19 @@ export default class Game {
     }
     this.emit(SOC.BUILD, { type, pid, piece, loc })
     this.emitTo(p_soc, SOC.HIDE_LOCS)
+  }
+
+  distributeResources({number, c_id}) {
+    if (number) {
+      //
+    } else if (c_id) {
+      const corner = Corner.getRefList()[c_id]
+      if (!corner || !corner.player_id) return
+      const player = this.getPlayer(corner.player_id)
+      corner.tiles.forEach(tile => {
+        tile.type !== 'S' && player.giveCard(CONST.TILE_RES[tile.type], 1)
+      })
+    }
   }
 
   setTimer(time_in_seconds) {
@@ -214,7 +228,18 @@ export default class Game {
     })[soc]?.(pid, ...data)
   }
 
-  onPlayerChange(pid, key) {}
+  onPlayerUpdate(pid, key) {
+    const public_json = this.getPlayer(pid)?.toJSON()
+    if (['closed_cards'].includes(key)) {
+      const private_json = this.getPlayer(pid)?.toJSON(1)
+      this.emitTo(this.getPlayerSoc(pid), SOC.UPDATE_PLAYER, private_json, key)
+      this.getOtherPlayerSocs(pid).forEach(sid => {
+        this.emitTo(sid, SOC.UPDATE_PLAYER, public_json, key)
+      })
+    } else {
+      this.emit(SOC.UPDATE_PLAYER, public_json, key)
+    }
+  }
 
   emitWithPlayer(type, ...data) { this.emit(type, this.players[this.#active_player], ...data) }
   emit(type, ...data) { this.#io.to(this.id + '').emit(type, ...data) }

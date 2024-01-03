@@ -26,21 +26,25 @@ export default class Player {
 
   giveCard(card_type, count) {
     this.closed_cards[card_type] += count
+    this.onChange(this.id, 'closed_cards')
   }
 
   takeCard(card_type, count) {
+    if (this.closed_cards[card_type] - count < 0) { throw "Cannot take more" }
     this.closed_cards[card_type] -= count
-    if (this.closed_cards[card_type] < 0) { throw "Cannot take more" }
+    this.onChange(this.id, 'closed_cards')
   }
 
   build(location, piece) {
-    this.pieces[piece]?.push(location)
+    if (!(piece in CONST.PIECES)) return
     if (piece === 'C') {
       this.pieces[piece] = this.pieces[piece].filter(l => l !== location)
+    }
+    this.pieces[piece].push(location)
+    if (piece === 'C' || piece === 'S') {
       this.public_vps++
       this.onChange(this.id, 'public_vps')
     }
-    piece === 'S' && this.public_vps++
   }
 
   openDevelopmentCard(card_type) {
@@ -60,7 +64,7 @@ export default class Player {
       name: this.name,
       public_vps: this.public_vps,
       resource_count: Object.keys(CONST.RESOURCES).reduce((mem, k) => mem + this.closed_cards[k], 0),
-      dev_card_count: Object.keys(CONST.RESOURCES).reduce((mem, k) => mem + this.closed_cards[k], 0),
+      dev_card_count: Object.keys(CONST.DEVELOPMENT_CARDS).reduce((mem, k) => mem + this.closed_cards[k], 0),
       open_dev_cards: this.open_dev_cards,
       trade_offers: this.trade_offers,
       ...(get_private ? {

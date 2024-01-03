@@ -77,8 +77,8 @@ export const SOCKET_EVENTS = {
   SET_TIMER: 'set_timer',
   SHOW_LOCS: 'show_actionable_locations',
   BUILD: 'build',
-  UPDATE_VP: 'update_victory_points',
   HIDE_LOCS: 'hide_all_shown_locations',
+  UPDATE_PLAYER: 'update_player_data',
 }
 
 export const AUDIO_FILES = {

@@ -13,6 +13,9 @@ Free to play multiplayer catan style board game
 ### Next Steps
   - Render Hand
 
+### Known Bugs
+  - Road building into the sea
+
 ## Todo - v1
 - [ ] basic game
   - [x] write a mapkey

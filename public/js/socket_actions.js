@@ -55,7 +55,9 @@ export default class SocketActions {
       ui.build(obj)
       // game.build(obj)
     })
-    socket.on(SOC.UPDATE_VP)
+    socket.on(SOC.UPDATE_PLAYER, (update_player, key) => {
+      ui.updatePlayer(update_player, key)
+    })
   }
 
   getMessage(alert_player, msg_key, ...data) {
