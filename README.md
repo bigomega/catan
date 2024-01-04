@@ -5,61 +5,45 @@ Free to play multiplayer catan style board game
 ### Data Structure
 <img src="https://github.com/bigomega/catan/assets/2320747/53b0abb7-78a0-49f3-8de8-0548003b3d81" width="500px"/>
 
+## Status
 ### In Progress
-  - Distribute resource
-  - ~~Place second house & road~~
-  - ~~Place first house & road~~
-  - ~~Alert & Notification Messaging~~
+  ##### Jan '24
+  - [ ] Refactor Game.js
+  - [x] ~~Page refresh state persistance~~
+  - [x] ~~Render Hand~~
+  - [x] ~~Distribute resource~~
+  - [x] ~~Place second house & road~~
+  - [x]  ~~Place first house & road~~
+  ##### Dec '23
+  - [x] ~~Alert & Notification Messaging~~
+  - [x] ~~Timer System~~
+  ##### Nov '23
+  - [x] ~~Sound Collection~~
+  - [x] ~~Waiting Room~~
+  ##### Jun '23
+  - [x] ~~Socket IO setup~~
+  - [x] ~~Render Corners and Edges~~
+  - [x] ~~Render Board~~
+  - [x] ~~Image and Sprite Collection & Edit~~
+  - [x] ~~Login Page~~
+  - [x] ~~Simple Server~~
+  - [x] ~~Decoding the map from key~~
 ### Next Steps
-  - Render Hand
+  - Rolling Dice animation
+  - Basic Turn Actions
+  - Robber
+  - Dev Card Actions
+  - Trade
+  - Opponents UI
+  - Shuffler
 
 ### Known Bugs
-  - Road building into the sea
+  - Road building into the sea from beach 🤷🏻‍♂️
 
-## Todo - v1
-- [ ] basic game
-  - [x] write a mapkey
-  - [x] have basic DS
-  - [x] rendering the board
-  - [ ] 1v1, 3player, 4 player modes
-  - [x] Game timers
-  - [x] Waiting Screen
-  - [x] Sounds
-    - [x] Start/End
-    - [x] Turn Notification
-    - [x] Knight
-    - [x] Robber
-    - [x] Dice
-    - [x] Build
-    - [ ] ? Get Resource
-  - [ ] rendering other stuff
-    - [ ] Hand
-    - [ ] Dice
-    - [ ] Robber
-    - [x] House, Village and Roads
-    - [ ] Trade options
-  - [ ] game mechanics + end condition
-  - [ ] Input options in UI
-  - [ ] ...
-- [ ] Few hardcoded maps
-- [ ] Introducing trading
-- [ ] Making it multiplayer
-  - [x] Use socket io
-  - [ ] Rooms
-    - [ ] create rooms
-    - [ ] Invite to rooms
-    - [ ] Room chat? `v2`
-  - [ ] Social login for pic? (and/or just a name/id - nologin) `v2`
-  - [ ] Discord help (for talking)
-  - [ ] ...
-- [ ] Misc
-  - [ ] tests
-
-### Todo - v1+
-- [ ] Introducing 8 player maps
-- [x] Time limit on players
-- [ ] Map generator
-  - [ ] Try to consume other map generator
-- [ ] Map creator
-- [ ] Seafarers expansion (fairly easy one)
-- [ ] Keyboard shortcuts
+## Future Ideas
+- Custom map builder
+- Introducing 8 player maps
+- Social login (w pic and/or just a name/id)
+- Discord help (for talking)
+- Seafarers expansion (fairly easy one)
+- Keyboard shortcuts
