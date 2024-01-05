@@ -42,13 +42,12 @@ export default class Player {
     if (!(piece in CONST.PIECES)) return
     if (piece === 'C') {
       const i = this.pieces.S.indexOf(location)
-      i >= 0 && this.pieces.S.splice(i, 1)
+      if (i >= 0) { this.pieces.S.splice(i, 1) }
+      else { throw "Cannot build city without settlement" }
     }
     this.pieces[piece].push(location)
-    this.onChange(this.id, 'pieces')
-    if (piece === 'C' || piece === 'S') {
+    if (piece !== 'R') {
       this.public_vps++
-      this.onChange(this.id, 'public_vps')
     }
   }
 

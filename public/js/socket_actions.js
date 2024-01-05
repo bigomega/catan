@@ -7,14 +7,12 @@ const MSGKEY = Object.keys(GAME_MESSAGES).reduce((m, k) => (m[k] = k, m), {})
 export default class SocketActions {
   socket; player; game; ui;
   #au_bop_delay = 0
-  game_info = {}
 
   constructor({ socket, player, game, ui }) {
     this.socket = socket
     this.player = player
     this.game = game
     this.ui = ui
-    this.game_info = { player_id: player.id, game_id: game.id }
     // Notify you're online
     socket.emit(SOC.PLAYER_ONLINE)
 
@@ -85,7 +83,7 @@ export default class SocketActions {
     // })
 
     socket.on(SOC.BUILD, (player, piece, loc) => {
-      if (player.pid === this.player.id) {
+      if (player.id === this.player.id) {
         const aud_file = ({
           S: AUDIO.BUILD_SETTLEMENT,
           C: AUDIO.BUILD_CITY,
@@ -96,14 +94,12 @@ export default class SocketActions {
       ui.build(player.id, piece, loc)
     })
 
-    // socket.on(SOC.UPDATE_PLAYER, (update_player, key, context) => {
-    //   if (key === 'closed_cards' && update_player.id === this.player.id) {
-    //     for (let i = 0; i < context.count; i++) {
-    //       this.playAudio(AUDIO.BOP)
-    //     }
-    //   }
-    //   ui.updatePlayer(update_player, key, context)
-    // })
+    socket.on(SOC.UPDATE_PLAYER, (update_player, key, context) => {
+      if (context && key === 'closed_cards' && update_player.id === this.player.id) {
+        ;[...Array(context.count)].forEach(_ => this.playAudio(AUDIO.BOP))
+      }
+      ui.updatePlayer(update_player, key, context)
+    })
 
     // socket.on(SOC.DICE_VALUE, (active_player, [d1, d2]) => {
     //   ui.toggleDice(false)

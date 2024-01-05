@@ -18,6 +18,8 @@ export default class PlayerUI {
   render() {
     this.renderActionBar()
     // this.hand.S = 8
+    // this.hand.L = 7
+    // this.hand.B = 6
     // this.hand.dK = 3
     // // delete this.hand.O
     // this.hand.dM = 1
@@ -154,6 +156,7 @@ export default class PlayerUI {
             transform:rotate(${group_rotation}deg) translateY(${group_translate}px);"
         >
         ${[...Array(count)].map((_, j) => {
+          if (count > 7 && j < count - 7) return '' // Max 7 cards rendered
           const c_rot = 15 * (count - j - 1) / (count - j)
           const c_mv = 15 * (count - j - 2) / (count - j)
           return `

@@ -1,7 +1,7 @@
 import * as CONST from "../public/js/const.js"
 const SOC = CONST.SOCKET_EVENTS
 
-export default class SocketManager {
+export default class IOManager {
   #game; #io;
 
   constructor({ game, io }) {
@@ -36,6 +36,13 @@ export default class SocketManager {
   requestInitialSetup(active_player, turn) { this.emit(SOC.INITIAL_SETUP, active_player, turn) }
 
   updateBuild(player, piece, loc) { this.emit(SOC.BUILD, player, piece, loc) }
+
+  updatePublicPlayerData(p_json, key) {
+    this.emit(SOC.UPDATE_PLAYER, p_json, key)
+  }
+  updatePrivatePlayerData(player_socket_id, p_json, key, data) {
+    this.#io.to(player_socket_id).emit(SOC.UPDATE_PLAYER, p_json, key, data)
+  }
 
   emit(type, ...data) { this.#io.to(this.#game.id).emit(type, ...data) }
 }

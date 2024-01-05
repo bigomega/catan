@@ -114,16 +114,13 @@ export default class Board {
 
   build(pid, piece, loc) {
     switch (piece) {
-      case 'S':
-        this.findCorner(loc)?.buildSettlement(pid); break;
-      case 'C':
-        this.findCorner(loc)?.buildCity(); break;
-      case 'R':
-        this.findEdge(loc)?.buildRoad(pid); break;
+      case 'S': this.findCorner(loc)?.buildSettlement(pid); break;
+      case 'C': this.findCorner(loc)?.buildCity(); break;
+      case 'R': this.findEdge(loc)?.buildRoad(pid); break;
     }
   }
 
-  // returns [{pid, res, count}, ...]
+  /** @returns {Array[Object]} {pid, res, count}[] */
   distribute(number) {
     return this.numbers[number]?.reduce(tile => {
       const res = CONST.TILE_RES[tile.type]

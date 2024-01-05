@@ -5,7 +5,7 @@ import Player from "./player.js"
 import Board from "../public/js/board/board.js"
 import Corner from "../public/js/board/corner.js"
 import Edge from "../public/js/board/edge.js"
-import SocketManager from "./socket_manager.js"
+import IOManager from "./io_manager.js"
 
 const ST = CONST.GAME_STATES
 const STATE_ORDER = [ST.INITIAL_SETUP, ST.PLAYER_ROLL, ST.PLAYER_ACTIONS, ST.PLAYER_ROLL]
@@ -29,7 +29,7 @@ export default class Game {
   }
   get active_player() { return this.#active_player + 1 }
   set active_player(pid) {
-    if (pid < 0 || pid >= this.player_count) { this.turn++ }
+    if (pid < 1 || pid > this.player_count) { this.turn++ }
     this.#active_player = (pid - 1) % this.player_count
   }
 
@@ -37,7 +37,7 @@ export default class Game {
     this.id = id
     this.config = config
     this.player_count = player_count
-    this.#io_manager = new SocketManager({ game: this, io, })
+    this.#io_manager = new IOManager({ game: this, io, })
     this.players.push(new Player(host_name, 1, this.#onPlayerUpdate.bind(this)))
   }
 
@@ -56,66 +56,40 @@ export default class Game {
     this.setTimer(this.config.strategize.time)
   }
 
+  /** @description this.state just ended */
   #next() {
     this.clearTimer()
     if (!this.#resolvePendingActions()) return
-
-    /**
-     * > state just ended
-     *
-     * If turn == 1 or 2
-     *    expected initial house & road
-     *    notify player
-     *    t1? increment player
-     *    t2? decrement player
-     *    set timer
-     *    stop here
-     *
-     * goto next state
-     *
-     * If state is roll
-     *    expect roll (send dice value, keep sum)
-     *    set timer
-     * Else If state is action
-     *    if 7 - robber
-     *    else
-     *        distribute res
-     *        set timer
-     */
 
     if (this.turn < 3) {
       this.expected_actions.push({
         type: ST.INITIAL_SETUP,
         pid: this.active_player,
-        callback: (pid, settlement_loc, road_loc) => {
-          let s_id = settlement_loc, r_id = road_loc
-          const valid_corners = this.board.getSettlementLocations(-1).map(s => s.id)
-          if (!valid_corners.includes(s_id)) {
-            s_id = this.getRandom(valid_corners)
-          }
-          const valid_edges = this.board.findCorner(s_id)?.getEdges(-1).map(e => e.id)
-          if (!valid_edges.includes(r_id)) {
-            r_id = this.getRandom(valid_edges)
-          }
-          this.build(pid, 'S', s_id)
-          this.build(pid, 'R', r_id)
-          // this.turn == 2 && this.#distributeCornerResources(s_id)
-        },
+        callback: this.#initialBuildCallback.bind(this),
       })
       this.#io_manager.requestInitialSetup(this.getActivePlayer(), this.turn)
       this.setTimer(this.config.initial_build.time)
       return
     }
+
+    this.#gotoNextState()
+    if (this.state === ST.PLAYER_ROLL) {
+      this.active_player++
+      // expect roll
+      // set timer
+    } else if (this.state === ST.PLAYER_ACTIONS) {
+      //    if 7 - robber
+      //    else
+      //        distribute res
+      //        set timer
+    }
   }
+
+  #gotoNextState() { this.state = STATE_ORDER[STATE_ORDER.indexOf(this.state) + 1] }
 
   #resolvePendingActions() {
     let continue_next = true
-    this.expected_actions.forEach(({ type, pid, cb }) => {
-      /**
-       * call the expected function
-       * if turn is 2, distribute res (can be part of the fn?)
-       */
-    })
+    this.expected_actions.forEach(({ type, pid, callback }) => callback(pid))
     this.expected_actions = []
     return continue_next
   }
@@ -130,6 +104,22 @@ export default class Game {
     }
   }
 
+  #initialBuildCallback(pid, settlement_loc, road_loc) {
+    let s_id = settlement_loc, r_id = road_loc
+    const valid_corners = this.board.getSettlementLocations(-1).map(s => s.id)
+    if (!valid_corners.includes(s_id)) { s_id = this.#getRandom(valid_corners) }
+    const valid_edges = this.board.findCorner(s_id)?.getEdges(-1).map(e => e.id)
+    if (!valid_edges.includes(r_id)) { r_id = this.#getRandom(valid_edges) }
+    this.build(pid, 'S', s_id)
+    this.build(pid, 'R', r_id)
+    if (this.turn === 1) {
+      this.active_player < this.player_count ? this.active_player++ : this.turn++
+    } else {
+      this.active_player--
+      this.#distributeCornerResources(s_id)
+    }
+  }
+
   build(pid, piece, loc) {
     this.board.build(pid, piece, loc)
     this.getPlayer(pid)?.addPiece(loc, piece)
@@ -137,9 +127,20 @@ export default class Game {
     this.#io_manager.updateBuild(this.getPlayer(pid), piece, loc)
   }
 
+  #distributeCornerResources(id) {
+    const corner = this.board.findCorner(id)
+    if (!corner || !corner.player_id) return
+    const player = this.getPlayer(corner.player_id)
+    corner.tiles.forEach(tile => {
+      CONST.TILE_RES[tile.type] && player.giveCard(CONST.TILE_RES[tile.type], 1)
+    })
+  }
 
-
-  #onPlayerUpdate() {}
+  #onPlayerUpdate(pid, key, context) {
+    const private_json = this.getPlayer(pid)?.toJSON(1)
+    this.#io_manager.updatePrivatePlayerData(this.getPlayerSoc(pid), private_json, key, context)
+    this.#io_manager.updatePublicPlayerData(this.getPlayer(pid)?.toJSON(), key)
+  }
 
   setTimer(time_in_seconds) {
     this.clearTimer()
@@ -148,16 +149,21 @@ export default class Game {
   }
   clearTimer() { clearTimeout(this.#timer) }
 
+  #getRandom(list) { return list[Math.floor(Math.random() * list.length)] }
+
   setSocketID(pid, sid) { this.getPlayer(pid)?.setSocket(sid) }
   removeSocketID(pid, sid) { this.getPlayer(pid)?.deleteSocket(sid) }
-  setUpSocketEvents(socket, pid) { this.#io_manager.setUpEvents(socket, pid) }
+  setUpSocketEvents(socket, pid) {
+    this.setSocketID(pid, socket.id)
+    this.#io_manager.setUpEvents(socket, pid)
+  }
 
   hasPlayer(id) { return id <= this.players.length }
   getPlayer(id) { return this.players[id - 1] }
   getOpponents(id) { return this.players.filter((_, i) => i !== (id - 1)) }
   getActivePlayer() { return this.players[this.#active_player] }
 
-  getPlayerSoc(id) { return getPlayer(id)?.socket_id }
+  getPlayerSoc(id) { return this.getPlayer(id)?.socket_id }
   getOtherPlayerSocs(id) {
     return this.players.filter((_, i) => i !== (id - 1)).map(p => p.socket_id)
   }
