@@ -2,18 +2,13 @@ import * as CONST from "../const.js"
 
 export default class Corner {
   id; trade; piece; player_id;
-  static #id_counter = 1
-  static #ref_list = []
   tiles = []
   edges = { top: null, left: null, right: null, bottom: null }
 
-  constructor(tile) {
-    this.id = Corner.#id_counter ++
-    Corner.#ref_list[this.id] = this
+  constructor(id, tile) {
+    this.id = id
     this.tiles.push(tile)
   }
-
-  static getRefList() { return this.#ref_list.slice() }
 
   addTile(tile) { this.tiles.push(tile) }
   addEdge(dir, edge) { this.edges[dir] = edge }

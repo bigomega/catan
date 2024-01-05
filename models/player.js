@@ -38,13 +38,14 @@ export default class Player {
     this.onChange(this.id, 'closed_cards', { card_type, count, taken: true })
   }
 
-  build(location, piece) {
+  addPiece(location, piece) {
     if (!(piece in CONST.PIECES)) return
     if (piece === 'C') {
       const i = this.pieces.S.indexOf(location)
       i >= 0 && this.pieces.S.splice(i, 1)
     }
     this.pieces[piece].push(location)
+    this.onChange(this.id, 'pieces')
     if (piece === 'C' || piece === 'S') {
       this.public_vps++
       this.onChange(this.id, 'public_vps')
@@ -63,30 +64,6 @@ export default class Player {
   }
 
   setLastStatus(message) { this.last_status = message }
-
-  getValidRoadLocs() {
-    const valid_locs = this.pieces.R.reduce((mem, r_loc) => {
-      const edge = Edge.getRefList()[r_loc]
-      const c1_eids = edge?.corner1.getEdges(-1).map(e => e.id)
-      const c2_eids = edge?.corner2.getEdges(-1).map(e => e.id)
-      return mem.concat(c1_eids, c2_eids)
-    }, [])
-    // remove duplicates
-    return [...new Set(valid_locs)]
-  }
-
-  getValidSettlementLocs() {
-    const reachable_locs = this.pieces.R.reduce((mem, r_loc) => {
-      const edge = Edge.getRefList()[r_loc]
-      return mem.concat(edge?.corner1.id, edge?.corner1.id)
-    }, [])
-    return [...new Set(reachable_locs)].filter(c_id => {
-      if (Corner.getRefList()[c_id]?.piece) { return false }
-      return Corner.getRefList()[c_id]?.hasNoNeighbours()
-    })
-  }
-
-  getValidCityLocs(pid) { return this.getPlayer(pid).pieces.S }
 
   toJSON(get_private) {
     const playerJSON = {

@@ -8,7 +8,6 @@ import Edge from "../public/js/board/edge.js"
 
 const ST = CONST.GAME_STATES
 const SOC = CONST.SOCKET_EVENTS
-// Keys of GAME_MESSAGES
 const MSG = Object.keys(GAME_MESSAGES).reduce((m,k) => (m[k]=k,m), {})
 /**
  * -------
@@ -185,7 +184,7 @@ export default class Game {
         this.dice_value = [CONST.ROLL(), CONST.ROLL()]
       }
     })
-    this.expected_actions.splice(0, this.expected_actions.length)
+    this.expected_actions = []
     // This is to avoid expected_actions being modified before reset
     future_fns.forEach(fn => fn())
     return abort_next_execution
@@ -288,6 +287,31 @@ export default class Game {
    * ----- MISC - BUILD, TIMER, HELPER - EMIT, PLAYER
    * --------------------------------------------------
    */
+
+  getValidRoadLocs() {
+    const valid_locs = this.pieces.R.reduce((mem, r_loc) => {
+      const edge = Edge.getRefList()[r_loc]
+      const c1_eids = edge?.corner1.getEdges(-1).map(e => e.id)
+      const c2_eids = edge?.corner2.getEdges(-1).map(e => e.id)
+      return mem.concat(c1_eids, c2_eids)
+    }, [])
+    // remove duplicates
+    return [...new Set(valid_locs)]
+  }
+
+  getValidSettlementLocs() {
+    const reachable_locs = this.pieces.R.reduce((mem, r_loc) => {
+      const edge = Edge.getRefList()[r_loc]
+      return mem.concat(edge?.corner1.id, edge?.corner1.id)
+    }, [])
+    return [...new Set(reachable_locs)].filter(c_id => {
+      if (Corner.getRefList()[c_id]?.piece) { return false }
+      return Corner.getRefList()[c_id]?.hasNoNeighbours()
+    })
+  }
+
+  getValidCityLocs(pid) { return this.getPlayer(pid).pieces.S }
+
   build(pid, type, loc, piece) {
     const player = this.getPlayer(pid)
     const p_soc = this.getPlayerSoc(pid)

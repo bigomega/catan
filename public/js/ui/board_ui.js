@@ -2,15 +2,15 @@ import Corner from "../board/corner.js"
 import Edge from "../board/edge.js"
 import * as CONST from "../const.js"
 const $ = document.querySelector.bind(document)
+const oKeys = Object.keys
 
 export default class BoardUI {
-  #socket_actions; board;
+  board;
   $el = $('#game > .board')
 
-  constructor(board) { this.board = board }
-
-  setSocketActions(sa) {
-    this.#socket_actions = sa
+  constructor(board, onClick) {
+    this.board = board
+    this.onClick = onClick
   }
 
   render() {
@@ -21,7 +21,7 @@ export default class BoardUI {
     const renderedEdges = []
 
     function _renderCorners(tile) {
-      return Object.keys(tile.corners).map(dir => {
+      return oKeys(tile.corners).map(dir => {
         const corner = tile.corners[dir]
         // if (corner.id == 4) {debugger}
         let $_trade = ''
@@ -30,14 +30,14 @@ export default class BoardUI {
         }
         if (renderedCorners.includes(corner.id)) { return $_trade }
         renderedCorners.push(corner.id)
-        return `<div class="corner" data-id="C${corner.id}" data-dir="${dir}"></div>
+        return `<div class="corner" data-id="${corner.id}" data-dir="${dir}"></div>
           ${$_trade}
         `
       }).join('')
     }
 
     function _renderEdges(tile) {
-      return Object.keys(tile.corners).map(dir => {
+      return oKeys(tile.corners).map(dir => {
         const corner = tile.corners[dir]
         const relevant_edges = {
           top: ['left', 'right'],
@@ -58,13 +58,13 @@ export default class BoardUI {
               'top_right': 'right',
             }[dir]
           }
-          return `<div class="edge" data-id="E${edge.id}" data-dir="${css_dir}"></div>`
+          return `<div class="edge" data-id="${edge.id}" data-dir="${css_dir}"></div>`
         }).join('')
       }).join('')
     }
 
     function _renderBeaches(tile) {
-      return Object.keys(tile.adjacent_tiles).map(dir =>
+      return oKeys(tile.adjacent_tiles).map(dir =>
         (tile.adjacent_tiles[dir] && tile.adjacent_tiles[dir].type !== 'S')
           ? `<div class="beach beach-${Math.floor(Math.random() * 3) + 1} beach-${dir}"></div>`
           : ''
@@ -75,7 +75,7 @@ export default class BoardUI {
       return row.map((tile, j) =>
         `<div
           class="tile ${tile.type}"
-          data-id="T${tile.id}"
+          data-id="${tile.id}"
           ${(tile.type === 'S' && tile.trade_edge)
           ? `data-trade="${tile.trade_type}" data-trade-dir="${tile.trade_edge}"`
           : ''
@@ -96,7 +96,7 @@ export default class BoardUI {
       ).join('')
     }
 
-    this.$el.innerHTML = this.board.tiles.map((row, i) => {
+    this.$el.innerHTML = this.board.tile_rows.map((row, i) => {
       startDiff += (row.diff || 0)
       if (startDiff < maxLeft) { maxLeft = startDiff }
       if (row.length > maxLength) { maxLength = row.length }
@@ -111,57 +111,50 @@ export default class BoardUI {
       `
     }).join('')
 
-    this.#updateExisting()
-
     this.$el.style.paddingLeft = `calc(var(--tile-width) / 2 * ${maxLeft * -1})`
     this.$el.style.width = `calc(var(--tile-width) * ${maxLength})`
     this.#setupEvents()
-  }
-
-  #updateExisting() {
-    const existing_changes = this.board.existing_changes
-    if (!existing_changes) return
-    Object.keys(existing_changes).forEach(type => {
-      if (type === CONST.LOCS.EDGE) {
-        Object.keys(existing_changes[type] || {}).forEach(loc => {
-          this.build({ type, loc, pid: existing_changes[type][loc] })
-        })
-      } else if (type === CONST.LOCS.CORNER) {
-        Object.keys(existing_changes[type] || {}).forEach(loc => {
-          const { piece, pid } = existing_changes[type][loc]
-          this.build({ type, loc, piece, pid })
-        })
-      }
-    })
   }
 
   #setupEvents() {
     this.$el.querySelectorAll('.corner').forEach($corner => {
       $corner.addEventListener('click', e => {
         if (e.target.classList.contains('shown')) {
-          const id = e.target.dataset.id?.replace(/^C/, '')
-          this.#socket_actions.sendLocationClick(CONST.LOCS.CORNER, id)
+          this.onClick(CONST.LOCS.CORNER, +e.target.dataset.id)
         }
       })
     })
     this.$el.querySelectorAll('.edge').forEach($edge => {
       $edge.addEventListener('click', e => {
         if (e.target.classList.contains('shown')) {
-          const id = e.target.dataset.id?.replace(/^E/, '')
-          this.#socket_actions.sendLocationClick(CONST.LOCS.EDGE, id)
+          this.onClick(CONST.LOCS.EDGE, +e.target.dataset.id)
         }
       })
     })
   }
 
-  #getCorner(id) { return this.$el.querySelector(`.corner[data-id=C${id}]`) }
-  #getEdge(id) { return this.$el.querySelector(`.edge[data-id=E${id}]`) }
+  build(pid, piece, location) {
+    if (piece === 'S' || piece === 'C') {
+      const $corner = this.#getCorner$(location)
+      if(!$corner) return
+      $corner.classList.remove('shown')
+      $corner.dataset.taken = piece
+      piece === 'S' && $corner.classList.add('taken', `p${pid}`)
+    } else if (piece === 'R') {
+      const $edge = this.#getEdge$(location)
+      $edge?.classList.remove('shown')
+      $edge?.classList.add('taken', 'p' + pid)
+    }
+  }
+
+  #getCorner$(id) { return this.$el.querySelector(`.corner[data-id="${id}"]`) }
+  #getEdge$(id) { return this.$el.querySelector(`.edge[data-id="${id}"]`) }
 
   showCorners(ids = []) {
-    ids.forEach(id => this.#getCorner(id)?.classList.add('shown'))
+    ids.forEach(id => this.#getCorner$(id)?.classList.add('shown'))
   }
   showEdges(ids = []) {
-    ids.forEach(id => this.#getEdge(id)?.classList.add('shown'))
+    ids.forEach(id => this.#getEdge$(id)?.classList.add('shown'))
   }
   showTiles(ids) { }
 
@@ -169,28 +162,5 @@ export default class BoardUI {
     this.$el.querySelectorAll('.corner.shown, .edge.shown').forEach($el => {
       $el.classList.remove('shown')
     })
-  }
-
-  /**
-   * Also updates the board DS (game.js is a deadbeat)
-   */
-  build({ type, pid, piece, loc }) {
-    if (type === CONST.LOCS.CORNER) {
-      const $corner = this.#getCorner(loc)
-      if (!$corner) return
-      const corner = Corner.getRefList()[loc]
-      $corner.classList.remove('shown')
-      $corner.dataset.taken = piece
-      if (piece === 'S') {
-        $corner.classList.add('taken', `p${pid}`)
-        corner?.buildSettlement(pid)
-      } else { corner?.buildCity() }
-    } else if (type === CONST.LOCS.EDGE) {
-      const $edge = this.#getEdge(loc)
-      if (!$edge) return
-      $edge.classList.remove('shown')
-      $edge.classList.add('taken', 'p' + pid)
-      Edge.getRefList()[loc]?.buildRoad(pid)
-    }
   }
 }

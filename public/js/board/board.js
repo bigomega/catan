@@ -1,13 +1,17 @@
 import * as CONST from "../const.js"
 import Corner from "./corner.js"
+import Edge from "./edge.js"
 import Tile from './tile.js'
 
 export default class Board {
   head_tile; existing_changes;
-  tiles = []
+  tile_rows = []
   numbers = [...Array(13)].map(_ => [])
+  #tile_refs = []
+  #corner_refs = []
+  #edge_refs = []
 
-  constructor(mapkey, existing_changes) {
+  constructor(mapkey, existing_changes = []) {
     this.mapkey = mapkey
     this.existing_changes = existing_changes
     /**
@@ -28,47 +32,65 @@ export default class Board {
     const mapkey_list = mapkey.trim().split('\n')
     for (let i = 0; i < mapkey_list.length; i++) {
       let row_map = mapkey_list[i].trim()
-      const prev_row = i > 0 ? this.tiles[i - 1] : null
-      const row_list = []
+      const prev_row = i > 0 ? this.tile_rows[i - 1] : null
+      const row_data = []
       // With the current implementation - ONLY ONE +/- can be used for Row Diff
       if (row_map[0] == '+' || row_map[0] == '-') {
-        row_list.diff = +(row_map[0] + '1')
+        row_data.diff = +(row_map[0] + '1')
         row_map = row_map.substr(1)
       } else if (i > 0) { // edge case
-        row_list.diff = 1
+        row_data.diff = 1
       }
       const row_map_arr = row_map.split('.')
       for (let j = 0; j < row_map_arr.length; j++) {
         const tile_map = row_map_arr[j].trim()
-        const prev_tile = j > 0 ? row_list[j - 1] : null
-        const row_diff_tmp = row_list.diff < 0 ? -1 : 0
+        const prev_tile = j > 0 ? row_data[j - 1] : null
+        const row_diff_tmp = row_data.diff < 0 ? -1 : 0
         const adjacent_tiles = {
           left: prev_tile,
           top_left: prev_row?.[j + row_diff_tmp],
           top_right: prev_row?.[j + row_diff_tmp + 1],
         }
+        const tile_params = {
+          id: this.#tile_refs.length, createCorner: this.createCorner.bind(this),
+          createEdge: this.createEdge.bind(this), ...adjacent_tiles
+        }
         if (tile_map[0] == 'S') {
           const { dir, res, num } =
             tile_map.match(new RegExp(CONST.SEA_REGEX))?.groups || {}
-          const trade_edge = ({
+          tile_params.trade_edge = ({
             tl: 'top_left', tr: 'top_right', l: 'left',
             r: 'right', bl: 'bottom_left', br: 'bottom_right',
           })[dir]
-          const tile =
-            new Tile({ type: 'S', trade_edge, trade_type: res, ...adjacent_tiles })
-          row_list.push(tile)
+          tile_params.trade_type = res
+          tile_params.type = 'S'
         } else {
           const { tile_type, num } =
-            tile_map.match(new RegExp(CONST.RESOURCE_REGEX))?.groups || {}
-          const tile = new Tile({ type: tile_type, num, ...adjacent_tiles })
-          num > 1 && num < 13 && this.numbers[num].push(tile)
-          row_list.push(tile)
+          tile_map.match(new RegExp(CONST.RESOURCE_REGEX))?.groups || {}
+          tile_params.type = tile_type
+          tile_params.num = num
         }
+        const tile = new Tile(tile_params)
+        tile.num && tile.num > 1 && tile.num < 13 && this.numbers[tile.num].push(tile)
+        this.#tile_refs.push(tile)
+        row_data.push(tile)
       }
-      this.tiles.push(row_list)
+      this.tile_rows.push(row_data)
     }
-    this.head_tile = this.tiles[0]?.[0]
+    this.head_tile = this.tile_rows[0]?.[0]
     return this
+  }
+
+  createCorner(tile) {
+    const corner = new Corner(this.#corner_refs.length, tile)
+    this.#corner_refs.push(corner)
+    return corner
+  }
+
+  createEdge(c1, c2) {
+    const edge = new Edge(this.#edge_refs.length, c1, c2)
+    this.#edge_refs.push(edge)
+    return edge
   }
 
   /**
@@ -78,13 +100,10 @@ export default class Board {
    *          id : locations with at least one player(id) road
    * @returns {Corner[]}
    */
-  settlementLocations(player_id) {
+  getSettlementLocations(player_id) {
     const locations = []
-    const visited_corners = []
-    Corner.getRefList().forEach(corner => {
+    this.#corner_refs.forEach(corner => {
       if (!corner.tiles.filter(t => t.type !== 'S').length) return
-      if (visited_corners[corner.id]) return
-      visited_corners[corner.id] = 1
       const no_neighbours = corner.hasNoNeighbours()
       const road_count = corner.getEdges(player_id).length
       // C.getEdges(pid) handles the "-1" case
@@ -93,11 +112,27 @@ export default class Board {
     return locations
   }
 
-  place(item, location) {
-    //
+  build(pid, piece, loc) {
+    switch (piece) {
+      case 'S':
+        this.findCorner(loc)?.buildSettlement(pid); break;
+      case 'C':
+        this.findCorner(loc)?.buildCity(); break;
+      case 'R':
+        this.findEdge(loc)?.buildRoad(pid); break;
+    }
   }
 
+  // returns [{pid, res, count}, ...]
   distribute(number) {
-    //
+    return this.numbers[number]?.reduce(tile => {
+      const res = CONST.TILE_RES[tile.type]
+      return mem.concat(tile.getOccupiedCorners().map(corner =>
+        ({ pid: corner.player_id, res, count: +(corner.piece === 'C') + 1 })
+      ))
+    }, [])
   }
+
+  findCorner(id) { return this.#corner_refs[id] }
+  findEdge(id) { return this.#edge_refs[id] }
 }

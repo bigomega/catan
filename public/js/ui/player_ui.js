@@ -103,7 +103,7 @@ export default class PlayerUI {
     }
   }
 
-  resetRenderTimer(pid, time_in_seconds) {
+  resetRenderTimer(time_in_seconds, pid) {
     this.timer && clearInterval(this.timer)
     this.toggleAction(this.$timer, this.player.id === pid)
     time_in_seconds--
@@ -214,10 +214,10 @@ export default class PlayerUI {
    */
   setStatus(message) {
     this.$status_bar.innerHTML = message.replace(/<br\/?>/g, '. ')
-    this.#socket_actions.saveStatus(this.$status_bar.innerHTML)
+    // this.#socket_actions.saveStatus(this.$status_bar.innerHTML)
   }
   appendStatus(message) {
     this.$status_bar.innerHTML += message.replace(/<br\/?>/g, '. ')
-    this.#socket_actions.saveStatus(this.$status_bar.innerHTML)
+    // this.#socket_actions.saveStatus(this.$status_bar.innerHTML)
   }
 }

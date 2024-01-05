@@ -63,9 +63,10 @@ export const GAME_CONFIG = {
 }
 
 export const GAME_STATES = {
-  STRATEGIZE: 'strategize',
-  INITIAL_BUILD: 'initial_build',
-  INITIAL_BUILD_2: 'initial_build_2',
+  INITIAL_SETUP: 'INITIAL_SETUP',
+  // STRATEGIZE: 'strategize',
+  // INITIAL_BUILD: 'initial_build',
+  // INITIAL_BUILD_2: 'initial_build_2',
   PLAYER_ROLL: 'player_roll',
   PLAYER_ACTIONS: 'player_actions',
   END: 'end',
@@ -73,18 +74,23 @@ export const GAME_STATES = {
 
 export const SOCKET_EVENTS = {
   // Client Sends…
-  JOINED_WAITING_ROOM: 'joined_waiting_room',
   PLAYER_ONLINE: 'player_online',
+  // Both
+  INITIAL_SETUP: 'ask/return_initial_setup',
+  // Server Sends…
+  JOINED_WAITING_ROOM: 'joined_waiting_room',
+  STATE_CHANGE: 'state_change',
+  SET_TIMER: 'set_timer',
+
+
   CLICK_LOC: 'clicked_location',
   ROLL_DICE: 'roll_the_dice',
   SAVE_STATUS: 'save_last_status',
-  // Server Sends…
+
   ALERT_ALL: 'alert_all',
   ALERT_PLAYER: 'alert_player',
   STATUS_ONLY: 'update_status_only',
   APPEND_STATUS: 'append_to_status',
-  STATE_CHANGE: 'state_change',
-  SET_TIMER: 'set_timer',
   SHOW_LOCS: 'show_actionable_locations', // sent privately
   BUILD: 'build',
   HIDE_LOCS: 'hide_all_shown_locations',

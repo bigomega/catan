@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser'
 import mustacheExpress from 'mustache-express'
 import { Server } from "socket.io"
 import http from "http"
-import Game from "./models/game.js"
+import Game from "./models/game2.js"
 import { parse as parseCookie } from "cookie"
 import * as CONST from "./public/js/const.js"
 
@@ -65,7 +65,7 @@ app.get('/game/:id', function(req, res) {
   // console.log(game.players.length, game.player_count)
   if (game.players.length < game.player_count) {
     res.render('waiting_room', {
-      players: JSON.stringify(game.getAllPlayers()),
+      players: JSON.stringify(game.players),
       player_count: game.player_count,
       game_id,
     })
@@ -75,7 +75,7 @@ app.get('/game/:id', function(req, res) {
   res.render('index', {
     game: JSON.stringify(game),
     player: JSON.stringify(player.toJSON(1)),
-    opponents: JSON.stringify(game.getOpponentPlayers(player.id).map(_ => _.toJSON())),
+    opponents: JSON.stringify(game.getOpponents(player.id).map(_ => _.toJSON())),
   })
 })
 
@@ -128,32 +128,16 @@ app.get('/clear-sessions/:id?', function(req, res) {
   res.redirect('/all-sessions')
 })
 
-// io.engine.use((req, res, next) => {
-//   next()
-// });
-
 const SOCK_INFO = {}
-io.use((socket, next) => {
-  const { game_id, player_id } = parseCookie(socket.handshake.headers.cookie || '')
-  socket.join(game_id || 'unroomed')
-  GAME_SESSIONS[game_id]?.setSocketID(player_id, socket.id)
-  SOCK_INFO[socket.id] = { game_id, player_id }
-  next()
-});
-
-const SOC = CONST.SOCKET_EVENTS
-// SOCKET IO ACTIVITIES
 io.on('connection', (socket) => {
-  // console.log('User connected - ', socket.id, socket.rooms)
+  let { game_id, player_id } = parseCookie(socket.handshake.headers.cookie || '')
+  game_id = +game_id; player_id = +player_id
+  socket.join(game_id || -1)
+  // Only setup socket events for the correct game
+  GAME_SESSIONS[game_id]?.setUpSocketEvents(socket, player_id)
+  SOCK_INFO[socket.id] = { game_id, player_id }
 
-  ;[SOC.PLAYER_ONLINE, SOC.CLICK_LOC, SOC.ROLL_DICE, SOC.SAVE_STATUS].forEach(soc => {
-    socket.on(soc, ({ player_id, game_id }, ...data) => {
-      const game = GAME_SESSIONS[game_id]
-      game.onSocEvents(soc, player_id, ...data)
-    })
-  })
-
-  /** @todo inform game of the disconnect. pause and continue */
+  /** @todo implement pause and continue */
   socket.on('disconnect', () => {
     const { game_id, player_id } = SOCK_INFO[socket.id]
     GAME_SESSIONS[game_id]?.removeSocketID(player_id, socket.id)

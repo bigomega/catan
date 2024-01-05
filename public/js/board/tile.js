@@ -7,10 +7,9 @@ const OPPOSITES = { top: 'bottom', left: 'right', right: 'left', bottom: 'top' }
 export default class Tile {
   id; type; num; adjacent_tiles; corners;
   trade_edge; trade_type; robbed;
-  static #id_counter = 1
 
-  constructor({ type = 'S', num, left, top_left, top_right, trade_edge, trade_type } = {}) {
-    this.id = Tile.#id_counter ++
+  constructor({ id, type = 'S', num, left, top_left, top_right, trade_edge, trade_type, createCorner, createEdge } = {}) {
+    this.id = id
     this.type = Object.keys(CONST.TILES).includes(type) ? type : 'S'
     this.num = num
     this.adjacent_tiles = { left, top_left, top_right }
@@ -38,7 +37,7 @@ export default class Tile {
       if (this.corners[dir]) {
         this.corners[dir].addTile(this)
       } else {
-        const newCorner = new Corner(this)
+        const newCorner = createCorner(this)
         this.corners[dir] = newCorner
         const ALL_CONNECTIONS = { // only within the current Tile
           top: { left: 'top_left', right: 'top_right' },
@@ -54,7 +53,7 @@ export default class Tile {
           // c_dir is direction of other corner from `newCorner`
           // c_loc is the location of other corner from tile view (simillar to dir)
           if (this.corners[c_loc]) {
-            const edge = new Edge(newCorner, this.corners[c_loc])
+            const edge = createEdge(newCorner, this.corners[c_loc])
             newCorner.addEdge(c_dir, edge)
             this.corners[c_loc].addEdge(OPPOSITES[c_dir], edge)
           }
