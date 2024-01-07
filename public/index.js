@@ -1,6 +1,7 @@
 import Game from "./js/game.js"
 import UI from "./js/ui.js"
 import SocketActions from "./js/socket_actions.js"
+import Player from "./js/player.js"
 
 // window.COOKIE = (str =>
 //   str
@@ -13,7 +14,7 @@ import SocketActions from "./js/socket_actions.js"
 // )(document.cookie)
 
 const socket = io()
-const player = window.player
+const player = new Player(window.player)
 const opponents = window.opponents
 const game = new Game(window.game)
 console.log(game)

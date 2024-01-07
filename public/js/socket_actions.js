@@ -24,23 +24,23 @@ export default class SocketActions {
           ui.alert(GAME_MESSAGES.STRATEGIZE.self(time))
           this.playAudio(AUDIO.START_END)
         },
-        // [CONST.GAME_STATES.PLAYER_ROLL]: _ => {
-        //   ui.toggleActions(false)
-        //   const message = this.getMessage(active_player, MSGKEY.ROLL_TURN)
-        //   if (active_player.id === this.player.id) {
-        //     ui.alert(message)
-        //     this.playAudio(AUDIO.PLAYER_TURN)
-        //     ui.toggleDice(true)
-        //   } else {
-        //     ui.setStatus(message)
-        //   }
-        // },
-        // [CONST.GAME_STATES.PLAYER_ACTIONS]: _ => {
-        //   if (active_player.id === this.player.id) {
-        //     ui.toggleActions(true)
-        //   }
-        //   // ui.setStatus(this.getMessage(active_player, MSGKEY.PLAYER_TURN))
-        // },
+        [CONST.GAME_STATES.PLAYER_ROLL]: _ => {
+          ui.toggleActions(false)
+          const message = this.getMessage(active_player, MSGKEY.ROLL_TURN)
+          if (active_player.id === this.player.id) {
+            ui.alert(message)
+            this.playAudio(AUDIO.PLAYER_TURN)
+            ui.toggleDice(true)
+          } else {
+            ui.setStatus(message)
+          }
+        },
+        [CONST.GAME_STATES.PLAYER_ACTIONS]: _ => {
+          if (active_player.id === this.player.id) {
+            ui.toggleActions(true)
+          }
+          // ui.setStatus(this.getMessage(active_player, MSGKEY.PLAYER_TURN))
+        },
       })[state]?.()
     })
 
@@ -88,7 +88,7 @@ export default class SocketActions {
           S: AUDIO.BUILD_SETTLEMENT,
           C: AUDIO.BUILD_CITY,
           R: AUDIO.BUILD_ROAD,
-        })[obj.piece]
+        })[piece]
         aud_file && this.playAudio(aud_file)
       }
       ui.build(player.id, piece, loc)
@@ -101,16 +101,16 @@ export default class SocketActions {
       ui.updatePlayer(update_player, key, context)
     })
 
-    // socket.on(SOC.DICE_VALUE, (active_player, [d1, d2]) => {
-    //   ui.toggleDice(false)
-    //   ui.setStatus(this.getMessage(active_player, MSGKEY.ROLL_VALUE, d1, d2))
-    //   if (active_player.id === this.player.id) {
-    //     this.playAudio(AUDIO.DICE)
-    //     ui.showDiceValue(d1, d2)
-    //   } else {
-    //     this.playAudio(AUDIO.DICE, 0.2)
-    //   }
-    // })
+    socket.on(SOC.DICE_VALUE, ([d1, d2], active_player) => {
+      ui.toggleDice(false)
+      ui.setStatus(this.getMessage(active_player, MSGKEY.ROLL_VALUE, d1, d2))
+      if (active_player.id === this.player.id) {
+        this.playAudio(AUDIO.DICE)
+        ui.showDiceValue(d1, d2)
+      } else {
+        this.playAudio(AUDIO.DICE, 0.2)
+      }
+    })
   }
 
   getMessage(alert_player, msg_key, ...data) {
@@ -140,14 +140,12 @@ export default class SocketActions {
   }
 
   // sendLocationClick(loc_type, id) {
-  //   this.socket.emit(SOC.CLICK_LOC, this.game_info, loc_type, id)
+  //   this.socket.emit(SOC.CLICK_LOC, loc_type, id)
   // }
 
-  // sendDiceClick() {
-  //   this.socket.emit(SOC.ROLL_DICE, this.game_info)
-  // }
+  sendDiceClick() { this.socket.emit(SOC.ROLL_DICE) }
 
-  // saveStatus(message) {
-  //   this.socket.emit(SOC.SAVE_STATUS, this.game_info, message)
-  // }
+  saveStatus(message) {
+    this.socket.emit(SOC.SAVE_STATUS, message)
+  }
 }

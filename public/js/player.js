@@ -1,19 +1,13 @@
-class Player {
-  constructor() {
-    // this.hand_resources = { ...RESOURCES }
-    // Object.keys(RESOURCES).map(r => this.hand_resources[r] = 0)
-
-    // this.hand_development_cards = { ...DEVELOPMENT_CARDS }
-    // Object.keys(DEVELOPMENT_CARDS).map(r => this.hand_development_cards[r] = 0)
+export default class Player {
+  constructor(player_obj) {
+    Object.assign(player_obj, {
+      update: this.update.bind(player_obj),
+    })
+    return player_obj
   }
 
-  addResource(resource, count = 1) {
-    this[resource] += count
+  update(updated_obj) {
+    Object.assign(this, updated_obj)
+    return this
   }
-  hasResource(resource, count = 1) { }
-  removeResource(resource, count = 1) { }
-
-  addPiece(type) { }
-  hasPiece(type) { }
-  removePiece(type) { }
 }

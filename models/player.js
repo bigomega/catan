@@ -46,9 +46,11 @@ export default class Player {
       else { throw "Cannot build city without settlement" }
     }
     this.pieces[piece].push(location)
+    this.onChange(this.id, 'pieces', { piece, location })
     if (piece !== 'R') {
       this.public_vps++
     }
+    this.onChange(this.id, 'public_vps', { public_vps: this.public_vps })
   }
 
   openDevelopmentCard(card_type) {

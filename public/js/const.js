@@ -75,17 +75,18 @@ export const GAME_STATES = {
 export const SOCKET_EVENTS = {
   // Client Sends…
   PLAYER_ONLINE: 'player_online',
+  ROLL_DICE: 'roll_the_dice',
+  SAVE_STATUS: 'save_last_status',
   // Both
   INITIAL_SETUP: 'ask/return_initial_setup',
   // Server Sends…
   JOINED_WAITING_ROOM: 'joined_waiting_room',
   STATE_CHANGE: 'state_change',
   SET_TIMER: 'set_timer',
+  DICE_VALUE: 'value_of_rolled_dice',
 
 
   CLICK_LOC: 'clicked_location',
-  ROLL_DICE: 'roll_the_dice',
-  SAVE_STATUS: 'save_last_status',
 
   ALERT_ALL: 'alert_all',
   ALERT_PLAYER: 'alert_player',
@@ -95,7 +96,6 @@ export const SOCKET_EVENTS = {
   BUILD: 'build',
   HIDE_LOCS: 'hide_all_shown_locations',
   UPDATE_PLAYER: 'update_player_data',
-  DICE_VALUE: 'value_of_rolled_dice',
 }
 
 export const AUDIO_FILES = {

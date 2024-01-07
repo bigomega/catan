@@ -23,8 +23,14 @@ export default class IOManager {
 
     /** @event Initial_Setup */
     socket.on(SOC.INITIAL_SETUP, (s_loc, r_loc) => {
-      game.initialBuild(pid, s_loc, r_loc)
+      game.initialBuildFromSoc(pid, s_loc, r_loc)
     })
+
+    /** @event Roll_Dice */
+    socket.on(SOC.ROLL_DICE, () => game.playerRollFromSock(pid))
+
+    /** @event Save_Status */
+    socket.on(SOC.SAVE_STATUS, html => game.saveStatusFromSoc(pid, html))
   }
 
   updateWaitingRoom(player) { this.emit(SOC.JOINED_WAITING_ROOM, player) }
@@ -37,12 +43,12 @@ export default class IOManager {
 
   updateBuild(player, piece, loc) { this.emit(SOC.BUILD, player, piece, loc) }
 
-  updatePublicPlayerData(p_json, key) {
-    this.emit(SOC.UPDATE_PLAYER, p_json, key)
-  }
+  updatePublicPlayerData(p_json, key) { this.emit(SOC.UPDATE_PLAYER, p_json, key) }
   updatePrivatePlayerData(player_socket_id, p_json, key, data) {
     this.#io.to(player_socket_id).emit(SOC.UPDATE_PLAYER, p_json, key, data)
   }
+
+  updateDiceValue(dice_value, active_player) { this.emit(SOC.DICE_VALUE, dice_value, active_player) }
 
   emit(type, ...data) { this.#io.to(this.#game.id).emit(type, ...data) }
 }

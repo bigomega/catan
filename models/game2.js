@@ -65,7 +65,7 @@ export default class Game {
       this.expected_actions.push({
         type: ST.INITIAL_SETUP,
         pid: this.active_player,
-        callback: this.#initialBuildCallback.bind(this),
+        callback: this.#expectedInitialBuild.bind(this),
       })
       this.#io_manager.requestInitialSetup(this.getActivePlayer(), this.turn)
       this.setTimer(this.config.initial_build.time)
@@ -75,17 +75,26 @@ export default class Game {
     this.#gotoNextState()
     if (this.state === ST.PLAYER_ROLL) {
       this.active_player++
-      // expect roll
-      // set timer
+      this.expected_actions.push({
+        type: ST.PLAYER_ROLL,
+        pid: this.active_player,
+        callback: pid => {
+          this.dice_value = [CONST.ROLL(), CONST.ROLL()]
+          this.#io_manager.updateDiceValue(this.dice_value, this.getActivePlayer())
+        },
+      })
+      this.setTimer(this.config.roll.time)
     } else if (this.state === ST.PLAYER_ACTIONS) {
-      //    if 7 - robber
-      //    else
-      //        distribute res
-      //        set timer
+      const dice_total = this.dice_value[0] + this.dice_value[1]
+      if (dice_total === 7) {
+        // Robber
+        this.setTimer(this.config.player_turn.time)
+      } else {
+        this.#distributeTileResources(dice_total)
+        this.setTimer(this.config.player_turn.time)
+      }
     }
   }
-
-  #gotoNextState() { this.state = STATE_ORDER[STATE_ORDER.indexOf(this.state) + 1] }
 
   #resolvePendingActions() {
     let continue_next = true
@@ -94,17 +103,7 @@ export default class Game {
     return continue_next
   }
 
-  initialBuild(pid, settlement_loc, road_loc) {
-    const expected_index = this.expected_actions.findIndex(_ => _.type === ST.INITIAL_SETUP)
-    const { pid: expected_pid, callback } = this.expected_actions[expected_index]
-    if (pid && pid === expected_pid) {
-      callback(pid, settlement_loc, road_loc)
-      this.expected_actions.splice(expected_index, 1)
-      this.#next()
-    }
-  }
-
-  #initialBuildCallback(pid, settlement_loc, road_loc) {
+  #expectedInitialBuild(pid, settlement_loc, road_loc) {
     let s_id = settlement_loc, r_id = road_loc
     const valid_corners = this.board.getSettlementLocations(-1).map(s => s.id)
     if (!valid_corners.includes(s_id)) { s_id = this.#getRandom(valid_corners) }
@@ -120,13 +119,6 @@ export default class Game {
     }
   }
 
-  build(pid, piece, loc) {
-    this.board.build(pid, piece, loc)
-    this.getPlayer(pid)?.addPiece(loc, piece)
-    this.map_changes.push({ pid, piece, loc })
-    this.#io_manager.updateBuild(this.getPlayer(pid), piece, loc)
-  }
-
   #distributeCornerResources(id) {
     const corner = this.board.findCorner(id)
     if (!corner || !corner.player_id) return
@@ -136,11 +128,50 @@ export default class Game {
     })
   }
 
+  #distributeTileResources(num) {
+    this.board.distribute(num).forEach(({pid, res, count}) => {
+      const player = this.getPlayer(pid)
+      res && player.giveCard(res, count)
+    })
+  }
+
+  build(pid, piece, loc) {
+    this.board.build(pid, piece, loc)
+    this.getPlayer(pid)?.addPiece(loc, piece)
+    this.map_changes.push({ pid, piece, loc })
+    this.#io_manager.updateBuild(this.getPlayer(pid), piece, loc)
+  }
+
+  // ===== SOC EVENTS =====
+
+  initialBuildFromSoc(pid, settlement_loc, road_loc) {
+    const expected_index = this.expected_actions.findIndex(_ => _.type === ST.INITIAL_SETUP)
+    const { pid: expected_pid, callback } = this.expected_actions[expected_index]
+    if (pid && pid === expected_pid) {
+      callback(pid, settlement_loc, road_loc)
+      this.expected_actions.splice(expected_index, 1)
+      this.#next()
+    }
+  }
+
+  playerRollFromSock(pid) {
+    const expected_index = this.expected_actions.findIndex(_ => _.type === ST.PLAYER_ROLL)
+    const { pid: expected_pid, callback } = this.expected_actions[expected_index]
+    if (pid && pid === expected_pid) {
+      this.dice_value = [CONST.ROLL(), CONST.ROLL()]
+      callback(pid)
+      this.#next()
+    }
+  }
+
+  saveStatusFromSoc(pid, text) { this.getPlayer(pid).setLastStatus(text) }
+
   #onPlayerUpdate(pid, key, context) {
     const private_json = this.getPlayer(pid)?.toJSON(1)
-    this.#io_manager.updatePrivatePlayerData(this.getPlayerSoc(pid), private_json, key, context)
     this.#io_manager.updatePublicPlayerData(this.getPlayer(pid)?.toJSON(), key)
+    this.#io_manager.updatePrivatePlayerData(this.getPlayerSoc(pid), private_json, key, context)
   }
+
 
   setTimer(time_in_seconds) {
     this.clearTimer()
@@ -150,6 +181,7 @@ export default class Game {
   clearTimer() { clearTimeout(this.#timer) }
 
   #getRandom(list) { return list[Math.floor(Math.random() * list.length)] }
+  #gotoNextState() { this.state = STATE_ORDER[STATE_ORDER.indexOf(this.state) + 1] }
 
   setSocketID(pid, sid) { this.getPlayer(pid)?.setSocket(sid) }
   removeSocketID(pid, sid) { this.getPlayer(pid)?.deleteSocket(sid) }
@@ -161,7 +193,7 @@ export default class Game {
   hasPlayer(id) { return id <= this.players.length }
   getPlayer(id) { return this.players[id - 1] }
   getOpponents(id) { return this.players.filter((_, i) => i !== (id - 1)) }
-  getActivePlayer() { return this.players[this.#active_player] }
+  getActivePlayer() { return this.players[this.#active_player] || this.players[0] }
 
   getPlayerSoc(id) { return this.getPlayer(id)?.socket_id }
   getOtherPlayerSocs(id) {

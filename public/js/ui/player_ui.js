@@ -2,18 +2,18 @@ import * as CONST from "../const.js"
 const $ = document.querySelector.bind(document)
 
 export default class PlayerUI {
-  #socket_actions; player; timer; hand;
+  player; timer; hand;
   $timer; $dice; $build_road; $build_settlement; $build_city; $buy_dev_card; $end_turn;
   $el = $('#game > .current-player')
   $hand = this.$el.querySelector('.hand')
   $action_bar = this.$el.querySelector('.actions')
   $status_bar = this.$el.querySelector('.status-bar')
 
-  constructor(player) {
+  constructor(player, ui) {
     this.player = player
+    this.ui = ui
     this.hand = this.#cleanHandData(this.player.closed_cards)
   }
-  setSocketActions(sa) { this.#socket_actions = sa }
 
   render() {
     this.renderActionBar()
@@ -69,13 +69,13 @@ export default class PlayerUI {
     // Dice Click
     this.$dice.addEventListener('click', e => {
       if(e.target.classList.contains('disabled')) return
-      this.#socket_actions.sendDiceClick()
+      this.ui.onDiceClick()
       e.target.classList.add('disabled')
     })
     // Road, Settlement & City Click
     const getEventCb = piece => e => {
       if (e.target.classList.contains('disabled')) return
-      // this.#socket_actions.askForLocations(piece)
+      this.ui.onPiece(piece)
     }
     this.$build_road.addEventListener('click', getEventCb('R'))
     this.$build_settlement.addEventListener('click', getEventCb('S'))
@@ -207,7 +207,6 @@ export default class PlayerUI {
       else { this.hand[type] = count }
     }
     this.renderHand()
-    // this.updateHandUI() // Not possible as the curve styling is JS based
   }
 
   /**
@@ -217,10 +216,10 @@ export default class PlayerUI {
    */
   setStatus(message) {
     this.$status_bar.innerHTML = message.replace(/<br\/?>/g, '. ')
-    // this.#socket_actions.saveStatus(this.$status_bar.innerHTML)
+    this.ui.saveStatus(this.$status_bar.innerHTML)
   }
   appendStatus(message) {
     this.$status_bar.innerHTML += message.replace(/<br\/?>/g, '. ')
-    // this.#socket_actions.saveStatus(this.$status_bar.innerHTML)
+    this.ui.saveStatus(this.$status_bar.innerHTML)
   }
 }

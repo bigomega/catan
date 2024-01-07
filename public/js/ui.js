@@ -22,10 +22,7 @@ export default class UI {
     this.all_players_ui = new AllPlayersUI(player, opponents, this)
   }
 
-  setSocketActions(sa) {
-    this.#socket_actions = sa
-    this.player_ui.setSocketActions(sa)
-  }
+  setSocketActions(sa) { this.#socket_actions = sa }
 
   render() {
     this.board_ui.render()
@@ -62,9 +59,18 @@ export default class UI {
     if (context && key === 'closed_cards') {
       this.player_ui.updateHand(update_player, context)
     }
+    this.player.id === update_player.id && this.player.update(update_player)
   }
   toggleDice(bool) { this.player_ui.toggleDice(bool) }
   toggleActions(bool) { this.player_ui.checkAndToggleActions(bool) }
+
+  onDiceClick() { this.#socket_actions.sendDiceClick() }
+
+  onPiece() {
+    this.hideAllShown()
+  }
+
+  saveStatus(text) { this.#socket_actions.saveStatus(text) }
 
   /**----------------
    * --- Board UI ---
@@ -86,6 +92,8 @@ export default class UI {
     this.board.build(pid, piece, loc)
     this.board_ui.build(pid, piece, loc)
     // update player data
+    // pid === this.player.id && this.player.addPiece(piece, loc)
+    // update viable roads, settl, cities
   }
 
   #onBoardClick(location_type, id) {
