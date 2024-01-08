@@ -80,7 +80,7 @@ export default class UI {
   }
   toggleDice(bool) { this.player_ui.toggleDice(bool) }
   toggleActions(bool) {
-    this.updateAllPossibleLocations()
+    bool && this.updateAllPossibleLocations()
     this.player_ui.checkAndToggleActions(bool)
   }
 
@@ -113,7 +113,9 @@ export default class UI {
     this.hideAllShown()
     this.board.build(pid, piece, loc)
     this.board_ui.build(pid, piece, loc)
-    pid === this.player.id && this.updateAllPossibleLocations()
+    if (pid === this.player.id && this.#socket_actions?.state === CONST.GAME_STATES.PLAYER_ACTIONS) {
+      this.toggleActions(true)
+    }
   }
 
   #onBoardClick(location_type, id) {

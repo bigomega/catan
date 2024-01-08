@@ -18,7 +18,9 @@ const SOC = CONST.SOCKET_EVENTS
 const MSG = Object.keys(GAME_MESSAGES).reduce((m, k) => (m[k] = k, m), {})
 
 export default class Game {
-  board; id; player_count;
+  /** @type {Board} */
+  board;
+  id; player_count;
   #state; #timer; #io_manager;
   #active_player = 0
   config = CONST.GAME_CONFIG
@@ -182,6 +184,28 @@ export default class Game {
   clickedLocationFromSoc(pid, loc_type, id) {
     if (pid !== this.active_player) return
     if (this.state !== ST.PLAYER_ACTIONS) return
+    const player = this.getActivePlayer()
+    if (loc_type === CONST.LOCS.EDGE) {
+      const valid_locs = this.board.getRoadLocationsFromRoads(player.pieces.R)
+      if (valid_locs.includes(id) && player.canBuy('R')) {
+        player.bought('R')
+        this.build(pid, 'R', id)
+      }
+    } else if (loc_type === CONST.LOCS.CORNER) {
+      const corner = this.board.findCorner(id)
+      if (!corner.piece) {
+        const valid_locs = this.board.getSettlementLocationsFromRoads(player.pieces.R)
+        if (valid_locs.includes(id) && player.canBuy('S')) {
+          player.bought('S')
+          this.build(pid, 'S', id)
+        }
+      } else if (corner.piece === 'S') {
+        if (player.pieces.S.includes(id) && player.canBuy('C')) {
+          player.bought('C')
+          this.build(pid, 'C', id)
+        }
+      }
+    }
   }
 
   saveStatusFromSoc(pid, text) { this.getPlayer(pid).setLastStatus(text) }

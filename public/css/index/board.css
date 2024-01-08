@@ -1,9 +1,11 @@
 @import '../constants.css';
 
 @keyframes piece-space-blink {
-  50% {
-    background: #b9b8b8aa;
-  }
+  50% { background: #b9b8b8aa; }
+}
+
+@keyframes piece-settlement-blink {
+  50% { transform: scale(1.5); }
 }
 
 /* --------------------------------------
@@ -157,7 +159,18 @@
       background-repeat: no-repeat;
       /* filter: drop-shadow(1px -1px 0px #000) drop-shadow(-1px 1px 0px #000) drop-shadow(1px 1px 0px #000) drop-shadow(-1px -1px 0px #000); */
       /* filter: drop-shadow(-3px 3px 3px #000); */
-      filter: drop-shadow(-3px 3px 2px #000) drop-shadow(-3px 3px 4px var(--sand-color)) drop-shadow(-3px 3px 5px var(--sand-color));
+      /* filter: drop-shadow(-3px 3px 2px #000) drop-shadow(-3px 3px 4px var(--sand-color)) drop-shadow(-3px 3px 5px var(--sand-color)); */
+      filter: drop-shadow(-3px 3px 2px #000) drop-shadow(1px -1px 3px var(--sand-color)) drop-shadow(3px -3px 5px var(--sand-color)) drop-shadow(-3px 3px 5px var(--sand-color)) drop-shadow(-3px 3px 4px var(--sand-color));
+
+      &.shown[data-taken=S] {
+        animation: piece-settlement-blink 1s infinite;
+        filter: drop-shadow(1px 0px 0px #fff) drop-shadow(-1px 0px 0px #fff) drop-shadow(0px 1px 0px #fff)drop-shadow(0px -1px 0px #fff);
+
+        &:hover {
+          animation: none;
+          filter: brightness(1.5) drop-shadow(1px 0px 0px #fff) drop-shadow(-1px 0px 0px #fff) drop-shadow(0px 1px 0px #fff)drop-shadow(0px -1px 0px #fff);
+        }
+      }
     }
 
     &.p1[data-taken=S] { background-image: url(/images/pieces/settlement-1.png); }
@@ -213,7 +226,7 @@
 
   .edge {
     width: 7px;
-    height: 40px;
+    height: 50px;
     background: #fff9;
     position: absolute;
     z-index: 1;
@@ -232,7 +245,7 @@
       }
     }
 
-    &.shown { visibility: visible; width: 10px; height: 50px; }
+    &.shown { visibility: visible; width: 10px; }
 
     &.taken {
       opacity: 1;
@@ -248,12 +261,13 @@
       &.p4 { background: var(--player-4-color); box-shadow: 1px 1px 0px 1px color-mix(in srgb, var(--player-4-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
     }
 
+    &[data-dir="right"] { transform: rotate(0deg) translate(146px, 61px); }
+    &[data-dir="bottom-left"] { transform: rotate(120deg) translate(92px, -91px); }
+    &[data-dir="bottom-right"] { transform: rotate(60deg) translate(164px, -30px); }
+    /* Only used in first tile */
     &[data-dir="top-left"] { transform: rotate(60deg) translate(15px, -29px); }
     &[data-dir="top-right"] { transform: rotate(120deg) translate(-56px, -92px); }
     &[data-dir="left"] { transform: rotate(0deg) translate(-5px, 62px); }
-    &[data-dir="right"] { transform: rotate(0deg) translate(145px, 61px); }
-    &[data-dir="bottom-left"] { transform: rotate(120deg) translate(94px, -91px); }
-    &[data-dir="bottom-right"] { transform: rotate(60deg) translate(166px, -30px); }
   }
 }
 

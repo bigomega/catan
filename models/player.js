@@ -39,6 +39,13 @@ export default class Player {
     this.onChange(this.id, 'closed_cards', { card_type, count, taken: true })
   }
 
+  bought(type) {
+    if (!(type in CONST.COST)) return
+    for (const res_key in CONST.COST[type]) {
+      this.takeCard(res_key, CONST.COST[type][res_key])
+    }
+  }
+
   addPiece(location, piece) {
     if (!(piece in CONST.PIECES)) return
     if (piece === 'C') {
@@ -63,6 +70,13 @@ export default class Player {
     const picked_res = avail_res[Math.floor(Math.random() * avail_res.length)]
     this.closed_cards[picked_res] -= 1
     return picked_res
+  }
+
+  canBuy(type) {
+    const costs = CONST.COST[type]
+    return Object.keys(costs).reduce((mem, res_key) => {
+      return mem && (this.closed_cards[res_key] >= costs[res_key])
+    }, true)
   }
 
   setLastStatus(message) { this.last_status = message }
