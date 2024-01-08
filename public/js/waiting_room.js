@@ -1,4 +1,4 @@
-import * as CONST from "./js/const.js"
+import * as CONST from "./const.js"
 
 window.player_count > 2 && document.querySelector('.player-3').classList.remove('hide')
 window.player_count > 3 && document.querySelector('.player-4').classList.remove('hide')

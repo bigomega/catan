@@ -69,6 +69,7 @@ export const GAME_STATES = {
   // INITIAL_BUILD_2: 'initial_build_2',
   PLAYER_ROLL: 'player_roll',
   PLAYER_ACTIONS: 'player_actions',
+  ROBBER: 'moving_robber',
   END: 'end',
 }
 
@@ -77,6 +78,7 @@ export const SOCKET_EVENTS = {
   PLAYER_ONLINE: 'player_online',
   ROLL_DICE: 'roll_the_dice',
   SAVE_STATUS: 'save_last_status',
+  CLICK_LOC: 'clicked_location',
   // Both
   INITIAL_SETUP: 'ask/return_initial_setup',
   // Server Sends…
@@ -84,9 +86,9 @@ export const SOCKET_EVENTS = {
   STATE_CHANGE: 'state_change',
   SET_TIMER: 'set_timer',
   DICE_VALUE: 'value_of_rolled_dice',
+  RES_RECEIVED: 'total_resources_received', // Private
 
 
-  CLICK_LOC: 'clicked_location',
 
   ALERT_ALL: 'alert_all',
   ALERT_PLAYER: 'alert_player',

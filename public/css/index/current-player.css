@@ -263,5 +263,8 @@
     position: relative;
     text-align: center;
     padding: 3px 10px;
+
+    b { color: #77450b; }
+    small { opacity: 0.7; }
   }
 }

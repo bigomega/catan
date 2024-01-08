@@ -1,3 +1,4 @@
+import Board from "./board/board.js"
 import * as CONST from "./const.js"
 import AllPlayersUI from "./ui/all_players_ui.js"
 import BoardUI from "./ui/board_ui.js"
@@ -8,11 +9,13 @@ export default class UI {
   #initial_setup; #socket_actions; board; player; opponents; alert_timer;
   player_ui; board_ui;
   #temp = {}
+  possible_locations = { R: [], S: [], C: [] }
   $splash = $('.splash')
   $alert = $('#game > .alert')
   $alert_parchment = $('#game > .alert .parchment')
   $alert_text = $('#game > .alert .text')
 
+  /** @param {Board} board  */
   constructor(board, player, opponents) {
     this.board = board
     this.player = player
@@ -26,9 +29,10 @@ export default class UI {
 
   render() {
     this.board_ui.render()
-    this.updateExistingBoard()
     this.player_ui.render()
     this.all_players_ui.render()
+
+    this.updateExistingBoard()
     this.$splash.classList.add('hide')
   }
 
@@ -47,6 +51,19 @@ export default class UI {
     // Animation + Visuals
   }
 
+  updateAllPossibleLocations() {
+    // Roads
+    this.possible_locations.R = this.board.getRoadLocationsFromRoads(this.player.pieces.R)
+    // Settlements
+    this.possible_locations.S = this.board.getSettlementLocationsFromRoads(this.player.pieces.R)
+    // Cities
+    this.possible_locations.C = this.player.pieces.S.slice(0)
+  }
+
+  getPossibleLocations(piece) {
+    if (!CONST.PIECES[piece]) return []
+    return this.possible_locations[piece]
+  }
 
   /**------------------------------
    * --- Player & AllPlayers UI ---
@@ -56,18 +73,23 @@ export default class UI {
   setTimer(t, pid) { this.player_ui.resetRenderTimer(t, pid) }
   updatePlayer(update_player, key, context) {
     this.all_players_ui.updatePlayer(update_player, key)
-    if (context && key === 'closed_cards') {
+    if (key === 'closed_cards' && context) {
       this.player_ui.updateHand(update_player, context)
     }
     this.player.id === update_player.id && this.player.update(update_player)
   }
   toggleDice(bool) { this.player_ui.toggleDice(bool) }
-  toggleActions(bool) { this.player_ui.checkAndToggleActions(bool) }
+  toggleActions(bool) {
+    this.updateAllPossibleLocations()
+    this.player_ui.checkAndToggleActions(bool)
+  }
 
   onDiceClick() { this.#socket_actions.sendDiceClick() }
 
-  onPiece() {
+  onPieceClick(piece) {
     this.hideAllShown()
+    const locs = this.getPossibleLocations(piece)
+    piece === 'R' ? this.showEdges(locs) : this.showCorners(locs)
   }
 
   saveStatus(text) { this.#socket_actions.saveStatus(text) }
@@ -91,14 +113,12 @@ export default class UI {
     this.hideAllShown()
     this.board.build(pid, piece, loc)
     this.board_ui.build(pid, piece, loc)
-    // update player data
-    // pid === this.player.id && this.player.addPiece(piece, loc)
-    // update viable roads, settl, cities
+    pid === this.player.id && this.updateAllPossibleLocations()
   }
 
   #onBoardClick(location_type, id) {
+    this.hideAllShown()
     if (this.#initial_setup) {
-      this.hideAllShown()
       if (location_type === 'C') {
         this.showCorners([id])
         this.#temp.settlement_loc = id
@@ -108,7 +128,9 @@ export default class UI {
         this.#socket_actions.sendInitialSetup(this.#temp)
         this.#initial_setup = false
       }
+      return
     }
+    this.#socket_actions.sendLocationClick(location_type, id)
   }
 
   showCorners(ids) { this.board_ui.showCorners(ids) }

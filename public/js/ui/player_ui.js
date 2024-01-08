@@ -1,5 +1,7 @@
 import * as CONST from "../const.js"
+import UI from "../ui.js"
 const $ = document.querySelector.bind(document)
+const oKeys = Object.keys
 
 export default class PlayerUI {
   player; timer; hand;
@@ -9,6 +11,7 @@ export default class PlayerUI {
   $action_bar = this.$el.querySelector('.actions')
   $status_bar = this.$el.querySelector('.status-bar')
 
+  /** @param {UI} ui  */
   constructor(player, ui) {
     this.player = player
     this.ui = ui
@@ -75,7 +78,7 @@ export default class PlayerUI {
     // Road, Settlement & City Click
     const getEventCb = piece => e => {
       if (e.target.classList.contains('disabled')) return
-      this.ui.onPiece(piece)
+      this.ui.onPieceClick(piece)
     }
     this.$build_road.addEventListener('click', getEventCb('R'))
     this.$build_settlement.addEventListener('click', getEventCb('S'))
@@ -89,14 +92,19 @@ export default class PlayerUI {
     })[key]
   }
 
+  canIBuy(type) {
+    const costs = CONST.COST[type]
+    return oKeys(costs).reduce((mem, res_key) => {
+      return mem && (this.hand[res_key] >= costs[res_key])
+    }, true)
+  }
+
   checkAndToggleActions(toggle) {
     if (toggle) {
       this.toggleAction(this.$end_turn, true)
-      Object.keys(CONST.COST).forEach(key => {
-        const can_buy = Object.keys(CONST.COST[key]).reduce((mem, res_key) => {
-          return mem && (this.hand[res_key] >= CONST.COST[key][res_key])
-        }, true)
-        this.toggleAction(this.keyTo$El(key), can_buy)
+      oKeys(CONST.COST).forEach(key => {
+        const can_act = this.canIBuy(key) && (key == 'DEV_C' || this.ui.getPossibleLocations(key).length)
+        this.toggleAction(this.keyTo$El(key), can_act)
       })
     } else {
       for (const $el of this.$action_bar.children) {
@@ -133,7 +141,7 @@ export default class PlayerUI {
    */
 
   renderHand() {
-    const hand_groups = Object.keys(this.hand)
+    const hand_groups = oKeys(this.hand)
       .reduce((mem, key) => (mem.push([key, this.hand[key]]), mem), [])
       .sort((a, b) => a[0].length - b[0].length)
     ;
@@ -177,7 +185,7 @@ export default class PlayerUI {
 
   #cleanHandData(cards_obj) {
     const clean_obj = Object.assign({}, cards_obj)
-    Object.keys(clean_obj).forEach(key => {
+    oKeys(clean_obj).forEach(key => {
       if (!clean_obj[key]) { delete clean_obj[key] }
     })
     return this.#combineVps(clean_obj)
@@ -185,7 +193,7 @@ export default class PlayerUI {
 
   #combineVps(cards_obj) {
     let vps = 0
-    Object.keys(CONST.DC_VICTORY_POINTS).forEach(vp_key => {
+    oKeys(CONST.DC_VICTORY_POINTS).forEach(vp_key => {
       if (cards_obj[vp_key]) {
         vps += cards_obj[vp_key]
         delete cards_obj[vp_key]

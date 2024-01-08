@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser'
 import mustacheExpress from 'mustache-express'
 import { Server } from "socket.io"
 import http from "http"
-import Game from "./models/game2.js"
+import Game from "./models/game.js"
 import { parse as parseCookie } from "cookie"
 import * as CONST from "./public/js/const.js"
 

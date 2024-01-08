@@ -1,5 +1,6 @@
 import * as CONST from "./const.js"
 import GAME_MESSAGES from "./const_messages.js"
+import UI from "./ui.js"
 const SOC = CONST.SOCKET_EVENTS
 const AUDIO = CONST.AUDIO_FILES
 const MSGKEY = Object.keys(GAME_MESSAGES).reduce((m, k) => (m[k] = k, m), {})
@@ -8,6 +9,7 @@ export default class SocketActions {
   socket; player; game; ui;
   #au_bop_delay = 0
 
+  /** @param {Object} p0 @param {UI} p0.ui */
   constructor({ socket, player, game, ui }) {
     this.socket = socket
     this.player = player
@@ -17,6 +19,7 @@ export default class SocketActions {
     socket.emit(SOC.PLAYER_ONLINE)
 
     // socket.onAny((event, ...args) => {})
+    /** @event State-Change */
     socket.on(SOC.STATE_CHANGE, (state, active_player) => {
       ;({
         [CONST.GAME_STATES.INITIAL_SETUP]: _ => {
@@ -25,27 +28,30 @@ export default class SocketActions {
           this.playAudio(AUDIO.START_END)
         },
         [CONST.GAME_STATES.PLAYER_ROLL]: _ => {
-          ui.toggleActions(false)
+          ui.toggleActions(0)
+          ui.hideAllShown(0)
           const message = this.getMessage(active_player, MSGKEY.ROLL_TURN)
           if (active_player.id === this.player.id) {
             ui.alert(message)
             this.playAudio(AUDIO.PLAYER_TURN)
-            ui.toggleDice(true)
+            ui.toggleDice(1)
           } else {
             ui.setStatus(message)
           }
         },
         [CONST.GAME_STATES.PLAYER_ACTIONS]: _ => {
           if (active_player.id === this.player.id) {
-            ui.toggleActions(true)
+            ui.toggleActions(1)
           }
           // ui.setStatus(this.getMessage(active_player, MSGKEY.PLAYER_TURN))
         },
       })[state]?.()
     })
 
+    /** @event Set-Timer */
     socket.on(SOC.SET_TIMER, (t, pid) => ui.setTimer(t, pid))
 
+    /** @event Initial-Setup-Request */
     socket.on(SOC.INITIAL_SETUP, (active_player, turn) => {
       ui.hideAllShown()
       const msg_key = turn < 2 ? MSGKEY.INITIAL_BUILD : MSGKEY.INITIAL_BUILD_2
@@ -82,6 +88,7 @@ export default class SocketActions {
     //   ui.hideAllShown()
     // })
 
+    /** @event Build */
     socket.on(SOC.BUILD, (player, piece, loc) => {
       if (player.id === this.player.id) {
         const aud_file = ({
@@ -94,6 +101,7 @@ export default class SocketActions {
       ui.build(player.id, piece, loc)
     })
 
+    /** @event Update-Player-Info */
     socket.on(SOC.UPDATE_PLAYER, (update_player, key, context) => {
       if (context && key === 'closed_cards' && update_player.id === this.player.id) {
         ;[...Array(context.count)].forEach(_ => this.playAudio(AUDIO.BOP))
@@ -101,6 +109,7 @@ export default class SocketActions {
       ui.updatePlayer(update_player, key, context)
     })
 
+    /** @event Show-Dice-Value */
     socket.on(SOC.DICE_VALUE, ([d1, d2], active_player) => {
       ui.toggleDice(false)
       ui.setStatus(this.getMessage(active_player, MSGKEY.ROLL_VALUE, d1, d2))
@@ -108,8 +117,13 @@ export default class SocketActions {
         this.playAudio(AUDIO.DICE)
         ui.showDiceValue(d1, d2)
       } else {
-        this.playAudio(AUDIO.DICE, 0.2)
+        // this.playAudio(AUDIO.DICE, 0.2)
       }
+    })
+
+    /** @event Total-Resources-Received */
+    socket.on(SOC.RES_RECEIVED, res_obj => {
+      ui.appendStatus(GAME_MESSAGES.RES_TO_EMOJI.self(res_obj))
     })
   }
 
@@ -139,9 +153,7 @@ export default class SocketActions {
     this.socket.emit(SOC.INITIAL_SETUP, settlement_loc, road_loc)
   }
 
-  // sendLocationClick(loc_type, id) {
-  //   this.socket.emit(SOC.CLICK_LOC, loc_type, id)
-  // }
+  sendLocationClick(loc_type, id) { this.socket.emit(SOC.CLICK_LOC, loc_type, id) }
 
   sendDiceClick() { this.socket.emit(SOC.ROLL_DICE) }
 

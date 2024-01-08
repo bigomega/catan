@@ -40,13 +40,17 @@ const GAME_MESSAGES = {
   },
   // --- STATUS UPDATES ---
   ROLL_VALUE: {
-    self: (n, m) => `You rolled a <b>${n + m}</b> 🎲 (${n} & ${m}).`,
-    other: (n, m, pname) => `${pname} rolled a <b>${n + m}</b> 🎲 (${n} & ${m}).`,
+    self: (n, m) => `🎲 You rolled a <b>${n + m}</b> <small>(${n}&${m})</small>.` + (n+m == 7 ? ' 🥷 Robber is moving.' : ''),
+    other: (n, m, pname) => `🎲 ${pname} rolled a <b>${n + m}</b> <small>(${n}&${m})</small>.` + (n+m == 7 ? ' 🥷 Robber is moving.' : ''),
   },
   RES_TO_EMOJI: {
-    self: res_obj => ' :: ' + Object.keys(res_obj).map(k => {
-      return res_obj[k] + CONST.RESOURCE_EMOJIS[k]
-    }).join(', '),
+    self: res_obj => {
+      const res_keys = Object.keys(res_obj)
+      if (!res_keys.length) return ''
+      return ' :: took→ ' + res_keys.map(k => {
+        return res_obj[k] + CONST.RESOURCE_EMOJIS[k]
+      }).join(',')
+    },
     other: _ => '',
   },
   _PROXY: {

@@ -13,7 +13,7 @@ export default class IOManager {
     // pid works as a closure for all events
     const game = this.#game
 
-    /** @event Player_Online */
+    /** @event Player-Online */
     socket.on(SOC.PLAYER_ONLINE, _ => {
       game.ready_players[pid] = 1
       if (Object.keys(game.ready_players).length === game.player_count) {
@@ -21,16 +21,19 @@ export default class IOManager {
       }
     })
 
-    /** @event Initial_Setup */
+    /** @event Initial-Setup */
     socket.on(SOC.INITIAL_SETUP, (s_loc, r_loc) => {
       game.initialBuildFromSoc(pid, s_loc, r_loc)
     })
 
-    /** @event Roll_Dice */
+    /** @event Roll-Dice */
     socket.on(SOC.ROLL_DICE, () => game.playerRollFromSock(pid))
 
-    /** @event Save_Status */
+    /** @event Save-Status */
     socket.on(SOC.SAVE_STATUS, html => game.saveStatusFromSoc(pid, html))
+
+    /** @event Clicked-Location */
+    socket.on(SOC.CLICK_LOC, (loc_type, id) => game.clickedLocationFromSoc(pid, loc_type, id))
   }
 
   updateWaitingRoom(player) { this.emit(SOC.JOINED_WAITING_ROOM, player) }
@@ -49,6 +52,10 @@ export default class IOManager {
   }
 
   updateDiceValue(dice_value, active_player) { this.emit(SOC.DICE_VALUE, dice_value, active_player) }
+
+  updatePrivateResourceReceived(player_socket_id, total_resouces) {
+    this.#io.to(player_socket_id).emit(SOC.RES_RECEIVED, total_resouces)
+  }
 
   emit(type, ...data) { this.#io.to(this.#game.id).emit(type, ...data) }
 }

@@ -8,7 +8,8 @@ export default class Player {
   static #names = ['Cheran(சே)', 'Cholan(ழ)', 'Paandian(பா)', 'Karikalan(க)']
   public_vps = 0
   /** @example { R: [12, 5, 56], S: [2, 8], C: [] } */
-  pieces = Object.keys(CONST.PIECES).reduce((mem, p_k) => (mem[p_k] = [], mem), {})
+  // pieces = Object.keys(CONST.PIECES).reduce((mem, p_k) => (mem[p_k] = [], mem), {})
+  pieces = { R: [], S: [], C: [] }
   closed_cards = {
     ...Helper.newObject(CONST.RESOURCES, 0),
     ...Helper.newObject(CONST.DEVELOPMENT_CARDS, 0),
@@ -43,7 +44,7 @@ export default class Player {
     if (piece === 'C') {
       const i = this.pieces.S.indexOf(location)
       if (i >= 0) { this.pieces.S.splice(i, 1) }
-      else { throw "Cannot build city without settlement" }
+      else { throw `Cannot build city without settlement. pid:${this.id}, loc: ${location}`  }
     }
     this.pieces[piece].push(location)
     this.onChange(this.id, 'pieces', { piece, location })

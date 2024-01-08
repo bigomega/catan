@@ -44,8 +44,10 @@ export default class AllPlayersUI {
   updatePlayer(player, key) {
     const _player = this.player_refs[player.id]
     if (!_player) return
-    if (key === 'public_vps') {
-      _player.$vps.innerHTML = player[key]
+    switch (key) {
+      case 'public_vps': _player.$vps.innerHTML = player[key]; break;
+      case 'closed_cards': break;
+      case 'pieces': break;
     }
   }
 }

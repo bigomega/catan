@@ -35,7 +35,7 @@ export default class Board {
       const prev_row = i > 0 ? this.tile_rows[i - 1] : null
       const row_data = []
       // With the current implementation - ONLY ONE +/- can be used for Row Diff
-      if (row_map[0] == '+' || row_map[0] == '-') {
+      if (row_map[0] === '+' || row_map[0] === '-') {
         row_data.diff = +(row_map[0] + '1')
         row_map = row_map.substr(1)
       } else if (i > 0) { // edge case
@@ -110,6 +110,33 @@ export default class Board {
       !corner.piece && no_neighbours && road_count && locations.push(corner)
     })
     return locations
+  }
+
+  getSettlementLocationsFromRoads(existing_roads = []) {
+    if (!existing_roads.length) return []
+    const corners = []
+    const check_corner = id => {
+      const corner = this.findCorner(id)
+      return !corners.includes(id) && !corner.piece && corner.hasNoNeighbours()
+    }
+    existing_roads.forEach(r_loc => {
+      const edge = this.findEdge(r_loc)
+      if (!edge) return
+      check_corner(edge.corner1.id) && corners.push(edge.corner1.id)
+      check_corner(edge.corner2.id) && corners.push(edge.corner2.id)
+    })
+    return corners
+  }
+
+  getRoadLocationsFromRoads(existing_roads = []) {
+    if (!existing_roads.length) return []
+    const valid_edges = existing_roads.reduce((mem, r_loc) => {
+      const edge = this.findEdge(r_loc)
+      const c1_edges = edge?.corner1.getEdges(-1).map(e => e.id)
+      const c2_edges = edge?.corner2.getEdges(-1).map(e => e.id)
+      return mem.concat(c1_edges, c2_edges)
+    }, [])
+    return [...new Set(valid_edges)] // remove duplicates
   }
 
   build(pid, piece, loc) {
