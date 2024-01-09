@@ -1,10 +1,7 @@
 import * as CONST from "../public/js/const.js"
-import GAME_MESSAGES from "../public/js/const_messages.js"
 import * as Helper from "../shuffler/helper.js"
 import Player from "./player.js"
 import Board from "../public/js/board/board.js"
-import Corner from "../public/js/board/corner.js"
-import Edge from "../public/js/board/edge.js"
 import IOManager from "./io_manager.js"
 
 const ST = CONST.GAME_STATES
@@ -14,8 +11,6 @@ const NEXT_STATE = {
   [ST.PLAYER_ACTIONS]: ST.PLAYER_ROLL,
   [ST.ROBBER]: ST.PLAYER_ACTIONS,
 }
-const SOC = CONST.SOCKET_EVENTS
-const MSG = Object.keys(GAME_MESSAGES).reduce((m, k) => (m[k] = k, m), {})
 
 export default class Game {
   /** @type {Board} */

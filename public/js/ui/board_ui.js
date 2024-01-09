@@ -1,5 +1,3 @@
-import Corner from "../board/corner.js"
-import Edge from "../board/edge.js"
 import * as CONST from "../const.js"
 const $ = document.querySelector.bind(document)
 const oKeys = Object.keys

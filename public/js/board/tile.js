@@ -1,6 +1,4 @@
 import * as CONST from "../const.js"
-import Corner from "./corner.js"
-import Edge from "./edge.js"
 
 const OPPOSITES = { top: 'bottom', left: 'right', right: 'left', bottom: 'top' }
 

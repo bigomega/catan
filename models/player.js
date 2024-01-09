@@ -1,7 +1,5 @@
 import * as CONST from "../public/js/const.js"
 import * as Helper from "../shuffler/helper.js"
-import Corner from "../public/js/board/corner.js"
-import Edge from "../public/js/board/edge.js"
 
 export default class Player {
   id; name; socket_id; onChange; last_status;
