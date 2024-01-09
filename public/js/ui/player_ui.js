@@ -81,9 +81,15 @@ export default class PlayerUI {
     this.$build_road.addEventListener('click', getEventCb('R'))
     this.$build_settlement.addEventListener('click', getEventCb('S'))
     this.$build_city.addEventListener('click', getEventCb('C'))
+    // Buy Development Card
     this.$buy_dev_card.addEventListener('click', e => {
       if (e.target.classList.contains('disabled')) return
       this.ui.onBuyDevCardClick()
+    })
+    // End Turn
+    this.$end_turn.addEventListener('click', e => {
+      if (e.target.classList.contains('disabled')) return
+      this.ui.endTurn()
     })
   }
 

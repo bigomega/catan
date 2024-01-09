@@ -22,21 +22,22 @@ export default class IOManager {
     })
 
     /** @event Initial-Setup */
-    socket.on(SOC.INITIAL_SETUP, (s_loc, r_loc) => {
-      game.initialBuildFromSoc(pid, s_loc, r_loc)
-    })
+    socket.on(SOC.INITIAL_SETUP, (s_loc, r_loc) => game.initialBuildIO(pid, s_loc, r_loc))
 
     /** @event Roll-Dice */
-    socket.on(SOC.ROLL_DICE, () => game.playerRollFromSock(pid))
+    socket.on(SOC.ROLL_DICE, () => game.playerRollIO(pid))
 
     /** @event Save-Status */
-    socket.on(SOC.SAVE_STATUS, html => game.saveStatusFromSoc(pid, html))
+    socket.on(SOC.SAVE_STATUS, html => game.saveStatusIO(pid, html))
 
     /** @event Clicked-Location */
-    socket.on(SOC.CLICK_LOC, (loc_type, id) => game.clickedLocationFromSoc(pid, loc_type, id))
+    socket.on(SOC.CLICK_LOC, (loc_type, id) => game.clickedLocationIO(pid, loc_type, id))
 
     /** @event Buy-Dev-Card */
-    socket.on(SOC.BUY_DEV, () => game.buyDevCardFromSoc(pid))
+    socket.on(SOC.BUY_DEV, () => game.buyDevCardIO(pid))
+
+    /** @event End-Turn */
+    socket.on(SOC.END_TURN, () => game.endTurnIO(pid))
   }
 
   updateWaitingRoom(player) { this.emit(SOC.JOINED_WAITING_ROOM, player) }

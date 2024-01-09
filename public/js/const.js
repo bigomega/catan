@@ -80,6 +80,7 @@ export const SOCKET_EVENTS = {
   SAVE_STATUS: 'save_last_status',
   CLICK_LOC: 'clicked_location',
   BUY_DEV: 'buy_development_card',
+  END_TURN: 'end_turn',
   // Both
   INITIAL_SETUP: 'ask/return_initial_setup',
   // Server Sends…

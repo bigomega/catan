@@ -162,5 +162,7 @@ export default class SocketActions {
 
   buyDevCard() { this.socket.emit(SOC.BUY_DEV) }
 
+  endTurn() { this.socket.emit(SOC.END_TURN) }
+
   saveStatus(message) { this.socket.emit(SOC.SAVE_STATUS, message) }
 }

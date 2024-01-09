@@ -61,6 +61,7 @@ export default class Game {
     this.setTimer(this.config.strategize.time)
   }
 
+  /** State Management */
   #next() {
     this.clearTimer()
     if (!this.#resolvePendingActions()) return
@@ -86,6 +87,9 @@ export default class Game {
       this.setTimer(this.config.robber.time)
     }
   }
+
+  // EXPECTATIONS & RESOLUTIONS
+  // ==========================
 
   #resolvePendingActions() {
     let continue_next = true
@@ -123,40 +127,10 @@ export default class Game {
     }
   }
 
-  #distributeCornerResources(id) {
-    const corner = this.board.findCorner(id)
-    if (!corner || !corner.player_id) return
-    const player = this.getPlayer(corner.player_id)
-    corner.tiles.forEach(tile => {
-      CONST.TILE_RES[tile.type] && player.giveCard(CONST.TILE_RES[tile.type], 1)
-    })
-  }
-
-  #distributeTileResources(num) {
-    const resource_by_pid = [...Array(this.player_count)].map(_ => ({}))
-    this.board.distribute(num).forEach(({pid, res, count}) => {
-      const player = this.getPlayer(pid)
-      if (res && count) {
-        player.giveCard(res, count)
-        if (resource_by_pid[pid-1][res]) resource_by_pid[pid-1][res] += count
-        else resource_by_pid[pid-1][res] = count
-      }
-    })
-    resource_by_pid.forEach((res, index) => {
-      this.#io_manager.updatePrivateResourceReceived(this.getPlayerSoc(index+1), res)
-    })
-  }
-
-  build(pid, piece, loc) {
-    this.board.build(pid, piece, loc)
-    this.getPlayer(pid)?.addPiece(loc, piece)
-    this.map_changes.push({ pid, piece, loc })
-    this.#io_manager.updateBuild(this.getPlayer(pid), piece, loc)
-  }
-
-  // ===== SOC EVENTS =====
-
-  initialBuildFromSoc(pid, settlement_loc, road_loc) {
+  // ===================
+  //      IO EVENTS
+  // ===================
+  initialBuildIO(pid, settlement_loc, road_loc) {
     const expected_index = this.expected_actions.findIndex(_ => _.type === ST.INITIAL_SETUP)
     const { pid: expected_pid, callback } = this.expected_actions[expected_index]
     if (pid && pid === expected_pid) {
@@ -166,17 +140,7 @@ export default class Game {
     }
   }
 
-  playerRollFromSock(pid) {
-    const expected_index = this.expected_actions.findIndex(_ => _.type === ST.PLAYER_ROLL)
-    const { pid: expected_pid, callback } = this.expected_actions[expected_index]
-    if (pid && pid === expected_pid) {
-      callback(pid)
-      this.expected_actions.splice(expected_index, 1)
-      this.#next()
-    }
-  }
-
-  clickedLocationFromSoc(pid, loc_type, id) {
+  clickedLocationIO(pid, loc_type, id) {
     if (pid !== this.active_player) return
     if (this.state !== ST.PLAYER_ACTIONS) return
     const player = this.getActivePlayer()
@@ -203,22 +167,57 @@ export default class Game {
     }
   }
 
-  buyDevCardFromSoc(pid) {
+  buyDevCardIO(pid) {
     if (pid !== this.active_player) return
     if (this.state !== ST.PLAYER_ACTIONS) return
     const player = this.getActivePlayer()
     player.canBuy('DEV_C') && player.bought('DEV_C', this.dev_cards.pop())
   }
 
-  saveStatusFromSoc(pid, text) { this.getPlayer(pid).setLastStatus(text) }
+  playerRollIO() { this.#next() }
+  endTurnIO() { this.#next() }
+  saveStatusIO(pid, text) { this.getPlayer(pid).setLastStatus(text) }
+
   // ===================
+  //        MISC
+  // ===================
+
+  #distributeCornerResources(id) {
+    const corner = this.board.findCorner(id)
+    if (!corner || !corner.player_id) return
+    const player = this.getPlayer(corner.player_id)
+    corner.tiles.forEach(tile => {
+      CONST.TILE_RES[tile.type] && player.giveCard(CONST.TILE_RES[tile.type], 1)
+    })
+  }
+
+  #distributeTileResources(num) {
+    const resource_by_pid = [...Array(this.player_count)].map(_ => ({}))
+    this.board.distribute(num).forEach(({ pid, res, count }) => {
+      const player = this.getPlayer(pid)
+      if (res && count) {
+        player.giveCard(res, count)
+        if (resource_by_pid[pid - 1][res]) resource_by_pid[pid - 1][res] += count
+        else resource_by_pid[pid - 1][res] = count
+      }
+    })
+    resource_by_pid.forEach((res, index) => {
+      this.#io_manager.updatePrivateResourceReceived(this.getPlayerSoc(index + 1), res)
+    })
+  }
+
+  build(pid, piece, loc) {
+    this.board.build(pid, piece, loc)
+    this.getPlayer(pid)?.addPiece(loc, piece)
+    this.map_changes.push({ pid, piece, loc })
+    this.#io_manager.updateBuild(this.getPlayer(pid), piece, loc)
+  }
 
   #onPlayerUpdate(pid, key, context) {
     const private_json = this.getPlayer(pid)?.toJSON(1)
     this.#io_manager.updatePublicPlayerData(this.getPlayer(pid)?.toJSON(), key)
     this.#io_manager.updatePrivatePlayerData(this.getPlayerSoc(pid), private_json, key, context)
   }
-
 
   setTimer(time_in_seconds) {
     this.clearTimer()

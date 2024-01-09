@@ -104,6 +104,7 @@ export default class UI {
 
   onBuyDevCardClick() { this.#socket_actions.buyDevCard() }
   saveStatus(text) { this.#socket_actions.saveStatus(text) }
+  endTurn() { this.#socket_actions.endTurn() }
 
   /**----------------
    * --- Board UI ---
