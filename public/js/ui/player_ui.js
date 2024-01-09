@@ -28,7 +28,7 @@ export default class PlayerUI {
     // this.hand.dM = 1
     // this.hand.dR = 1
     // this.hand.dY = 1
-    // this.hand.dVps = 2
+    // this.hand.dVp = 2
     this.renderHand()
     this.$status_bar.innerHTML = this.player.last_status || '...'
   }
@@ -194,29 +194,11 @@ export default class PlayerUI {
   }
 
   #cleanHandData(cards_obj) {
-    const clean_obj = Object.assign({}, cards_obj)
-    oKeys(clean_obj).forEach(key => {
-      if (!clean_obj[key]) { delete clean_obj[key] }
-    })
-    return this.#combineVps(clean_obj)
+    return Object.fromEntries(Object.entries(cards_obj).filter(([_, v]) => v))
   }
 
-  #combineVps(cards_obj) {
-    let vps = 0
-    oKeys(CONST.DC_VICTORY_POINTS).forEach(vp_key => {
-      if (cards_obj[vp_key]) {
-        vps += cards_obj[vp_key]
-        delete cards_obj[vp_key]
-      }
-    })
-    if (vps) { cards_obj.dVps = vps }
-    return cards_obj
-  }
-
-  updateHand(player, { card_type, count, taken }) {
+  updateHand(player, { card_type: type, count, taken }) {
     if (!count) return
-    let type = card_type
-    if (card_type in CONST.DC_VICTORY_POINTS) { type = 'dVps' }
     if (taken && this.hand[type]) {
       if (this.hand[type] - count > -1) { this.hand[type] -= count }
       if (!this.hand[type]) { delete this.hand[type] }

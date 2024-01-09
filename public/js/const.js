@@ -19,17 +19,17 @@ export const RESOURCE_REGEX = `(?<tile_type>[${Object.keys(TILES).join('|')}])(?
 export const TILE_RES = { G: 'S',  J: 'L',  C: 'B',  M: 'O',  F: 'W'}
 
 export const DEVELOPMENT_CARDS = {
-  dK: 'Knight',
+  dK: 'Knight', dVp: 'Victory Point',
   dR: 'Road building', dY: 'Year of plenty', dM: 'Monopoly',
-  dL: 'Library', dMr: 'Market', dG: 'Great Hall', dC: 'Chapel', dU: 'University',
 }
 
 export const DEVELOPMENT_CARDS_DECK = []
 DEVELOPMENT_CARDS_DECK.push(...[...Array(14)].map(_ => 'dK')) // 14 Knights
 DEVELOPMENT_CARDS_DECK.push('dR','dR', 'dY','dY', 'dM','dM') // 2 of each power cards
-DEVELOPMENT_CARDS_DECK.push('dL', 'dMr', 'dG', 'dC', 'dU') // 5 victory points
+DEVELOPMENT_CARDS_DECK.push(...[...Array(5)].map(_ => 'dVp')) // 5 victory points
 
-export const DC_VICTORY_POINTS = { dL: 1, dMr: 1, dG: 1, dC: 1, dU: 1 }
+export const DC_VICTORY_POINT_CARD_VARIETIES = ['dL', 'dMr', 'dG', 'dC', 'dU']
+// dL: 'Library', dMr: 'Market', dG: 'Great Hall', dC: 'Chapel', dU: 'University',
 
 export const LOCS = { CORNER: 'C', EDGE: 'E', TILE: 'T' }
 

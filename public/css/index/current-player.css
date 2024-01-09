@@ -57,7 +57,7 @@
         &[data-type=dR] { background-size: 1077px; background-position: -16px -245px; }
         &[data-type=dY] { background-size: 1097px; background-position: -338px -247px; }
         &[data-type=dM] { background-size: 1077px; background-position: -177px -239px; }
-        &[data-type=dVps] { background-size: 1047px; background-position: -314px -460px; }
+        &[data-type=dVp] { background-size: 1047px; background-position: -314px -460px; }
       }
 
       .card-count {
