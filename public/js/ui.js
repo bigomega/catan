@@ -4,10 +4,11 @@ import AllPlayersUI from "./ui/all_players_ui.js"
 import BoardUI from "./ui/board_ui.js"
 import PlayerUI from "./ui/player_ui.js";
 const $ = document.querySelector.bind(document)
+const ST = CONST.GAME_STATES
 
 export default class UI {
   #initial_setup; #socket_actions; board; player; opponents; alert_timer;
-  player_ui; board_ui;
+  player_ui; board_ui; game_state;
   #temp = {}
   possible_locations = { R: [], S: [], C: [] }
   $splash = $('.splash')
@@ -31,9 +32,6 @@ export default class UI {
     this.board_ui.render()
     this.player_ui.render()
     this.all_players_ui.render()
-
-    this.updateExistingBoard()
-    this.updateAllPossibleLocations()
     this.$splash.classList.add('hide')
   }
 
@@ -116,8 +114,7 @@ export default class UI {
     this.board.build(pid, piece, loc)
     this.board_ui.build(pid, piece, loc)
 
-    const ACTIONS = CONST.GAME_STATES.PLAYER_ACTIONS
-    if (pid === this.player.id && this.#socket_actions?.state === ACTIONS) {
+    if (pid === this.player.id && this.game_state === ST.PLAYER_ACTIONS) {
       this.toggleActions(true)
     }
   }

@@ -40,8 +40,8 @@ const GAME_MESSAGES = {
   },
   // --- STATUS UPDATES ---
   ROLL_VALUE: {
-    self: (n, m) => `🎲 You rolled a <b>${n + m}</b> <small>(${n}&${m})</small>.` + (n+m == 7 ? ' 🥷 Robber is moving.' : ''),
-    other: (n, m, pname) => `🎲 ${pname} rolled a <b>${n + m}</b> <small>(${n}&${m})</small>.` + (n+m == 7 ? ' 🥷 Robber is moving.' : ''),
+    self: (n, m) => `🎲 You rolled a <b>${n + m}</b> <small>(${n}+${m})</small>.` + (n+m == 7 ? ' 🥷 Robber is moving.' : ''),
+    other: (n, m, pname) => `🎲 ${pname} rolled a <b>${n + m}</b> <small>(${n}+${m})</small>.` + (n+m == 7 ? ' 🥷 Robber is moving.' : ''),
   },
   RES_TO_EMOJI: {
     self: res_obj => {

@@ -6,7 +6,7 @@ const AUDIO = CONST.AUDIO_FILES
 const MSGKEY = Object.keys(GAME_MESSAGES).reduce((m, k) => (m[k] = k, m), {})
 
 export default class SocketActions {
-  socket; player; game; ui; state;
+  socket; player; game; ui;
   #au_bop_delay = 0
 
   /** @param {Object} p0 @param {UI} p0.ui */
@@ -21,7 +21,7 @@ export default class SocketActions {
     // socket.onAny((event, ...args) => {})
     /** @event State-Change */
     socket.on(SOC.STATE_CHANGE, (state, active_player) => {
-      this.state = state
+      this.ui.game_state = state
       ;({
         [CONST.GAME_STATES.INITIAL_SETUP]: _ => {
           const time = this.game.config.strategize.time

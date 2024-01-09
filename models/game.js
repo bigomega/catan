@@ -248,11 +248,15 @@ export default class Game {
   getNonActivePlayerSocs() { return this.getOtherPlayerSocs(this.active_player) }
 
   toJSON() {
+    const timer_left = this.#timer && Math.ceil((this.#timer._idleStart + this.#timer._idleTimeout) / 1000 - process.uptime())
     return {
       id: this.id,
       mapkey: this.mapkey,
       map_changes: this.map_changes,
       config: this.config,
+      active_player: this.active_player,
+      state: this.state,
+      timer: timer_left > 1 ? timer_left : 0,
     }
   }
 }
