@@ -37,11 +37,12 @@ export default class Player {
     this.onChange(this.id, 'closed_cards', { card_type, count, taken: true })
   }
 
-  bought(type) {
-    if (!(type in CONST.COST)) return
+  bought(type, dev_c_key) {
+    if (!this.canBuy(type)) throw `Cannot buy: ${type}`
     for (const res_key in CONST.COST[type]) {
       this.takeCard(res_key, CONST.COST[type][res_key])
     }
+    type === 'DEV_C' && this.giveCard(dev_c_key, 1)
   }
 
   addPiece(location, piece) {
@@ -71,9 +72,9 @@ export default class Player {
   }
 
   canBuy(type) {
-    const costs = CONST.COST[type]
-    return Object.keys(costs).reduce((mem, res_key) => {
-      return mem && (this.closed_cards[res_key] >= costs[res_key])
+    if (!(type in CONST.COST)) return
+    return Object.keys(CONST.COST[type]).reduce((mem, res_key) => {
+      return mem && (this.closed_cards[res_key] >= CONST.COST[type][res_key])
     }, true)
   }
 

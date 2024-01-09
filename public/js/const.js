@@ -79,6 +79,7 @@ export const SOCKET_EVENTS = {
   ROLL_DICE: 'roll_the_dice',
   SAVE_STATUS: 'save_last_status',
   CLICK_LOC: 'clicked_location',
+  BUY_DEV: 'buy_development_card',
   // Both
   INITIAL_SETUP: 'ask/return_initial_setup',
   // Server Sends…

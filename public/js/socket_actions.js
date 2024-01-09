@@ -31,6 +31,7 @@ export default class SocketActions {
         [CONST.GAME_STATES.PLAYER_ROLL]: _ => {
           ui.toggleActions(0)
           ui.hideAllShown(0)
+          ui.active_player_id = active_player.id
           const message = this.getMessage(active_player, MSGKEY.ROLL_TURN)
           if (active_player.id === this.player.id) {
             ui.alert(message)
@@ -155,11 +156,11 @@ export default class SocketActions {
     this.socket.emit(SOC.INITIAL_SETUP, settlement_loc, road_loc)
   }
 
-  sendLocationClick(loc_type, id) { this.socket.emit(SOC.CLICK_LOC, loc_type, id) }
-
   sendDiceClick() { this.socket.emit(SOC.ROLL_DICE) }
 
-  saveStatus(message) {
-    this.socket.emit(SOC.SAVE_STATUS, message)
-  }
+  sendLocationClick(loc_type, id) { this.socket.emit(SOC.CLICK_LOC, loc_type, id) }
+
+  buyDevCard() { this.socket.emit(SOC.BUY_DEV) }
+
+  saveStatus(message) { this.socket.emit(SOC.SAVE_STATUS, message) }
 }

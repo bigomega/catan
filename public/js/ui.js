@@ -8,6 +8,7 @@ const ST = CONST.GAME_STATES
 
 export default class UI {
   #initial_setup; #socket_actions; board; player; opponents; alert_timer;
+  active_player_id;
   player_ui; board_ui; game_state;
   #temp = {}
   possible_locations = { R: [], S: [], C: [] }
@@ -64,6 +65,12 @@ export default class UI {
     return this.possible_locations[piece]
   }
 
+  isCurrentPlayerInvolvedAndActing(pid) {
+    return pid === this.player.id
+      && pid === this.active_player_id
+      && this.game_state === ST.PLAYER_ACTIONS
+  }
+
   /**------------------------------
    * --- Player & AllPlayers UI ---
    */
@@ -76,6 +83,9 @@ export default class UI {
       this.player_ui.updateHand(update_player, context)
     }
     this.player.id === update_player.id && this.player.update(update_player)
+    if (this.isCurrentPlayerInvolvedAndActing(update_player.id)) {
+      this.player_ui.checkAndToggleActions(true)
+    }
   }
   toggleDice(bool) { this.player_ui.toggleDice(bool) }
   toggleActions(bool) {
@@ -92,6 +102,7 @@ export default class UI {
     piece === 'R' ? this.showEdges(locs) : this.showCorners(locs)
   }
 
+  onBuyDevCardClick() { this.#socket_actions.buyDevCard() }
   saveStatus(text) { this.#socket_actions.saveStatus(text) }
 
   /**----------------
@@ -114,8 +125,8 @@ export default class UI {
     this.board.build(pid, piece, loc)
     this.board_ui.build(pid, piece, loc)
 
-    if (pid === this.player.id && this.game_state === ST.PLAYER_ACTIONS) {
-      this.toggleActions(true)
+    if (this.isCurrentPlayerInvolvedAndActing(pid)) {
+      this.updateAllPossibleLocations()
     }
   }
 

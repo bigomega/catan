@@ -44,12 +44,8 @@ export default class PlayerUI {
       <div class="timer disabled">0:00</div>
       <div class="roll-dice disabled" title="Roll Dice (SPACE)">🎲🎲</div>
       <div class="build-road disabled" title="Build Road (R)"></div>
-      <div class="build-settlement disabled" title="Build Settlement (S)">
-        <img src="/images/pieces/settlement-${this.player.id}.png"/>
-      </div>
-      <div class="build-city disabled" title="Build City (C)">
-        <img src="/images/pieces/city-${this.player.id}.png"/>
-      </div>
+      <div class="build-settlement disabled" title="Build Settlement (S)"></div>
+      <div class="build-city disabled" title="Build City (C)"></div>
       <div class="dev-card disabled" title="Buy Development Card (D)">
         <img src="/images/dc-back.png"/>
       </div>
@@ -85,6 +81,10 @@ export default class PlayerUI {
     this.$build_road.addEventListener('click', getEventCb('R'))
     this.$build_settlement.addEventListener('click', getEventCb('S'))
     this.$build_city.addEventListener('click', getEventCb('C'))
+    this.$buy_dev_card.addEventListener('click', e => {
+      if (e.target.classList.contains('disabled')) return
+      this.ui.onBuyDevCardClick()
+    })
   }
 
   keyTo$El(key) {

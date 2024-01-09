@@ -106,6 +106,7 @@
         font-weight: 600;
       }
     }
+
     /* DICE */
     .roll-dice {
       padding: 8px 10px;
@@ -134,6 +135,7 @@
         filter: brightness(1.2);
       }
     }
+
     /* BUILD ROAD */
     .build-road {
       position: relative;
@@ -177,30 +179,27 @@
         &::before { opacity: .1; }
       }
     }
+
     /* BUILD SETTL, CITY */
     .build-city,
     .build-settlement
     {
+      height: 100%;
+      background-repeat: no-repeat;
+      background-position: center;
       cursor: pointer;
-      & img {
-        width: 40px;
-        filter: drop-shadow(1px 1px 0px #fff) drop-shadow(-1px -1px 0px #fff) drop-shadow(1px -1px 0px #fff) drop-shadow(-1px 1px 0px #fff);
+      filter: drop-shadow(1px 1px 0px #fff) drop-shadow(-1px -1px 0px #fff) drop-shadow(1px -1px 0px #fff) drop-shadow(-1px 1px 0px #fff);
+      &:hover, &.active { filter: brightness(0.7); }
 
-        &:hover, &.active { filter: brightness(0.7); }
-      }
       &.disabled {
         cursor: not-allowed;
-        & img {
-          filter: grayscale(1) brightness(2);
-          opacity: 0.5;
-        }
+        filter: grayscale(1) brightness(2);
+        opacity: 0.5;
       }
     }
-    .build-settlement img {
-      width: 30px;
-      position: relative;
-      /* top: 5px; */
-    }
+    .build-settlement { width: 30px; background-size: 30px; }
+    .build-city { width: 40px; background-size: 40px; }
+
     /* DEV CARD */
     .dev-card {
       cursor: pointer;
@@ -224,6 +223,7 @@
         filter: brightness(0.7);
       }
     }
+
     /* END TURN */
     .end-turn {
       background: #fff;
@@ -243,6 +243,7 @@
       }
     }
   }
+
   &.id-1 .actions { background: var(--player-1-color); border-color: var(--player-1-color-dark); }
   &.id-2 .actions { background: var(--player-2-color); border-color: var(--player-2-color-dark); }
   &.id-3 .actions { background: var(--player-3-color); border-color: var(--player-3-color-dark); }
@@ -252,6 +253,16 @@
   &.id-2 .actions .build-road::after { background: var(--player-2-color-dark); }
   &.id-3 .actions .build-road::after { background: var(--player-3-color-dark); }
   &.id-4 .actions .build-road::after { background: var(--player-4-color-dark); }
+
+  &.id-1 .actions .build-settlement { background-image: url(/images/pieces/settlement-1.png); }
+  &.id-2 .actions .build-settlement { background-image: url(/images/pieces/settlement-2.png); }
+  &.id-3 .actions .build-settlement { background-image: url(/images/pieces/settlement-3.png); }
+  &.id-4 .actions .build-settlement { background-image: url(/images/pieces/settlement-4.png); }
+
+  &.id-1 .actions .build-city { background-image: url(/images/pieces/city-1.png); }
+  &.id-2 .actions .build-city { background-image: url(/images/pieces/city-2.png); }
+  &.id-3 .actions .build-city { background-image: url(/images/pieces/city-3.png); }
+  &.id-4 .actions .build-city { background-image: url(/images/pieces/city-4.png); }
 
   &.id-1 .actions .end-turn { color: var(--player-1-color); }
   &.id-2 .actions .end-turn { color: var(--player-2-color); }

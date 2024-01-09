@@ -29,6 +29,7 @@ export default class Game {
 
     // Existing Game updates
     this.ui.game_state = this.state
+    this.ui.active_player_id = this.active_player
     this.ui.updateExistingBoard()
     this.timer && this.ui.setTimer(this.timer, this.active_player)
     if (this.player.id === this.active_player) {

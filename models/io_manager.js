@@ -34,6 +34,9 @@ export default class IOManager {
 
     /** @event Clicked-Location */
     socket.on(SOC.CLICK_LOC, (loc_type, id) => game.clickedLocationFromSoc(pid, loc_type, id))
+
+    /** @event Buy-Dev-Card */
+    socket.on(SOC.BUY_DEV, () => game.buyDevCardFromSoc(pid))
   }
 
   updateWaitingRoom(player) { this.emit(SOC.JOINED_WAITING_ROOM, player) }

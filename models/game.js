@@ -22,7 +22,7 @@ export default class Game {
   players = []; ready_players = {}; map_changes = []; expected_actions = []
   turn = 1; dice_value = 2
   mapkey = `S(br-S2).S.S(bl-B2).S\n-S.M5.J10.J8.S(bl-*3)\n-S(r-O2).J2.C9.G11.C4.S\n-S.G6.J4.D.F3.F11.S(l-W2)\n+S(r-L2).F3.G5.C6.M12.S\n+S.F8.G10.M9.S(tl-*3)\n+S(tr-*3).S.S(tl-*3).S`
-  // dev_cards = Helper.shuffle(CONST.DEVELOPMENT_CARDS_DECK.slice())
+  dev_cards = Helper.shuffle(CONST.DEVELOPMENT_CARDS_DECK.slice())
 
   get state() { return this.#state }
   set state(s) {
@@ -201,6 +201,13 @@ export default class Game {
         }
       }
     }
+  }
+
+  buyDevCardFromSoc(pid) {
+    if (pid !== this.active_player) return
+    if (this.state !== ST.PLAYER_ACTIONS) return
+    const player = this.getActivePlayer()
+    player.canBuy('DEV_C') && player.bought('DEV_C', this.dev_cards.pop())
   }
 
   saveStatusFromSoc(pid, text) { this.getPlayer(pid).setLastStatus(text) }
