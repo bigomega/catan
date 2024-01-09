@@ -110,9 +110,6 @@ export default class SocketActions {
         ;[...Array(context.count)].forEach(_ => this.playAudio(AUDIO.BOP))
       }
       ui.updatePlayer(update_player, key, context)
-      if (key === 'closed_cards.dc') {
-        ui.setStatus(this.getMessage(update_player, MSGKEY.DEVELOPMENT_CARD_BUY))
-      }
     })
 
     /** @event Show-Dice-Value */
@@ -130,6 +127,12 @@ export default class SocketActions {
     /** @event Total-Resources-Received */
     socket.on(SOC.RES_RECEIVED, res_obj => {
       ui.appendStatus(GAME_MESSAGES.RES_TO_EMOJI.self(res_obj))
+    })
+
+    /** @event Development-Card-Taken */
+    socket.on(SOC.DEV_CARD_TAKEN, (active_player, count) => {
+      ui.setDevCardCount(count)
+      ui.setStatus(this.getMessage(active_player, MSGKEY.DEVELOPMENT_CARD_BUY))
     })
   }
 

@@ -102,6 +102,7 @@ export default class UI {
     piece === 'R' ? this.showEdges(locs) : this.showCorners(locs)
   }
 
+  setDevCardCount(n) { this.player_ui.setDevCardCount(n) }
   onBuyDevCardClick() { this.#socket_actions.buyDevCard() }
   saveStatus(text) { this.#socket_actions.saveStatus(text) }
   endTurn() { this.#socket_actions.endTurn() }

@@ -55,6 +55,8 @@ export default class IOManager {
     this.#io.to(player_socket_id).emit(SOC.UPDATE_PLAYER, p_json, key, data)
   }
 
+  updateDevCardTaken(active_player, count) { this.emit(SOC.DEV_CARD_TAKEN, active_player, count) }
+
   updateDiceValue(dice_value, active_player) { this.emit(SOC.DICE_VALUE, dice_value, active_player) }
 
   updatePrivateResourceReceived(player_socket_id, total_resouces) {

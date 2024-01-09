@@ -16,6 +16,7 @@ export default class Game {
     this.config = game_obj.config
     this.active_player = game_obj.active_player
     this.state = game_obj.state
+    this.dev_cards_len = game_obj.dev_cards_len
     this.timer = game_obj.timer
 
     this.board = new Board(game_obj.mapkey, game_obj.map_changes)
@@ -31,11 +32,12 @@ export default class Game {
     this.ui.game_state = this.state
     this.ui.active_player_id = this.active_player
     this.ui.updateExistingBoard()
+    this.ui.setDevCardCount(this.dev_cards_len)
     this.timer && this.ui.setTimer(this.timer, this.active_player)
     if (this.player.id === this.active_player) {
       switch (this.state) {
         case ST.PLAYER_ACTIONS: this.ui.toggleActions(true); break;
-        case ST.PLAYER_ROLL: ui.toggleDice(1); break;
+        case ST.PLAYER_ROLL: this.ui.toggleDice(1); break;
       }
     }
   }

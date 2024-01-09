@@ -89,6 +89,7 @@ export const SOCKET_EVENTS = {
   SET_TIMER: 'set_timer',
   DICE_VALUE: 'value_of_rolled_dice',
   RES_RECEIVED: 'total_resources_received', // Private
+  DEV_CARD_TAKEN: 'developer_card_deck_taken',
 
 
 

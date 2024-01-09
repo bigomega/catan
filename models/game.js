@@ -170,8 +170,10 @@ export default class Game {
   buyDevCardIO(pid) {
     if (pid !== this.active_player) return
     if (this.state !== ST.PLAYER_ACTIONS) return
+    if (!this.dev_cards.length) return
     const player = this.getActivePlayer()
     player.canBuy('DEV_C') && player.bought('DEV_C', this.dev_cards.pop())
+    this.#io_manager.updateDevCardTaken(player, this.dev_cards.length)
   }
 
   playerRollIO() { this.#next() }
@@ -260,6 +262,7 @@ export default class Game {
       config: this.config,
       active_player: this.active_player,
       state: this.state,
+      dev_cards_len: this.dev_cards.length,
       timer: timer_left > 1 ? timer_left : 0,
     }
   }

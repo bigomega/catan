@@ -46,7 +46,7 @@ export default class PlayerUI {
       <div class="build-road disabled" title="Build Road (R)"></div>
       <div class="build-settlement disabled" title="Build Settlement (S)"></div>
       <div class="build-city disabled" title="Build City (C)"></div>
-      <div class="dev-card disabled" title="Buy Development Card (D)">
+      <div class="dev-card disabled" title="Buy Development Card (D)" data-count="-">
         <img src="/images/dc-back.png"/>
       </div>
       <div class="trade disabled">Trade</div>
@@ -147,6 +147,7 @@ export default class PlayerUI {
     $el?.classList[toggle ? 'remove' : 'add']('disabled')
   }
 
+  setDevCardCount(n) { this.$buy_dev_card.dataset.count = n }
   build(location) { }
   useDevelopmentCard(type, attr) { }
 
