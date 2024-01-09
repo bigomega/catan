@@ -79,7 +79,7 @@ export default class UI {
   setTimer(t, pid) { this.player_ui.resetRenderTimer(t, pid) }
   updatePlayer(update_player, key, context) {
     this.all_players_ui.updatePlayer(update_player, key)
-    if (key === 'closed_cards' && context && this.player.id == update_player.id) {
+    if (key.includes('closed_cards') && context && this.player.id == update_player.id) {
       this.player_ui.updateHand(update_player, context)
     }
     this.player.id === update_player.id && this.player.update(update_player)

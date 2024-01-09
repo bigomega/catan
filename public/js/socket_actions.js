@@ -106,10 +106,13 @@ export default class SocketActions {
 
     /** @event Update-Player-Info */
     socket.on(SOC.UPDATE_PLAYER, (update_player, key, context) => {
-      if (context && !context.taken && key === 'closed_cards' && update_player.id === this.player.id) {
+      if (context && !context.taken && key.includes('closed_cards')  && update_player.id === this.player.id) {
         ;[...Array(context.count)].forEach(_ => this.playAudio(AUDIO.BOP))
       }
       ui.updatePlayer(update_player, key, context)
+      if (key === 'closed_cards.dc') {
+        ui.setStatus(this.getMessage(update_player, MSGKEY.DEVELOPMENT_CARD_BUY))
+      }
     })
 
     /** @event Show-Dice-Value */

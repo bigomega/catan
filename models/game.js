@@ -219,6 +219,9 @@ export default class Game {
     this.#io_manager.updatePrivatePlayerData(this.getPlayerSoc(pid), private_json, key, context)
   }
 
+  //      HELPERS
+  // =================
+
   setTimer(time_in_seconds) {
     this.clearTimer()
     this.#io_manager.updateTimer(time_in_seconds, this.active_player)

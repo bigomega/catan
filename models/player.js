@@ -28,7 +28,8 @@ export default class Player {
 
   giveCard(card_type, count) {
     this.closed_cards[card_type] += count
-    this.onChange(this.id, 'closed_cards', { card_type, count })
+    const change_type = (card_type in CONST.RESOURCES) ? 'res' : 'dc'
+    this.onChange(this.id, `closed_cards.${change_type}`, { card_type, count })
   }
 
   takeCard(card_type, count) {
