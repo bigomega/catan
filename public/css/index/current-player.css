@@ -96,7 +96,7 @@
     > div {
       margin: 0 5px;
     }
-
+    /* TIMER */
     .timer {
       font-family: monospace;
       font-size: 2em;
@@ -106,7 +106,7 @@
         font-weight: 600;
       }
     }
-
+    /* DICE */
     .roll-dice {
       padding: 8px 10px;
       position: relative;
@@ -134,7 +134,7 @@
         filter: brightness(1.2);
       }
     }
-
+    /* BUILD ROAD */
     .build-road {
       position: relative;
       width: 40px;
@@ -154,7 +154,9 @@
         z-index: -1;
       }
 
-      > div {
+      &::after {
+        content: '';
+        display: flex;
         width: 6px;
         margin-left: 15px;
         height: 40px;
@@ -162,20 +164,20 @@
         background: var(--sand-color-dark);
       }
 
-      &:hover {
+      &:hover, &.active {
         filter: brightness(0.7);
-        > div { border-color: transparent; }
+        &::after { border-color: transparent; }
       }
 
       &.disabled {
         cursor: not-allowed;
         filter: grayscale(1) brightness(2);
         opacity: 0.7;
-        > div { border-color: #0003; }
+        &::after { border-color: #0003; }
         &::before { opacity: .1; }
       }
     }
-
+    /* BUILD SETTL, CITY */
     .build-city,
     .build-settlement
     {
@@ -184,7 +186,7 @@
         width: 40px;
         filter: drop-shadow(1px 1px 0px #fff) drop-shadow(-1px -1px 0px #fff) drop-shadow(1px -1px 0px #fff) drop-shadow(-1px 1px 0px #fff);
 
-        &:hover { filter: brightness(0.7); }
+        &:hover, &.active { filter: brightness(0.7); }
       }
       &.disabled {
         cursor: not-allowed;
@@ -194,13 +196,12 @@
         }
       }
     }
-
     .build-settlement img {
       width: 30px;
       position: relative;
       /* top: 5px; */
     }
-
+    /* DEV CARD */
     .dev-card {
       cursor: pointer;
       & img { width: 30px; }
@@ -212,6 +213,7 @@
       }
     }
 
+    /* TRADE */
     .trade {
       cursor: pointer;
       &:not(.disabled):hover {
@@ -222,7 +224,7 @@
         filter: brightness(0.7);
       }
     }
-
+    /* END TURN */
     .end-turn {
       background: #fff;
       color: var(--sand-color-dark);
@@ -246,10 +248,10 @@
   &.id-3 .actions { background: var(--player-3-color); border-color: var(--player-3-color-dark); }
   &.id-4 .actions { background: var(--player-4-color); border-color: var(--player-4-color-dark); }
 
-  &.id-1 .actions .build-road > div { background: var(--player-1-color-dark); }
-  &.id-2 .actions .build-road > div { background: var(--player-2-color-dark); }
-  &.id-3 .actions .build-road > div { background: var(--player-3-color-dark); }
-  &.id-4 .actions .build-road > div { background: var(--player-4-color-dark); }
+  &.id-1 .actions .build-road::after { background: var(--player-1-color-dark); }
+  &.id-2 .actions .build-road::after { background: var(--player-2-color-dark); }
+  &.id-3 .actions .build-road::after { background: var(--player-3-color-dark); }
+  &.id-4 .actions .build-road::after { background: var(--player-4-color-dark); }
 
   &.id-1 .actions .end-turn { color: var(--player-1-color); }
   &.id-2 .actions .end-turn { color: var(--player-2-color); }

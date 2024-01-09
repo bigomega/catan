@@ -43,7 +43,7 @@ export default class PlayerUI {
     this.$action_bar.innerHTML = `
       <div class="timer disabled">0:00</div>
       <div class="roll-dice disabled" title="Roll Dice (SPACE)">🎲🎲</div>
-      <div class="build-road disabled" title="Build Road (R)"><div></div></div>
+      <div class="build-road disabled" title="Build Road (R)"></div>
       <div class="build-settlement disabled" title="Build Settlement (S)">
         <img src="/images/pieces/settlement-${this.player.id}.png"/>
       </div>
@@ -77,8 +77,10 @@ export default class PlayerUI {
     })
     // Road, Settlement & City Click
     const getEventCb = piece => e => {
-      if (e.target.classList.contains('disabled')) return
-      this.ui.onPieceClick(piece)
+      const classList = e.target.classList
+      if (classList.contains('disabled')) return
+      this.ui.onPieceClick(piece, classList.contains('active'))
+      classList.toggle('active')
     }
     this.$build_road.addEventListener('click', getEventCb('R'))
     this.$build_settlement.addEventListener('click', getEventCb('S'))
@@ -100,16 +102,24 @@ export default class PlayerUI {
   }
 
   checkAndToggleActions(toggle) {
+    this.removeActiveActions()
     if (toggle) {
       this.toggleAction(this.$end_turn, true)
       oKeys(CONST.COST).forEach(key => {
-        const can_act = this.canIBuy(key) && (key == 'DEV_C' || this.ui.getPossibleLocations(key).length)
+        const can_act = this.canIBuy(key)
+          && (key == 'DEV_C' || this.ui.getPossibleLocations(key).length)
         this.toggleAction(this.keyTo$El(key), can_act)
       })
     } else {
       for (const $el of this.$action_bar.children) {
         this.toggleAction($el)
       }
+    }
+  }
+
+  removeActiveActions() {
+    for (const $el of this.$action_bar.children) {
+      $el.classList.remove('active')
     }
   }
 
@@ -156,7 +166,7 @@ export default class PlayerUI {
       const group_rotation = -15 + (30 / ( group_size - 1 )) * i
       const group_translate = CURVE_TRANSLATE[i]
       let group_margin = group_size < 4
-        ? 50 : (group_size > 6 ? (group_size > 8 ? -50 : -30) : 0)
+        ? 50 : (group_size > 6 ? (group_size > 8 ? -50 : -30) : -10)
       return `
         <div
           class="card-group" data-type="${type}" data-count="${count}"

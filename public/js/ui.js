@@ -33,6 +33,7 @@ export default class UI {
     this.all_players_ui.render()
 
     this.updateExistingBoard()
+    this.updateAllPossibleLocations()
     this.$splash.classList.add('hide')
   }
 
@@ -86,8 +87,9 @@ export default class UI {
 
   onDiceClick() { this.#socket_actions.sendDiceClick() }
 
-  onPieceClick(piece) {
+  onPieceClick(piece, is_active) {
     this.hideAllShown()
+    if (is_active) return
     const locs = this.getPossibleLocations(piece)
     piece === 'R' ? this.showEdges(locs) : this.showCorners(locs)
   }
@@ -113,7 +115,9 @@ export default class UI {
     this.hideAllShown()
     this.board.build(pid, piece, loc)
     this.board_ui.build(pid, piece, loc)
-    if (pid === this.player.id && this.#socket_actions?.state === CONST.GAME_STATES.PLAYER_ACTIONS) {
+
+    const ACTIONS = CONST.GAME_STATES.PLAYER_ACTIONS
+    if (pid === this.player.id && this.#socket_actions?.state === ACTIONS) {
       this.toggleActions(true)
     }
   }

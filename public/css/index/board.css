@@ -1,13 +1,5 @@
 @import '../constants.css';
 
-@keyframes piece-space-blink {
-  50% { background: #b9b8b8aa; }
-}
-
-@keyframes piece-settlement-blink {
-  50% { transform: scale(1.5); }
-}
-
 /* --------------------------------------
  * BOARD
  * -------------
@@ -120,9 +112,11 @@
 }
 
 /* --------------------------------------
- * CORNERS (& Trade Docs)
- * -------------
+* CORNERS (& Trade Docs)
+* -------------
 */
+@keyframes piece-space-blink { 50% { background: #b9b8b8aa; } }
+@keyframes piece-settlement-blink { 50% { transform: scale(1.3); } }
 .board .tile {
   .corners {
     position: absolute;
