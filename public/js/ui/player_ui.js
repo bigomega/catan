@@ -216,6 +216,10 @@ export default class PlayerUI {
     this.renderHand()
   }
 
+  activateDropCards() {
+    //
+  }
+
   /**
    * -----------------
    *   STATUS BAR UI

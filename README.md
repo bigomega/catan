@@ -8,7 +8,9 @@ Free to play multiplayer catan style board game
 ## Status
 ### In Progress
   ##### Jan '24
-  - [ ] Refactor Game.js
+  - [x] Robber
+  - [x] ~~Basic Turn Actions~~
+  - [x] ~~Refactor Game.js~~
   - [x] ~~Page refresh state persistance~~
   - [x] ~~Render Hand~~
   - [x] ~~Distribute resource~~
@@ -29,13 +31,12 @@ Free to play multiplayer catan style board game
   - [x] ~~Simple Server~~
   - [x] ~~Decoding the map from key~~
 ### Next Steps
-  - Rolling Dice animation
-  - Basic Turn Actions
-  - Robber
   - Dev Card Actions
   - Trade
+  - End Game
   - Opponents UI
   - Shuffler
+  - Animations
 
 ### Known Bugs
   - Road building into the sea from beach 🤷🏻‍♂️

@@ -63,5 +63,7 @@ export default class IOManager {
     this.#io.to(player_socket_id).emit(SOC.RES_RECEIVED, total_resouces)
   }
 
+  moveRobber(id) { this.emit(SOC.ROBBER_MOVE, id) }
+
   emit(type, ...data) { this.#io.to(this.#game.id).emit(type, ...data) }
 }

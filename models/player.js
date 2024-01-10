@@ -4,9 +4,9 @@ import * as Helper from "../shuffler/helper.js"
 export default class Player {
   id; name; socket_id; onChange; last_status;
   static #names = ['Cheran(சே)', 'Cholan(ழ)', 'Paandian(பா)', 'Karikalan(க)']
+  resource_count = 0
+  dev_card_count = 0
   public_vps = 0
-  /** @example { R: [12, 5, 56], S: [2, 8], C: [] } */
-  // pieces = Object.keys(CONST.PIECES).reduce((mem, p_k) => (mem[p_k] = [], mem), {})
   pieces = { R: [], S: [], C: [] }
   closed_cards = {
     ...Helper.newObject(CONST.RESOURCES, 0),
@@ -29,12 +29,18 @@ export default class Player {
   giveCard(card_type, count) {
     this.closed_cards[card_type] += count
     const change_type = (card_type in CONST.RESOURCES) ? 'res' : 'dc'
+    if (change_type === 'res') { this.resource_count += count }
+    else { this.dev_card_count += count }
+
     this.onChange(this.id, `closed_cards.${change_type}`, { card_type, count })
   }
 
   takeCard(card_type, count) {
     if (this.closed_cards[card_type] - count < 0) { throw "Cannot take more" }
     this.closed_cards[card_type] -= count
+    if (card_type in CONST.RESOURCES) { this.resource_count -= count }
+    else { this.dev_card_count -= count }
+
     this.onChange(this.id, 'closed_cards', { card_type, count, taken: true })
   }
 
@@ -65,11 +71,12 @@ export default class Player {
     //
   }
 
-  pickRandomResource() {
-    const avail_res = Object.keys(CONST.RESOURCES).filter(k => this.closed_cards[k] > 0)
-    const picked_res = avail_res[Math.floor(Math.random() * avail_res.length)]
-    this.closed_cards[picked_res] -= 1
-    return picked_res
+  takeRandomResource(count = 1) {
+    for (let i = 0; i < count; i++) {
+      const avail_res = Object.keys(CONST.RESOURCES).filter(k => this.closed_cards[k] > 0)
+      const picked_res = avail_res[Math.floor(Math.random() * avail_res.length)]
+      this.takeCard(picked_res, 1)
+    }
   }
 
   canBuy(type) {
@@ -87,8 +94,8 @@ export default class Player {
       name: this.name,
       pieces: this.pieces,
       public_vps: this.public_vps,
-      resource_count: Object.keys(CONST.RESOURCES).reduce((mem, k) => mem + this.closed_cards[k], 0),
-      dev_card_count: Object.keys(CONST.DEVELOPMENT_CARDS).reduce((mem, k) => mem + this.closed_cards[k], 0),
+      resource_count: this.resource_count,
+      dev_card_count: this.dev_card_count,
       open_dev_cards: this.open_dev_cards,
       trade_offers: this.trade_offers,
       last_status: this.last_status,

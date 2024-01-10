@@ -45,7 +45,23 @@ export default class SocketActions {
           if (active_player.id === this.player.id) {
             ui.toggleActions(1)
           }
-          // ui.setStatus(this.getMessage(active_player, MSGKEY.PLAYER_TURN))
+        },
+        [CONST.GAME_STATES.ROBBER_DROP]: _ => {
+          const drop_count = this.player.resource_count > 7 ? Math.floor(this.player.resource_count/2) : 0
+          if (drop_count) {
+            ui.alert(GAME_MESSAGES.ROBBER.self(drop_count))
+            ui.robberDrop(drop_count)
+          } else {
+            ui.appendStatus(GAME_MESSAGES.ROBBER.other())
+          }
+        },
+        [CONST.GAME_STATES.ROBBER_MOVE]: _ => {
+          if (active_player.id === this.player.id) {
+            ui.alert(GAME_MESSAGES.ROBBER_MOVE.self())
+            ui.robberMove()
+          } else {
+            ui.setStatus(GAME_MESSAGES.ROBBER_MOVE.other(active_player.name))
+          }
         },
       })[state]?.()
     })
@@ -122,6 +138,7 @@ export default class SocketActions {
       } else {
         // this.playAudio(AUDIO.DICE, 0.2)
       }
+      (d1 + d2) === 7 && setTimeout(_ => this.playAudio(AUDIO.ROBBER), 1000)
     })
 
     /** @event Total-Resources-Received */

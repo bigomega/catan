@@ -71,9 +71,12 @@ export default class UI {
       && this.game_state === ST.PLAYER_ACTIONS
   }
 
+  robberMove() {}
+
   /**------------------------------
    * --- Player & AllPlayers UI ---
    */
+  // To UI
   setStatus(message) { this.player_ui.setStatus(message) }
   appendStatus(message) { this.player_ui.appendStatus(message) }
   setTimer(t, pid) { this.player_ui.resetRenderTimer(t, pid) }
@@ -87,12 +90,15 @@ export default class UI {
       this.player_ui.checkAndToggleActions(true)
     }
   }
+  setDevCardCount(n) { this.player_ui.setDevCardCount(n) }
   toggleDice(bool) { this.player_ui.toggleDice(bool) }
   toggleActions(bool) {
     bool && this.updateAllPossibleLocations()
     this.player_ui.checkAndToggleActions(bool)
   }
+  robberDrop(count) { this.player_ui.activateDropCards() }
 
+  // From UI
   onDiceClick() { this.#socket_actions.sendDiceClick() }
 
   onPieceClick(piece, is_active) {
@@ -102,7 +108,8 @@ export default class UI {
     piece === 'R' ? this.showEdges(locs) : this.showCorners(locs)
   }
 
-  setDevCardCount(n) { this.player_ui.setDevCardCount(n) }
+  onCardClick(type) {}
+
   onBuyDevCardClick() { this.#socket_actions.buyDevCard() }
   saveStatus(text) { this.#socket_actions.saveStatus(text) }
   endTurn() { this.#socket_actions.endTurn() }

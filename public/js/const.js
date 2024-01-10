@@ -69,7 +69,8 @@ export const GAME_STATES = {
   // INITIAL_BUILD_2: 'initial_build_2',
   PLAYER_ROLL: 'player_roll',
   PLAYER_ACTIONS: 'player_actions',
-  ROBBER: 'moving_robber',
+  ROBBER_DROP: 'drop_resource_for_robber',
+  ROBBER_MOVE: 'moving_robber',
   END: 'end',
 }
 
@@ -83,10 +84,13 @@ export const SOCKET_EVENTS = {
   END_TURN: 'end_turn',
   // Both
   INITIAL_SETUP: 'ask/return_initial_setup',
+  ROBBER_MOVE: 'robber_is_moved',
   // Server Sends…
   JOINED_WAITING_ROOM: 'joined_waiting_room',
   STATE_CHANGE: 'state_change',
   SET_TIMER: 'set_timer',
+  BUILD: 'build',
+  UPDATE_PLAYER: 'update_player_data', // Public & Private
   DICE_VALUE: 'value_of_rolled_dice',
   RES_RECEIVED: 'total_resources_received', // Private
   DEV_CARD_TAKEN: 'developer_card_deck_taken',
@@ -98,9 +102,7 @@ export const SOCKET_EVENTS = {
   STATUS_ONLY: 'update_status_only',
   APPEND_STATUS: 'append_to_status',
   SHOW_LOCS: 'show_actionable_locations', // sent privately
-  BUILD: 'build',
   HIDE_LOCS: 'hide_all_shown_locations',
-  UPDATE_PLAYER: 'update_player_data',
 }
 
 export const AUDIO_FILES = {
@@ -111,4 +113,6 @@ export const AUDIO_FILES = {
   BOP: 'bop.mp3',
   DICE: 'dice.mp3',
   PLAYER_TURN: 'player-turn.mp3',
+  ROBBER: 'robber.mp3',
+  KNIGHT: 'knight.mp3',
 }

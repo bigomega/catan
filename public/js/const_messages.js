@@ -40,8 +40,8 @@ const GAME_MESSAGES = {
   },
   // --- STATUS UPDATES ---
   ROLL_VALUE: {
-    self: (n, m) => `🎲 You rolled a <b>${n + m}</b> <small>(${n}+${m})</small>.` + (n+m == 7 ? ' 🥷 Robber is moving.' : ''),
-    other: (n, m, pname) => `🎲 ${pname} rolled a <b>${n + m}</b> <small>(${n}+${m})</small>.` + (n+m == 7 ? ' 🥷 Robber is moving.' : ''),
+    self: (n, m) => `🎲 You rolled a <b>${n + m}</b><small>(${n}+${m})</small>.`,
+    other: (n, m, pname) => `🎲 ${pname} rolled a <b>${n + m}</b><small>(${n}+${m})</small>.`,
   },
   RES_TO_EMOJI: {
     self: res_obj => {
@@ -82,8 +82,12 @@ const GAME_MESSAGES = {
     other: pname => `${pname} has been Robbed.`,
   },
   ROBBER: {
-    self: _ => `The Robber 🥷 is awake. Drop half your cards if you have more than 7`,
-    other: _ => `The Robber 🥷 is awake. Drop half your cards if you have more than 7`,
+    self: drop => (drop?` You have been GREEEEDY.<br><b>Give ${drop} resource card(s)</b> to the activated Robber 🥷.`:` 🥷 Robber is actived.`),
+    other: _ => ` 🥷 Robber is actived.`,
+  },
+  ROBBER_MOVE: {
+    self: _ => `Move the Robber 🥷.`,
+    other: (pname) => `${pname} is moving the robber 🥷.`,
   },
 }
 

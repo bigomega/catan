@@ -4,12 +4,14 @@ const OPPOSITES = { top: 'bottom', left: 'right', right: 'left', bottom: 'top' }
 
 export default class Tile {
   id; type; num; adjacent_tiles; corners;
-  trade_edge; trade_type; robbed;
+  trade_edge; trade_type;
+  robbed = false
 
-  constructor({ id, type = 'S', num, left, top_left, top_right, trade_edge, trade_type, createCorner, createEdge } = {}) {
+  constructor({ id, type = 'S', num, left, top_left, top_right, trade_edge, trade_type, robbed, createCorner, createEdge } = {}) {
     this.id = id
     this.type = Object.keys(CONST.TILES).includes(type) ? type : 'S'
     this.num = num
+    if (robbed) this.robbed = true
     this.adjacent_tiles = { left, top_left, top_right }
     if (left) { left.adjacent_tiles.right = this }
     if (top_left) { top_left.adjacent_tiles.bottom_right = this }
@@ -74,7 +76,6 @@ export default class Tile {
           this.corners[dir]?.setTrade(trade_type)
         })
     }
-    if (this.type === 'D') { this.robbed = true }
   }
 
   getAllCorners() {
@@ -84,4 +85,6 @@ export default class Tile {
   getOccupiedCorners() {
     return this.getAllCorners().filter(c => c.player_id)
   }
+
+  toggleRobbed(bool) { this.robbed = bool }
 }

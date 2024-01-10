@@ -9,17 +9,18 @@ const NEXT_STATE = {
   [ST.INITIAL_SETUP]: ST.PLAYER_ROLL,
   [ST.PLAYER_ROLL]: ST.PLAYER_ACTIONS,
   [ST.PLAYER_ACTIONS]: ST.PLAYER_ROLL,
-  [ST.ROBBER]: ST.PLAYER_ACTIONS,
+  [ST.ROBBER_DROP]: ST.ROBBER_MOVE,
+  [ST.ROBBER_MOVE]: ST.PLAYER_ACTIONS,
 }
 
 export default class Game {
-  /** @type {Board} */
-  board;
+  /** @type {Board} */ board;
   id; player_count;
   #state; #timer; #io_manager;
   #active_player = 0
   config = CONST.GAME_CONFIG
-  players = []; ready_players = {}; map_changes = []; expected_actions = []
+  /** @type {Player[]} */ players = []
+  ready_players = {}; map_changes = []; expected_actions = []; robbed_players = [];
   turn = 1; dice_value = 2
   mapkey = `S(br-S2).S.S(bl-B2).S\n-S.M5.J10.J8.S(bl-*3)\n-S(r-O2).J2.C9.G11.C4.S\n-S.G6.J4.D.F3.F11.S(l-W2)\n+S(r-L2).F3.G5.C6.M12.S\n+S.F8.G10.M9.S(tl-*3)\n+S(tr-*3).S.S(tl-*3).S`
   dev_cards = Helper.shuffle(CONST.DEVELOPMENT_CARDS_DECK.slice())
@@ -42,7 +43,7 @@ export default class Game {
     this.#io_manager = new IOManager({ game: this, io, })
     this.players.push(new Player(host_name, 1, this.#onPlayerUpdate.bind(this)))
     this.expected_actions.add = (...elems) => elems.forEach(obj => {
-      this.expected_actions.push(Object.assign(obj, {type: this.state, pid: this.active_player}))
+      this.expected_actions.push(Object.assign({ type: this.state, pid: this.active_player }, obj))
     })
   }
 
@@ -61,7 +62,9 @@ export default class Game {
     this.setTimer(this.config.strategize.time)
   }
 
+  // ===================
   /** State Management */
+  // ===================
   #next() {
     this.clearTimer()
     if (!this.#resolvePendingActions()) return
@@ -82,14 +85,23 @@ export default class Game {
         callback: _ => (this.active_player++, this.#gotoNextState()),
       })
       this.setTimer(this.config.player_turn.time)
-    } else if (this.state === ST.ROBBER) {
-      this.expected_actions.add({ callback: _ => this.#gotoNextState() })
-      this.setTimer(this.config.robber.time)
+    } else if (this.state === ST.ROBBER_DROP) {
+      this.robbed_players = []
+      this.players.forEach(pl => {
+        if (pl.resource_count > 7) {
+          this.expected_actions.add({ pid: pl.id, callback: this.#expectedRobberDrop.bind(this) })
+          this.robbed_players.push(pl.id)
+        }
+      })
+      this.setTimer(this.config.robber.drop_time)
+    } else if (this.state === ST.ROBBER_MOVE) {
+      this.expected_actions.add({ callback: this.#expectedRobberMove.bind(this) })
+      this.setTimer(this.config.robber.move_time)
     }
   }
 
   // EXPECTATIONS & RESOLUTIONS
-  // ==========================
+  // #region ==========================
 
   #resolvePendingActions() {
     let continue_next = true
@@ -98,6 +110,7 @@ export default class Game {
     return continue_next
   }
 
+  /** Initial Build */
   #expectedInitialBuild(pid, settlement_loc, road_loc) {
     let s_id = settlement_loc, r_id = road_loc
     const valid_corners = this.board.getSettlementLocations(-1).map(s => s.id)
@@ -115,21 +128,43 @@ export default class Game {
     }
   }
 
+  /** Roll Dice */
   #expectedRoll(pid) {
     this.dice_value = [CONST.ROLL(), CONST.ROLL()]
     this.#io_manager.updateDiceValue(this.dice_value, this.getActivePlayer())
     const dice_total = this.dice_value[0] + this.dice_value[1]
     if (dice_total === 7) {
-      this.state = ST.ROBBER
+      const drop = this.players.filter(p => p.resource_count > 7).length
+      this.state = drop ? ST.ROBBER_DROP : ST.ROBBER_MOVE
     } else {
       this.#distributeTileResources(dice_total)
       this.#gotoNextState()
     }
   }
 
+  /** Robber Drop Resource */
+  #expectedRobberDrop(pid) {
+    const player = this.getPlayer(pid)
+    if (player.resource_count < 8) return
+    player.takeRandomResource(Math.floor(player.resource_count / 2))
+
+    const robbed_index = this.robbed_players.indexOf(pid)
+    robbed_index > -1 && this.robbed_players.splice(robbed_index, 1)
+    !this.robbed_players.length && this.#gotoNextState()
+  }
+
+  /** Robber Movement */
+  #expectedRobberMove(pid) {
+    const moved_id = this.#getRandom(this.board.getRobbableTiles())
+    this.board.moveRobber(moved_id)
+    this.#io_manager.moveRobber(moved_id)
+    this.#gotoNextState()
+  }
+  //#endregion
+
   // ===================
   //      IO EVENTS
-  // ===================
+  //#region ===================
   initialBuildIO(pid, settlement_loc, road_loc) {
     const expected_index = this.expected_actions.findIndex(_ => _.type === ST.INITIAL_SETUP)
     const { pid: expected_pid, callback } = this.expected_actions[expected_index]
@@ -179,10 +214,11 @@ export default class Game {
   playerRollIO() { this.#next() }
   endTurnIO() { this.#next() }
   saveStatusIO(pid, text) { this.getPlayer(pid).setLastStatus(text) }
+  //#endregion
 
   // ===================
   //        MISC
-  // ===================
+  //#region ===================
 
   #distributeCornerResources(id) {
     const corner = this.board.findCorner(id)
@@ -220,9 +256,10 @@ export default class Game {
     this.#io_manager.updatePublicPlayerData(this.getPlayer(pid)?.toJSON(), key)
     this.#io_manager.updatePrivatePlayerData(this.getPlayerSoc(pid), private_json, key, context)
   }
+  //#endregion
 
   //      HELPERS
-  // =================
+  //#region =================
 
   setTimer(time_in_seconds) {
     this.clearTimer()
@@ -266,4 +303,5 @@ export default class Game {
       timer: timer_left > 1 ? timer_left : 0,
     }
   }
+  //#endregion
 }

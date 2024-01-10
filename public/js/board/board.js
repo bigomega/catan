@@ -4,12 +4,12 @@ import Edge from "./edge.js"
 import Tile from './tile.js'
 
 export default class Board {
-  head_tile; existing_changes;
+  head_tile; existing_changes; robber_loc;
   tile_rows = []
   numbers = [...Array(13)].map(_ => [])
-  #tile_refs = []
-  #corner_refs = []
-  #edge_refs = []
+  /** @type {Tile[]} */ #tile_refs = []
+  /** @type {Corner[]} */ #corner_refs = []
+  /** @type {Edge[]} */ #edge_refs = []
 
   constructor(mapkey, existing_changes = []) {
     this.mapkey = mapkey
@@ -23,7 +23,7 @@ export default class Board {
      * each tile is split by dor (.) and each tile has it's own regex
      * Sea -> S(direction - ResourceKey number)? <sea has optional trade in a direction>
      * Desert -> D
-     * Resource -> ResourceKey number
+     * ResourceTile -> TileKey number {F|G|J|C|M}
      * ex., +S(r-L2).F3.G5.C6.M12.S
      *
      * Since decoding always happens from left to right and top to bottom,
@@ -64,9 +64,14 @@ export default class Board {
           })[dir]
           tile_params.trade_type = res
           tile_params.type = 'S'
+        } else if (tile_map[0] == 'D') {
+          tile_params.robbed = true
+          // Keep moving the robber to the last Desert found
+          if (this.robber_loc) { this.findTile(this.robber_loc)?.toggleRobbed(false) }
+          this.robber_loc = tile_params.id
         } else {
           const { tile_type, num } =
-          tile_map.match(new RegExp(CONST.RESOURCE_REGEX))?.groups || {}
+            tile_map.match(new RegExp(CONST.RESOURCE_REGEX))?.groups || {}
           tile_params.type = tile_type
           tile_params.num = num
         }
@@ -139,12 +144,23 @@ export default class Board {
     return [...new Set(valid_edges)] // remove duplicates
   }
 
+  getRobbableTiles() {
+    return this.#tile_refs.filter(t => !t.robbed && t.type !== 'S').map(t => t.id)
+  }
+
   build(pid, piece, loc) {
     switch (piece) {
       case 'S': this.findCorner(loc)?.buildSettlement(pid); break;
       case 'C': this.findCorner(loc)?.buildCity(); break;
       case 'R': this.findEdge(loc)?.buildRoad(pid); break;
     }
+  }
+
+  moveRobber(id) {
+    if (!this.getRobbableTiles().includes(id)) return
+    this.findTile(id).toggleRobbed(true)
+    this.findTile(this.robber_loc).toggleRobbed(false)
+    this.robber_loc = id
   }
 
   /** @returns {Array[Object]} {pid, res, count}[] */
@@ -159,4 +175,5 @@ export default class Board {
 
   findCorner(id) { return this.#corner_refs[id] }
   findEdge(id) { return this.#edge_refs[id] }
+  findTile(id) { return this.#tile_refs[id] }
 }

@@ -37,7 +37,7 @@ export default class Game {
     if (this.player.id === this.active_player) {
       switch (this.state) {
         case ST.PLAYER_ACTIONS: this.ui.toggleActions(true); break;
-        case ST.PLAYER_ROLL: this.ui.toggleDice(1); break;
+        case ST.PLAYER_ROLL: this.ui.toggleDice(true); break;
       }
     }
   }
