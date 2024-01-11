@@ -85,6 +85,143 @@ body {
       width: calc(100% - 2em);
     }
   }
+
+  > .robber-drop-zone .drop-zone {
+    position: fixed;
+    top: 0;
+    left: 0px;
+    width: 100%;
+    background: color-mix(in srgb, var(--sand-color) 80%, #fff0);
+    padding: 20px 20px 0;
+    border-bottom: 5px solid var(--sand-color-dark);
+    box-sizing: border-box;
+    box-shadow: 0 0px 15px 0px #000;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    font-family: sans-serif;
+
+    .drop-card {
+      position: relative;
+      cursor: pointer;
+      width: 140px;
+      height: 212px;
+      border: 5px dashed var(--sand-color-dark);
+      margin-right: 20px;
+      margin-bottom: 20px;
+      border-radius: 20px;
+      &.valued { border-color: transparent; }
+
+      &::before {
+        content: '';
+        display: block;
+        background-image: url(/images/cards_sprite.png);
+        background-color: #ebd290;
+        width: 100%;
+        height: 100%;
+        border-radius: 15px;
+        filter: blur(3px) sepia(0.2);
+        filter: blur(3px) sepia(0.5) brightness(0.7);
+        filter: brightness(0.4) sepia(0.5);
+      }
+      &.valued::before { filter: none; box-shadow: 0px 0px 5px 5px #0006; }
+
+      &[data-type=S]::before { background-size: 1100px; background-position: -176px -13px; }
+      &[data-type=L]::before { background-size: 1109px; background-position: -639px -9px; }
+      &[data-type=B]::before { background-size: 1077px; background-position: -12px -15px; }
+      &[data-type=O]::before { background-size: 1074px; background-position: -326px -5px; }
+      &[data-type=W]::before { background-size: 1097px; background-position: -484px -9px; }
+
+      &::after {
+        display: none;
+        content: attr(data-count);
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        background: var(--sand-color-dark);
+        border-bottom-right-radius: 15px;
+        border-bottom-left-radius: 15px;
+        color: #fff;
+        /* font-size: 2em;
+        font-weight: 600; */
+        padding: 5px 0;
+      }
+      &.valued::after { display: block; }
+    }
+
+    .drop-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      .drop-emoji { font-size: 50px; }
+
+      .dropped-count {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 22px solid #333;
+        position: relative;
+
+        &::before {
+          content: attr(data-count);
+          color: var(--sand-color-dark);
+          background-color: var(--sand-color);
+          position: absolute;
+          left: 0px;
+          top: 0px;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          font-size: 2em;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .dropped-count-light {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: #aaa;
+          border: 1px solid #000;
+          position: absolute;
+          left: 20px;
+          top: -17px;
+          transform-origin: 5px 42px;
+
+          &.on {
+            background: #edba20;
+            box-shadow: 0 0 5px 2px #edba20;
+          }
+        }
+      }
+
+      .drop-give-button {
+        margin: 20px 10px;
+        padding: 7px 15px;
+        width: 100%;
+        box-sizing: border-box;
+        text-align: center;
+        background: #ccc;
+        color: #999;
+        border-radius: 3px;
+        font-size: 1.2em;
+        cursor: not-allowed;
+
+        &.active {
+          background: #333;
+          color: #fff;
+          cursor: pointer;
+
+          &:hover { box-shadow: 0 0 10px 0px #333; }
+        }
+      }
+    }
+  }
 }
 
 @media screen and (min-width: 994px) {

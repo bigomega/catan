@@ -38,6 +38,7 @@ export default class PlayerUI {
    *   ACTION BAR UI
    * -----------------
    */
+  //#region
   renderActionBar() {
     this.$el.classList.add('id-' + this.player.id)
     this.$action_bar.innerHTML = `
@@ -150,18 +151,16 @@ export default class PlayerUI {
   setDevCardCount(n) { this.$buy_dev_card.dataset.count = n }
   build(location) { }
   useDevelopmentCard(type, attr) { }
+  //#endregion
 
   /**
    * ------------
    *   HAND UI
    * ------------
    */
-
+  //#region
   renderHand() {
-    const hand_groups = oKeys(this.hand)
-      .reduce((mem, key) => (mem.push([key, this.hand[key]]), mem), [])
-      .sort((a, b) => a[0].length - b[0].length)
-    ;
+    const hand_groups = Object.entries(this.hand).sort((a, b) => a[0].length - b[0].length)
     const group_size = hand_groups.length // cannot be more than 10
     const CURVE_TRANSLATE = [
       [0], [0,0], [10,0,20], [20,0,0,30], [30,5,0,9,40],
@@ -197,7 +196,13 @@ export default class PlayerUI {
     this.#setupHandEvents()
   }
   #setupHandEvents() {
-    // this.$hand
+    this.$hand.querySelectorAll('.card, .card-count').forEach($el => {
+      $el.addEventListener('click', e => {
+        const $card_group = e.target.parentElement
+        if (!$card_group.classList.contains('active')) return
+        this.ui.onCardClick($card_group.dataset.type)
+      })
+    })
   }
 
   #cleanHandData(cards_obj) {
@@ -205,20 +210,15 @@ export default class PlayerUI {
   }
 
   updateHand(player, { card_type: type, count, taken }) {
-    if (!count) return
-    if (taken && this.hand[type]) {
-      if (this.hand[type] - count > -1) { this.hand[type] -= count }
-      if (!this.hand[type]) { delete this.hand[type] }
-    } else if (!taken) {
-      if (this.hand[type]) { this.hand[type] += count }
-      else { this.hand[type] = count }
-    }
+    this.hand = this.#cleanHandData(player.closed_cards)
     this.renderHand()
   }
 
-  activateDropCards() {
-    //
+  activateResourceCards() {
+    const res_selector = oKeys(CONST.RESOURCES).map(k => `.card-group[data-type="${k}"]`).join(',')
+    this.$hand.querySelectorAll(res_selector).forEach($el => $el.classList.add('active'))
   }
+  //#endregion
 
   /**
    * -----------------

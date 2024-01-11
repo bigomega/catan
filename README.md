@@ -37,6 +37,7 @@ Free to play multiplayer catan style board game
   - Opponents UI
   - Shuffler
   - Animations
+  - Browser Memory Optimization
 
 ### Known Bugs
   - Road building into the sea from beach 🤷🏻‍♂️

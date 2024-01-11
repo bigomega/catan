@@ -16,6 +16,7 @@ export default class UI {
   $alert = $('#game > .alert')
   $alert_parchment = $('#game > .alert .parchment')
   $alert_text = $('#game > .alert .text')
+  $robber_drop = $('#game > .robber-drop-zone')
 
   /** @param {Board} board  */
   constructor(board, player, opponents) {
@@ -73,13 +74,31 @@ export default class UI {
 
   robberMove() {}
 
+  renderRobberDrop(count) {
+    const holding_res = Object.entries(this.player.closed_cards).filter(([k, v]) => v).map(([k]) => k)
+    this.$robber_drop.innerHTML = `
+      <div class="drop-zone">
+        ${holding_res.map(k => `
+          <div class="drop-card" data-type="${k}" data-count="0"></div>
+        `).join('')}
+        <div class="drop-actions">
+          <div class="drop-emoji">🥷</div>
+          <div class="dropped-count" data-count="0">
+            ${[...Array(count)].map((_, i) => `
+              <div class="dropped-count-light l-${i}"
+                style="transform:rotate(${360*i/count}deg)"></div>
+            `).join('')}
+          </div>
+          <div class="drop-give-button">Give</div>
+        </div>
+      </div>
+    `
+  }
+
   /**------------------------------
    * --- Player & AllPlayers UI ---
    */
   // To UI
-  setStatus(message) { this.player_ui.setStatus(message) }
-  appendStatus(message) { this.player_ui.appendStatus(message) }
-  setTimer(t, pid) { this.player_ui.resetRenderTimer(t, pid) }
   updatePlayer(update_player, key, context) {
     this.all_players_ui.updatePlayer(update_player, key)
     if (key.includes('closed_cards') && context && this.player.id == update_player.id) {
@@ -90,17 +109,24 @@ export default class UI {
       this.player_ui.checkAndToggleActions(true)
     }
   }
-  setDevCardCount(n) { this.player_ui.setDevCardCount(n) }
-  toggleDice(bool) { this.player_ui.toggleDice(bool) }
+
   toggleActions(bool) {
     bool && this.updateAllPossibleLocations()
     this.player_ui.checkAndToggleActions(bool)
   }
-  robberDrop(count) { this.player_ui.activateDropCards() }
+
+  robberDrop(count) {
+    this.renderRobberDrop(5)
+    this.player_ui.activateResourceCards()
+  }
+
+  setStatus(message) { this.player_ui.setStatus(message) }
+  appendStatus(message) { this.player_ui.appendStatus(message) }
+  setTimer(t, pid) { this.player_ui.resetRenderTimer(t, pid) }
+  setDevCardCount(n) { this.player_ui.setDevCardCount(n) }
+  toggleDice(bool) { this.player_ui.toggleDice(bool) }
 
   // From UI
-  onDiceClick() { this.#socket_actions.sendDiceClick() }
-
   onPieceClick(piece, is_active) {
     this.hideAllShown()
     if (is_active) return
@@ -110,6 +136,7 @@ export default class UI {
 
   onCardClick(type) {}
 
+  onDiceClick() { this.#socket_actions.sendDiceClick() }
   onBuyDevCardClick() { this.#socket_actions.buyDevCard() }
   saveStatus(text) { this.#socket_actions.saveStatus(text) }
   endTurn() { this.#socket_actions.endTurn() }

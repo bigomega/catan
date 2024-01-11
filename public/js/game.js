@@ -36,8 +36,13 @@ export default class Game {
     this.timer && this.ui.setTimer(this.timer, this.active_player)
     if (this.player.id === this.active_player) {
       switch (this.state) {
-        case ST.PLAYER_ACTIONS: this.ui.toggleActions(true); break;
+        case ST.INITIAL_SETUP: this.ui.showInitialBuild(); break;
         case ST.PLAYER_ROLL: this.ui.toggleDice(true); break;
+        case ST.PLAYER_ACTIONS: this.ui.toggleActions(true); break;
+        case ST.ROBBER_DROP:
+          this.player.resource_count > 7 && this.ui.robberDrop(Math.floor(this.player.resource_count/2))
+          break;
+        case ST.ROBBER_MOVE: this.ui.robberMove(); break;
       }
     }
   }

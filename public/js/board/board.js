@@ -65,6 +65,7 @@ export default class Board {
           tile_params.trade_type = res
           tile_params.type = 'S'
         } else if (tile_map[0] == 'D') {
+          tile_params.type = 'D'
           tile_params.robbed = true
           // Keep moving the robber to the last Desert found
           if (this.robber_loc) { this.findTile(this.robber_loc)?.toggleRobbed(false) }
