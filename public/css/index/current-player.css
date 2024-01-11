@@ -37,6 +37,11 @@
         cursor: pointer;
         animation: card-group-blink .7s infinite alternate ease-in-out;
       }
+      &.disabled {
+        animation: none;
+        cursor: not-allowed;
+        .card { filter: grayscale(1) brightness(.5); }
+      }
 
       .card {
         /* cursor: pointer; */
@@ -49,7 +54,9 @@
         box-shadow: 3px 0px 5px -3px #0006;
         background-image: url(/images/cards_sprite.png);
 
-        &:not(:first-child) {
+        &:not(:last-child).hide { visibility: hidden; }
+
+        &:not(:last-child) {
           position: absolute;
           bottom: 0px;
         }
@@ -73,6 +80,7 @@
         position: absolute;
         top: -14px;
         left: 43px;
+        z-index: 1;
         /* background: #fff; */
         background: #5a460e;
         color: #ebd290;
@@ -84,6 +92,8 @@
         display: flex;
         justify-content: center;
         align-items: center;
+
+        &.hide { display: none; }
       }
     }
   }

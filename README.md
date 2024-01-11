@@ -8,6 +8,7 @@ Free to play multiplayer catan style board game
 ## Status
 ### In Progress
   ##### Jan '24
+  - [ ] Client Refactor
   - [x] Robber
   - [x] ~~Basic Turn Actions~~
   - [x] ~~Refactor Game.js~~

@@ -82,8 +82,8 @@ const GAME_MESSAGES = {
     other: pname => `${pname} has been Robbed.`,
   },
   ROBBER: {
-    self: drop => (drop?` You have been GREEEEDY.<br><b>Give ${drop} resource card(s)</b> to the activated Robber 🥷.`:` 🥷 Robber is actived.`),
-    other: _ => ` 🥷 Robber is actived.`,
+    self: drop => (drop?` You have been GREEEEDY.<br><b>Give ${drop} resources</b> to the activated Robber 🥷.`:` 🥷 Robber is actived.`),
+    other: _ => ` 🥷 Robber is actived. Opponents are dropping resources.`,
   },
   ROBBER_MOVE: {
     self: _ => `Move the Robber 🥷.`,

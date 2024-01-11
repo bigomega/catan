@@ -11,6 +11,7 @@ export default class UI {
   active_player_id;
   player_ui; board_ui; game_state;
   #temp = {}
+  #robber_drop_res = {}
   possible_locations = { R: [], S: [], C: [] }
   $splash = $('.splash')
   $alert = $('#game > .alert')
@@ -37,7 +38,7 @@ export default class UI {
     this.$splash.classList.add('hide')
   }
 
-  alert(message) {
+  alert(message, status_also) {
     this.$alert.classList.add('show')
     this.$alert_parchment.innerHTML = message
     this.$alert_text.innerHTML = message
@@ -45,7 +46,7 @@ export default class UI {
     this.alert_timer = setTimeout(_ => {
       this.$alert.classList.remove('show')
     }, CONST.GAME_CONFIG.alert.time * 1000)
-    this.setStatus(message)
+    status_also && this.setStatus(message)
   }
 
   showDiceValue() {
@@ -76,6 +77,9 @@ export default class UI {
 
   renderRobberDrop(count) {
     const holding_res = Object.entries(this.player.closed_cards).filter(([k, v]) => v).map(([k]) => k)
+    this.#robber_drop_res = Object.fromEntries(holding_res.map(k => [k,0]))
+    this.#robber_drop_res._total = 0
+    this.#robber_drop_res._goal = count
     this.$robber_drop.innerHTML = `
       <div class="drop-zone">
         ${holding_res.map(k => `
@@ -86,13 +90,52 @@ export default class UI {
           <div class="dropped-count" data-count="0">
             ${[...Array(count)].map((_, i) => `
               <div class="dropped-count-light l-${i}"
-                style="transform:rotate(${360*i/count}deg)"></div>
+                style="transform:rotate(${((360)*i/count)}deg)"></div>
             `).join('')}
           </div>
-          <div class="drop-give-button">Give</div>
+          <div class="drop-give-button">Let Go!</div>
         </div>
       </div>
     `
+    this.$robber_drop.querySelector('.drop-emoji').addEventListener('click', e => {
+      this.#socket_actions.playAudio(CONST.AUDIO_FILES.ROBBER)
+    })
+    this.$robber_drop.querySelector('.drop-give-button').addEventListener('click', e => {
+      if (!e.target.classList.contains('active')) return
+      const clean_obj = Object.fromEntries(Object.entries(this.#robber_drop_res)
+        .filter(([k]) => CONST.RESOURCES[k]))
+      this.#socket_actions.sendRobberDrop(clean_obj)
+    })
+    this.$robber_drop.querySelectorAll('.drop-card').forEach($el => {
+      $el.addEventListener('click', e => {
+        if (!+$el.dataset.count) return
+        const type = $el.dataset.type
+        if (this.#robber_drop_res[type] === undefined) return
+        this.#robber_drop_res[type] -= 1
+        this.#robber_drop_res._total -= 1
+        this.updateRobberDropCount()
+        this.player_ui.toggleHandResource(type, true)
+      })
+    })
+  }
+
+  updateRobberDropCount() {
+    Object.entries(this.#robber_drop_res).forEach(([key, value]) => {
+      if (key === '_goal') {
+        const goal_reached = value == this.#robber_drop_res._total
+        this.$robber_drop.querySelector('.drop-give-button').classList[goal_reached?'add':'remove']('active')
+      } else if (key === '_total') {
+        this.$robber_drop.querySelector(`.dropped-count`).dataset.count = value
+        this.$robber_drop.querySelectorAll(`.dropped-count .dropped-count-light`).forEach(($el, i) => {
+          if (i < value) $el.classList.add('on')
+          else $el.classList.remove('on')
+        })
+      } else {
+        const $drop = this.$robber_drop.querySelector(`.drop-card[data-type="${key}"]`)
+        $drop.dataset.count = value
+        $drop.classList[value?'add':'remove']('valued')
+      }
+    })
   }
 
   /**------------------------------
@@ -116,9 +159,11 @@ export default class UI {
   }
 
   robberDrop(count) {
-    this.renderRobberDrop(5)
+    this.renderRobberDrop(count)
     this.player_ui.activateResourceCards()
   }
+
+  hideRobberDrop() { this.$robber_drop.innerHTML = "" }
 
   setStatus(message) { this.player_ui.setStatus(message) }
   appendStatus(message) { this.player_ui.appendStatus(message) }
@@ -134,7 +179,16 @@ export default class UI {
     piece === 'R' ? this.showEdges(locs) : this.showCorners(locs)
   }
 
-  onCardClick(type) {}
+  onCardClick(type) {
+    if (this.game_state === ST.ROBBER_DROP) {
+      if (this.#robber_drop_res._total >= this.#robber_drop_res._goal) return
+      if (this.#robber_drop_res[type] === undefined) return
+      if (!this.player_ui.toggleHandResource(type)) return
+      this.#robber_drop_res[type] += 1
+      this.#robber_drop_res._total += 1
+      this.updateRobberDropCount()
+    }
+  }
 
   onDiceClick() { this.#socket_actions.sendDiceClick() }
   onBuyDevCardClick() { this.#socket_actions.buyDevCard() }

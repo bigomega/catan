@@ -38,6 +38,9 @@ export default class IOManager {
 
     /** @event End-Turn */
     socket.on(SOC.END_TURN, () => game.endTurnIO(pid))
+
+    /** @event Robber-Drop */
+    socket.on(SOC.ROBBER_DROP, cards => game.robberDropIO(pid, cards))
   }
 
   updateWaitingRoom(player) { this.emit(SOC.JOINED_WAITING_ROOM, player) }
@@ -51,7 +54,7 @@ export default class IOManager {
   updateBuild(player, piece, loc) { this.emit(SOC.BUILD, player, piece, loc) }
 
   updatePublicPlayerData(p_json, key) { this.emit(SOC.UPDATE_PLAYER, p_json, key) }
-  updatePrivatePlayerData(player_socket_id, p_json, key, data) {
+  updatePlayerData_Private(player_socket_id, p_json, key, data) {
     this.#io.to(player_socket_id).emit(SOC.UPDATE_PLAYER, p_json, key, data)
   }
 
@@ -59,9 +62,11 @@ export default class IOManager {
 
   updateDiceValue(dice_value, active_player) { this.emit(SOC.DICE_VALUE, dice_value, active_player) }
 
-  updatePrivateResourceReceived(player_socket_id, total_resouces) {
+  updateResourceReceived_Private(player_socket_id, total_resouces) {
     this.#io.to(player_socket_id).emit(SOC.RES_RECEIVED, total_resouces)
   }
+
+  updateRobbed_Private(player_socket_id) { this.emit(SOC.ROBBER_DROP) }
 
   moveRobber(id) { this.emit(SOC.ROBBER_MOVE, id) }
 

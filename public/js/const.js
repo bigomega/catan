@@ -84,6 +84,7 @@ export const SOCKET_EVENTS = {
   END_TURN: 'end_turn',
   // Both
   INITIAL_SETUP: 'ask/return_initial_setup',
+  ROBBER_DROP: 'resources_dropped_to_robber/update_the_same',
   ROBBER_MOVE: 'robber_is_moved',
   // Server Sends…
   JOINED_WAITING_ROOM: 'joined_waiting_room',

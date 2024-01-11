@@ -91,7 +91,8 @@ body {
     top: 0;
     left: 0px;
     width: 100%;
-    background: color-mix(in srgb, var(--sand-color) 80%, #fff0);
+    /* background: var(--sand-color); */
+    background: color-mix(in srgb, var(--sand-color-dark) 80%, #fff0);
     padding: 20px 20px 0;
     border-bottom: 5px solid var(--sand-color-dark);
     box-sizing: border-box;
@@ -103,14 +104,15 @@ body {
 
     .drop-card {
       position: relative;
-      cursor: pointer;
+      cursor: not-allowed;
       width: 140px;
       height: 212px;
-      border: 5px dashed var(--sand-color-dark);
+      /* border: 5px dashed var(--sand-color-dark); */
+      border: 5px dashed var(--sand-color);
       margin-right: 20px;
       margin-bottom: 20px;
       border-radius: 20px;
-      &.valued { border-color: transparent; }
+      &.valued { border-color: transparent; cursor: pointer; }
 
       &::before {
         content: '';
@@ -120,11 +122,12 @@ body {
         width: 100%;
         height: 100%;
         border-radius: 15px;
-        filter: blur(3px) sepia(0.2);
-        filter: blur(3px) sepia(0.5) brightness(0.7);
+        /* filter: blur(3px) sepia(0.2);
+        filter: blur(3px) sepia(0.5) brightness(0.7); */
         filter: brightness(0.4) sepia(0.5);
       }
       &.valued::before { filter: none; box-shadow: 0px 0px 5px 5px #0006; }
+      &.valued:hover::before { box-shadow: 5px 5px 10px 5px #0009; }
 
       &[data-type=S]::before { background-size: 1100px; background-position: -176px -13px; }
       &[data-type=L]::before { background-size: 1109px; background-position: -639px -9px; }
@@ -134,7 +137,7 @@ body {
 
       &::after {
         display: none;
-        content: attr(data-count);
+        content: "Giving " attr(data-count);
         position: absolute;
         bottom: 0;
         left: 0;
@@ -143,10 +146,12 @@ body {
         background: var(--sand-color-dark);
         border-bottom-right-radius: 15px;
         border-bottom-left-radius: 15px;
-        color: #fff;
+        color: #fff9;
         /* font-size: 2em;
         font-weight: 600; */
         padding: 5px 0;
+        /* border-top: 1px solid var(--sand-color); */
+        box-shadow: 0 -5px 5px -3px var(--sand-color);
       }
       &.valued::after { display: block; }
     }
@@ -157,19 +162,32 @@ body {
       align-items: center;
       justify-content: center;
 
-      .drop-emoji { font-size: 50px; }
+      .drop-emoji {
+        font-size: 50px;
+        cursor: pointer;
+        filter: drop-shadow(0px 0px 1px #fff) drop-shadow(0px 0px 1px #fff) drop-shadow(0px 0px 1px #fff);
+
+        &:hover {
+          filter: drop-shadow(0px 0px 1px #fff) drop-shadow(0px 0px 1px #fff) drop-shadow(0px 0px 5px #fff);
+          transform: scale(1.3);
+        }
+      }
 
       .dropped-count {
         width: 50px;
         height: 50px;
         border-radius: 50%;
-        border: 22px solid #333;
+        /* border: 2px solid var(--sand-color-dark); */
+        border: 2px solid var(--sand-color);
+        margin: 20px;
         position: relative;
 
         &::before {
           content: attr(data-count);
-          color: var(--sand-color-dark);
-          background-color: var(--sand-color);
+          /* color: var(--sand-color-dark); */
+          color: var(--sand-color);
+          /* background-color: var(--sand-color); */
+          background-color: var(--sand-color-dark);
           position: absolute;
           left: 0px;
           top: 0px;
@@ -186,16 +204,19 @@ body {
           width: 10px;
           height: 10px;
           border-radius: 50%;
-          background: #aaa;
-          border: 1px solid #000;
+          background: #999;
+          border: 1px solid #333;
           position: absolute;
           left: 20px;
           top: -17px;
           transform-origin: 5px 42px;
+          opacity: 0.3;
 
           &.on {
-            background: #edba20;
-            box-shadow: 0 0 5px 2px #edba20;
+            background: #8ee529;
+            box-shadow: 0 0 5px 2px #8ee529;
+            border-color: #d0fa9e;
+            opacity: 1;
           }
         }
       }
@@ -208,16 +229,24 @@ body {
         text-align: center;
         background: #ccc;
         color: #999;
-        border-radius: 3px;
+        border-radius: 5px;
         font-size: 1.2em;
+        font-weight: bold;
+        border: 2px solid transparent;
         cursor: not-allowed;
 
         &.active {
+          /* background: var(--sand-color-dark);
+          background: var(--sand-color); */
           background: #333;
-          color: #fff;
+          /* color: var(--sand-color);
+          color: var(--sand-color-dark); */
+          color: var(--sand-color);
           cursor: pointer;
+          border-color: var(--sand-color);
 
-          &:hover { box-shadow: 0 0 10px 0px #333; }
+          /* &:hover { box-shadow: 0 0 10px 0px var(--sand-color-dark); } */
+          &:hover { box-shadow: 0 0 10px 0px var(--sand-color), 0 0 20px 0px var(--sand-color); }
         }
       }
     }

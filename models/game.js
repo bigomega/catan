@@ -20,7 +20,7 @@ export default class Game {
   #active_player = 0
   config = CONST.GAME_CONFIG
   /** @type {Player[]} */ players = []
-  ready_players = {}; map_changes = []; expected_actions = []; robbed_players = [];
+  ready_players = {}; map_changes = []; expected_actions = []; robbing_players = [];
   turn = 1; dice_value = 2
   mapkey = `S(br-S2).S.S(bl-B2).S\n-S.M5.J10.J8.S(bl-*3)\n-S(r-O2).J2.C9.G11.C4.S\n-S.G6.J4.D.F3.F11.S(l-W2)\n+S(r-L2).F3.G5.C6.M12.S\n+S.F8.G10.M9.S(tl-*3)\n+S(tr-*3).S.S(tl-*3).S`
   dev_cards = Helper.shuffle(CONST.DEVELOPMENT_CARDS_DECK.slice())
@@ -86,11 +86,14 @@ export default class Game {
       })
       this.setTimer(this.config.player_turn.time)
     } else if (this.state === ST.ROBBER_DROP) {
-      this.robbed_players = []
+      this.robbing_players = []
       this.players.forEach(pl => {
         if (pl.resource_count > 7) {
-          this.expected_actions.add({ pid: pl.id, callback: this.#expectedRobberDrop.bind(this) })
-          this.robbed_players.push(pl.id)
+          this.expected_actions.add({
+            pid: pl.id, drop_count: Math.floor(pl.resource_count / 2),
+            callback: this.#expectedRobberDrop.bind(this)
+          })
+          this.robbing_players.push(pl.id)
         }
       })
       this.setTimer(this.config.robber.drop_time)
@@ -105,13 +108,13 @@ export default class Game {
 
   #resolvePendingActions() {
     let continue_next = true
-    this.expected_actions.forEach(({ type, pid, callback }) => callback(pid))
+    this.expected_actions.forEach(({ type, pid, callback, ...params }) => callback(pid, params))
     this.expected_actions.splice(0, this.expected_actions.length)
     return continue_next
   }
 
   /** Initial Build */
-  #expectedInitialBuild(pid, settlement_loc, road_loc) {
+  #expectedInitialBuild(pid, { settlement_loc, road_loc } = {}) {
     let s_id = settlement_loc, r_id = road_loc
     const valid_corners = this.board.getSettlementLocations(-1).map(s => s.id)
     if (!valid_corners.includes(s_id)) { s_id = this.#getRandom(valid_corners) }
@@ -143,14 +146,18 @@ export default class Game {
   }
 
   /** Robber Drop Resource */
-  #expectedRobberDrop(pid) {
+  #expectedRobberDrop(pid, { drop_count = 0, resources } = {}) {
     const player = this.getPlayer(pid)
-    if (player.resource_count < 8) return
-    player.takeRandomResource(Math.floor(player.resource_count / 2))
-
-    const robbed_index = this.robbed_players.indexOf(pid)
-    robbed_index > -1 && this.robbed_players.splice(robbed_index, 1)
-    !this.robbed_players.length && this.#gotoNextState()
+    if (player.resource_count > 7) {
+      resources && Object.entries(resources).forEach(([key, value]) => {
+        try { player.takeCard(key, value); drop_count -= value
+        } catch (error) { /* Couldn't take the resource */ }
+      })
+      drop_count > 0 && player.takeRandomResource(drop_count)
+    }
+    const rob_pl_index = this.robbing_players.indexOf(pid)
+    rob_pl_index >= 0 && this.robbing_players.splice(rob_pl_index, 1)
+    !this.robbing_players.length && this.#gotoNextState()
   }
 
   /** Robber Movement */
@@ -169,7 +176,7 @@ export default class Game {
     const expected_index = this.expected_actions.findIndex(_ => _.type === ST.INITIAL_SETUP)
     const { pid: expected_pid, callback } = this.expected_actions[expected_index]
     if (pid && pid === expected_pid) {
-      callback(pid, settlement_loc, road_loc)
+      callback(pid, { settlement_loc, road_loc })
       this.expected_actions.splice(expected_index, 1)
       this.#next()
     }
@@ -211,6 +218,24 @@ export default class Game {
     this.#io_manager.updateDevCardTaken(player, this.dev_cards.length)
   }
 
+  robberDropIO(pid, resources) {
+    if (this.state !== ST.ROBBER_DROP) return
+    if (!this.robbing_players.includes(pid)) return
+    const expected_index = this.expected_actions.findIndex(_ =>_.type === ST.ROBBER_DROP && _.pid === pid)
+    if (expected_index < 0) return
+    const expected_obj = this.expected_actions[expected_index]
+    const total_given = Object.entries(resources).reduce((mem, [_, v]) => mem + v, 0)
+    if (total_given < expected_obj.drop_count) return
+
+    expected_obj.callback(pid, { drop_count: expected_obj.drop_count, resources })
+    this.expected_actions.splice(expected_index, 1)
+    if (this.robbing_players.length) {
+      this.#io_manager.updateRobbed_Private(this.getPlayerSoc(pid))
+    } else {
+      // this.#next()
+    }
+  }
+
   playerRollIO() { this.#next() }
   endTurnIO() { this.#next() }
   saveStatusIO(pid, text) { this.getPlayer(pid).setLastStatus(text) }
@@ -240,7 +265,7 @@ export default class Game {
       }
     })
     resource_by_pid.forEach((res, index) => {
-      this.#io_manager.updatePrivateResourceReceived(this.getPlayerSoc(index + 1), res)
+      this.#io_manager.updateResourceReceived_Private(this.getPlayerSoc(index + 1), res)
     })
   }
 
@@ -254,7 +279,7 @@ export default class Game {
   #onPlayerUpdate(pid, key, context) {
     const private_json = this.getPlayer(pid)?.toJSON(1)
     this.#io_manager.updatePublicPlayerData(this.getPlayer(pid)?.toJSON(), key)
-    this.#io_manager.updatePrivatePlayerData(this.getPlayerSoc(pid), private_json, key, context)
+    this.#io_manager.updatePlayerData_Private(this.getPlayerSoc(pid), private_json, key, context)
   }
   //#endregion
 

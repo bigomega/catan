@@ -25,7 +25,7 @@ export default class SocketActions {
       ;({
         [CONST.GAME_STATES.INITIAL_SETUP]: _ => {
           const time = this.game.config.strategize.time
-          ui.alert(GAME_MESSAGES.STRATEGIZE.self(time))
+          ui.alert(GAME_MESSAGES.STRATEGIZE.self(time), true)
           this.playAudio(AUDIO.START_END)
         },
         [CONST.GAME_STATES.PLAYER_ROLL]: _ => {
@@ -34,7 +34,7 @@ export default class SocketActions {
           ui.active_player_id = active_player.id
           const message = this.getMessage(active_player, MSGKEY.ROLL_TURN)
           if (active_player.id === this.player.id) {
-            ui.alert(message)
+            ui.alert(message, true)
             this.playAudio(AUDIO.PLAYER_TURN)
             ui.toggleDice(1)
           } else {
@@ -50,14 +50,16 @@ export default class SocketActions {
           const drop_count = this.player.resource_count > 7 ? Math.floor(this.player.resource_count/2) : 0
           if (drop_count) {
             ui.alert(GAME_MESSAGES.ROBBER.self(drop_count))
+            ui.appendStatus(GAME_MESSAGES.ROBBER.self(drop_count))
             ui.robberDrop(drop_count)
           } else {
             ui.appendStatus(GAME_MESSAGES.ROBBER.other())
           }
         },
         [CONST.GAME_STATES.ROBBER_MOVE]: _ => {
+          ui.hideRobberDrop()
           if (active_player.id === this.player.id) {
-            ui.alert(GAME_MESSAGES.ROBBER_MOVE.self())
+            ui.alert(GAME_MESSAGES.ROBBER_MOVE.self(), true)
             ui.robberMove()
           } else {
             ui.setStatus(GAME_MESSAGES.ROBBER_MOVE.other(active_player.name))
@@ -76,7 +78,7 @@ export default class SocketActions {
       const message = this.getMessage(active_player, msg_key)
       if (active_player.id === this.player.id) {
         ui.showInitialBuild()
-        ui.alert(message)
+        ui.alert(message, true)
       } else {
         ui.setStatus(message)
       }
@@ -120,7 +122,7 @@ export default class SocketActions {
       ui.setStatus(this.getMessage(player, MSGKEY.BUILDING, piece))
     })
 
-    /** @event Update-Player-Info */
+    /** @event PRIVATE?--Update-Player-Info */
     socket.on(SOC.UPDATE_PLAYER, (update_player, key, context) => {
       if (context && !context.taken && key.includes('closed_cards')  && update_player.id === this.player.id) {
         ;[...Array(context.count)].forEach(_ => this.playAudio(AUDIO.BOP))
@@ -141,7 +143,7 @@ export default class SocketActions {
       (d1 + d2) === 7 && setTimeout(_ => this.playAudio(AUDIO.ROBBER), 1000)
     })
 
-    /** @event Total-Resources-Received */
+    /** @event PRIVATE--Total-Resources-Received */
     socket.on(SOC.RES_RECEIVED, res_obj => {
       ui.appendStatus(GAME_MESSAGES.RES_TO_EMOJI.self(res_obj))
     })
@@ -150,6 +152,12 @@ export default class SocketActions {
     socket.on(SOC.DEV_CARD_TAKEN, (active_player, count) => {
       ui.setDevCardCount(count)
       ui.setStatus(this.getMessage(active_player, MSGKEY.DEVELOPMENT_CARD_BUY))
+    })
+
+    /** @event PRIVATE--Robber-Drop-Done */
+    socket.on(SOC.ROBBER_DROP, () => {
+      ui.hideRobberDrop()
+      ui.setStatus(GAME_MESSAGES.ROBBER.other())
     })
   }
 
@@ -186,6 +194,8 @@ export default class SocketActions {
   buyDevCard() { this.socket.emit(SOC.BUY_DEV) }
 
   endTurn() { this.socket.emit(SOC.END_TURN) }
+
+  sendRobberDrop(cards) { this.socket.emit(SOC.ROBBER_DROP, cards) }
 
   saveStatus(message) { this.socket.emit(SOC.SAVE_STATUS, message) }
 }

@@ -179,6 +179,7 @@ export default class PlayerUI {
           style="margin-right:${group_margin}px;
             transform:rotate(${group_rotation}deg) translateY(${group_translate}px);"
         >
+        <div class="card-count ${count<2 ?'hide':''}">${count}</div>
         ${[...Array(count)].map((_, j) => {
           if (count > 7 && j < count - 7) return '' // Max 7 cards rendered
           const c_rot = 15 * (count - j - 1) / (count - j)
@@ -189,7 +190,6 @@ export default class PlayerUI {
             ></div>
           `
         }).join('')}
-        ${count > 1 ? `<div class="card-count">${count}</div>` : ''}
         </div>
       `
     }).join('')
@@ -217,6 +217,23 @@ export default class PlayerUI {
   activateResourceCards() {
     const res_selector = oKeys(CONST.RESOURCES).map(k => `.card-group[data-type="${k}"]`).join(',')
     this.$hand.querySelectorAll(res_selector).forEach($el => $el.classList.add('active'))
+  }
+
+  toggleHandResource(type, show) {
+    if (show) {
+      const count = +this.$hand.querySelector(`.card-group[data-type="${type}"] .card-count`).innerHTML
+      this.$hand.querySelector(`.card-group[data-type="${type}"] .card-count`).innerHTML = count+1
+      this.$hand.querySelector(`.card-group[data-type="${type}"]`).classList.remove('disabled')
+      const hidden_list = this.$hand.querySelectorAll(`.card-group[data-type="${type}"] .card.hide`)
+      if (hidden_list.length) hidden_list[hidden_list.length - 1].classList.remove('hide')
+    } else {
+      const count = +this.$hand.querySelector(`.card-group[data-type="${type}"] .card-count`).innerHTML
+      if (!count) return
+      this.$hand.querySelector(`.card-group[data-type="${type}"] .card:not(.hide)`)?.classList.add('hide')
+      this.$hand.querySelector(`.card-group[data-type="${type}"] .card-count`).innerHTML = count - 1
+      if (count === 1) this.$hand.querySelector(`.card-group[data-type="${type}"]`).classList.add('disabled')
+    }
+    return 1
   }
   //#endregion
 
