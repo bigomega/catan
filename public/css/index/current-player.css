@@ -17,9 +17,11 @@
     display: flex;
     justify-content: center;
     position: absolute;
-    bottom: -120px;
+    bottom: -180px;
     width: 100%;
     filter: drop-shadow(0px 0px 15px #000);
+    transition: filter .25s cubic-bezier(0.55, 0.06, 0.68, 0.19), bottom .25s linear;
+    &.blur:not(:hover) { filter: drop-shadow(0px 0px 15px #000) blur(2px); }
 
     .card-group {
       cursor: default;
@@ -110,6 +112,9 @@
     color: #fff;
     border-top: 5px solid #000;
     filter: drop-shadow(0px -2px 10px black);
+    transition: all .25s linear;
+    position: relative;
+    bottom: -60px;
 
     > div {
       margin: 0 5px;
@@ -118,18 +123,19 @@
     .timer {
       font-family: monospace;
       font-size: 2em;
-
-      &.disabled {
-        color: #0004;
-        font-weight: 600;
-      }
+      position: relative;
+      top: -60px;
+      color: #fff;
+      opacity: 0.5;
+      text-shadow: 0px 0px 3px #000;
+      transition: all .25s linear;
     }
 
     /* DICE */
     .roll-dice {
       padding: 8px 10px;
       position: relative;
-      top: -10px;
+      top: 40px;
       font-size: 60px;
       background: inherit;
       border-radius: 30px 30px 0 0;
@@ -141,12 +147,9 @@
       transition: all .25s linear;
 
       &.disabled {
-        border-radius: 10px 10px 0 0;
-        line-height: 70px;
-        top: 5px;
         filter: grayscale(1) contrast(0.5);
         cursor: not-allowed;
-        padding-top: 3px;
+        line-height: 70px;
       }
 
       &:not(.disabled):hover {
@@ -317,5 +320,20 @@
 
     b { color: #77450b; }
     small { opacity: 0.7; }
+  }
+  &.show .hand,
+  &:not(.show) .hand:has(~.actions:hover, ~ .status-bar:hover) { bottom: -120px; }
+  &.show .actions,
+  &:not(.show) .actions:hover,
+  &:not(.show) .actions:has(~ .status-bar:hover) {
+    bottom: 0;
+    .roll-dice { top: -10px; }
+    .timer {
+      top: 0;
+      color: inherit;
+      opacity: 1;
+      text-shadow: none;
+      &.disabled { color: #0004; font-weight: 600; }
+    }
   }
 }

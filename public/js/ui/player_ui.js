@@ -33,6 +33,9 @@ export default class PlayerUI {
     this.$status_bar.innerHTML = this.player.last_status || '...'
   }
 
+  toggleShow(bool) { this.$el.classList[bool?'add':'remove']('show') }
+  toggleHandBlur(bool) { this.$hand.classList[bool?'add':'remove']('blur') }
+
   /**
    * -----------------
    *   ACTION BAR UI

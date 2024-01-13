@@ -58,20 +58,17 @@ body {
       text-shadow: none;
     }
 
-    b {
-      background: #734101;
-      padding: 8px;
-      border-radius: 10px;
-      color: #e5dac1;
-      text-shadow: none;
-    }
-
     .parchment {
       box-shadow: 2px 3px 20px black, 0 0 125px #8f5922 inset;
       background: #fffef0;
       filter: url(#wavy2);
       padding: 1em;
       color: transparent;
+
+      b {
+        background: #734101;
+        padding: 8px;
+      }
     }
 
     .text {
@@ -83,6 +80,11 @@ body {
       z-index: 1;
       padding: 1em;
       width: calc(100% - 2em);
+      b {
+        padding: 8px;
+        color: #e5dac1;
+        text-shadow: none;
+      }
     }
   }
 

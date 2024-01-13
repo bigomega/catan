@@ -11,6 +11,8 @@ export default class BoardUI {
     this.onClick = onClick
   }
 
+  toggleHide(bool) { this.$el.classList[bool?'add':'remove']('hide') }
+
   render() {
     let startDiff = 0
     let maxLeft = 0
@@ -119,13 +121,13 @@ export default class BoardUI {
     this.$el.querySelectorAll('.corner').forEach($corner => {
       $corner.addEventListener('click', e => {
         if (!e.target.classList.contains('shown')) return
-          this.onClick(CONST.LOCS.CORNER, +e.target.dataset.id)
+        this.onClick(CONST.LOCS.CORNER, +e.target.dataset.id)
       })
     })
     this.$el.querySelectorAll('.edge').forEach($edge => {
       $edge.addEventListener('click', e => {
         if (!e.target.classList.contains('shown')) return
-          this.onClick(CONST.LOCS.EDGE, +e.target.dataset.id)
+        this.onClick(CONST.LOCS.EDGE, +e.target.dataset.id)
       })
     })
     this.$el.querySelectorAll('.background, .number').forEach($tile => {

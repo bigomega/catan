@@ -37,8 +37,10 @@ export default class SocketActions {
             ui.alert(message)
             this.playAudio(AUDIO.PLAYER_TURN)
             ui.toggleDice(1)
+            ui.player_ui.toggleShow(1)
           } else {
             ui.setStatus(message)
+            ui.player_ui.toggleShow()
           }
         },
         [CONST.GAME_STATES.PLAYER_ACTIONS]: _ => {

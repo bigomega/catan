@@ -44,6 +44,7 @@ export default class Game {
         case ST.ROBBER_DROP: break;
         case ST.ROBBER_MOVE: this.ui.showRobberMovement(); break;
       }
+      this.state && this.state !== ST.INITIAL_SETUP && this.ui.player_ui.toggleShow(1)
     }
     if (this.state === ST.ROBBER_DROP) {
       this.player.resource_count > 7

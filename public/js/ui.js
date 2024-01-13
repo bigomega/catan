@@ -160,11 +160,15 @@ export default class UI {
   }
 
   robberDrop(count) {
+    this.board_ui.toggleHide(true)
     this.renderRobberDrop(count)
     this.player_ui.activateResourceCards()
   }
 
-  hideRobberDrop() { this.$robber_drop.innerHTML = "" }
+  hideRobberDrop() {
+    this.board_ui.toggleHide()
+    this.$robber_drop.innerHTML = ""
+  }
 
   setStatus(message) { this.player_ui.setStatus(message) }
   appendStatus(message) { this.player_ui.appendStatus(message) }
@@ -224,6 +228,7 @@ export default class UI {
   }
 
   moveRobber(id) {
+    this.hideAllShown()
     this.board.moveRobber(id)
     this.board_ui.moveRobber(id)
   }
@@ -263,8 +268,8 @@ export default class UI {
     this.#socket_actions.sendLocationClick(location_type, id)
   }
 
-  showCorners(ids) { this.board_ui.showCorners(ids) }
-  showEdges(ids) { this.board_ui.showEdges(ids) }
-  showTiles(ids) { this.board_ui.showTiles(ids) }
-  hideAllShown() { this.board_ui.hideAllShown() }
+  showCorners(ids) { this.player_ui.toggleHandBlur(1); this.board_ui.showCorners(ids) }
+  showEdges(ids) { this.player_ui.toggleHandBlur(1); this.board_ui.showEdges(ids) }
+  showTiles(ids) { this.player_ui.toggleHandBlur(1); this.board_ui.showTiles(ids) }
+  hideAllShown() { this.player_ui.toggleHandBlur(); this.board_ui.hideAllShown() }
 }

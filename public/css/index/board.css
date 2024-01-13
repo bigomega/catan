@@ -13,6 +13,7 @@
   margin: 30px 0px 150px;
   box-sizing: border-box;
   filter: drop-shadow(2px 2px 3px #000a);
+  &.hide { filter: drop-shadow(2px 2px 3px #000a) blur(2px); }
 
   .row {
     position: relative;
@@ -91,8 +92,13 @@
       }
     }
 
+    &.robbed .background { filter: sepia(.8) brightness(0.9); }
     &.robbed::before {
       content: '';
+      /* content: "🥷";
+      font-size: 90px;
+      left: 30px;
+      top: 15px; */
       display: block;
       z-index: 4;
       position: absolute;
