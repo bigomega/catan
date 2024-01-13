@@ -77,7 +77,9 @@ export default class UI {
   }
 
   renderRobberDrop(count) {
-    const holding_res = Object.entries(this.player.closed_cards).filter(([k, v]) => v).map(([k]) => k)
+    const holding_res = Object.entries(this.player.closed_cards)
+      .filter(([k, v]) => v && CONST.RESOURCES[k]).map(([k]) => k)
+    ;
     this.#robber_drop_res = Object.fromEntries(holding_res.map(k => [k,0]))
     this.#robber_drop_res._total = 0
     this.#robber_drop_res._goal = count

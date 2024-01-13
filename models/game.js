@@ -173,7 +173,7 @@ export default class Game {
     ;
     if (opp_c_pids.length) {
       // Steal
-      if (!opp_c_pids.includes(stolen_pid)) { stolen_pid = this.#getRandom(tile_opp_pids) }
+      if (!opp_c_pids.includes(stolen_pid)) { stolen_pid = this.#getRandom(opp_c_pids) }
       const stolen_p = this.getPlayer(stolen_pid)
       const [stolen_res] = stolen_p.takeRandomResource()
       if (stolen_res) {
@@ -315,10 +315,13 @@ export default class Game {
   //      HELPERS
   //#region =================
 
-  setTimer(time_in_seconds) {
+  setTimer(time_in_seconds, fn) {
     this.clearTimer()
     this.#io_manager.updateTimer(time_in_seconds, this.active_player)
-    this.#timer = setTimeout(this.#next.bind(this), time_in_seconds * 1000)
+    this.#timer = setTimeout(_ => {
+      fn && (typeof fn === 'function') && fn()
+      this.#next()
+    }, time_in_seconds * 1000)
   }
   clearTimer() { clearTimeout(this.#timer) }
 

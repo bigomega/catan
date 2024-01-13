@@ -75,6 +75,7 @@ export default class Player {
     const all_picked_res = []
     for (let i = 0; i < count; i++) {
       const avail_res = Object.keys(CONST.RESOURCES).filter(k => this.closed_cards[k] > 0)
+      if (!avail_res.length) { break }
       const picked_res = avail_res[Math.floor(Math.random() * avail_res.length)]
       all_picked_res.push(picked_res)
       this.takeCard(picked_res, 1)
