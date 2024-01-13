@@ -72,13 +72,14 @@ export default class BoardUI {
     function _renderRow(row) {
       return row.map((tile, j) =>
         `<div
-          class="tile ${tile.type}"
+          class="tile ${tile.type} ${tile.robbed ?'robbed':''}"
           data-id="${tile.id}"
           ${(tile.type === 'S' && tile.trade_edge)
           ? `data-trade="${tile.trade_type}" data-trade-dir="${tile.trade_edge}"`
           : ''
         }
         >
+          <div class="background"></div>
           <div class="corners">${_renderCorners(tile)}</div>
           <div class="edges">${_renderEdges(tile)}</div>
           ${tile.type === 'S' ? `<div class="beaches">${_renderBeaches(tile)}</div>` : ''}
@@ -117,16 +118,20 @@ export default class BoardUI {
   #setupEvents() {
     this.$el.querySelectorAll('.corner').forEach($corner => {
       $corner.addEventListener('click', e => {
-        if (e.target.classList.contains('shown')) {
+        if (!e.target.classList.contains('shown')) return
           this.onClick(CONST.LOCS.CORNER, +e.target.dataset.id)
-        }
       })
     })
     this.$el.querySelectorAll('.edge').forEach($edge => {
       $edge.addEventListener('click', e => {
-        if (e.target.classList.contains('shown')) {
+        if (!e.target.classList.contains('shown')) return
           this.onClick(CONST.LOCS.EDGE, +e.target.dataset.id)
-        }
+      })
+    })
+    this.$el.querySelectorAll('.background, .number').forEach($tile => {
+      $tile.addEventListener('click', e => {
+        if (!e.target.parentElement.classList.contains('shown')) return
+        this.onClick(CONST.LOCS.TILE, +e.target.parentElement.dataset.id)
       })
     })
   }
@@ -145,19 +150,21 @@ export default class BoardUI {
     }
   }
 
+  moveRobber(id) {
+    this.$el.querySelector('.tile.robbed')?.classList.remove('robbed')
+    this.#getTile$(id)?.classList.add('robbed')
+  }
+
   #getCorner$(id) { return this.$el.querySelector(`.corner[data-id="${id}"]`) }
   #getEdge$(id) { return this.$el.querySelector(`.edge[data-id="${id}"]`) }
+  #getTile$(id) { return this.$el.querySelector(`.tile[data-id="${id}"]`) }
 
-  showCorners(ids = []) {
-    ids.forEach(id => this.#getCorner$(id)?.classList.add('shown'))
-  }
-  showEdges(ids = []) {
-    ids.forEach(id => this.#getEdge$(id)?.classList.add('shown'))
-  }
-  showTiles(ids) { }
+  showCorners(ids = []) { ids.forEach(id => this.#getCorner$(id)?.classList.add('shown')) }
+  showEdges(ids = []) { ids.forEach(id => this.#getEdge$(id)?.classList.add('shown')) }
+  showTiles(ids = []) { ids.forEach(id => this.#getTile$(id)?.classList.add('shown')) }
 
   hideAllShown() {
-    this.$el.querySelectorAll('.corner.shown, .edge.shown').forEach($el => {
+    this.$el.querySelectorAll('.corner.shown, .edge.shown, .tile.shown').forEach($el => {
       $el.classList.remove('shown')
     })
   }

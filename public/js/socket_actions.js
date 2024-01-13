@@ -25,7 +25,7 @@ export default class SocketActions {
       ;({
         [CONST.GAME_STATES.INITIAL_SETUP]: _ => {
           const time = this.game.config.strategize.time
-          ui.alert(GAME_MESSAGES.STRATEGIZE.self(time), true)
+          ui.alert(GAME_MESSAGES.STRATEGIZE.self(time))
           this.playAudio(AUDIO.START_END)
         },
         [CONST.GAME_STATES.PLAYER_ROLL]: _ => {
@@ -34,7 +34,7 @@ export default class SocketActions {
           ui.active_player_id = active_player.id
           const message = this.getMessage(active_player, MSGKEY.ROLL_TURN)
           if (active_player.id === this.player.id) {
-            ui.alert(message, true)
+            ui.alert(message)
             this.playAudio(AUDIO.PLAYER_TURN)
             ui.toggleDice(1)
           } else {
@@ -50,7 +50,6 @@ export default class SocketActions {
           const drop_count = this.player.resource_count > 7 ? Math.floor(this.player.resource_count/2) : 0
           if (drop_count) {
             ui.alert(GAME_MESSAGES.ROBBER.self(drop_count))
-            ui.appendStatus(GAME_MESSAGES.ROBBER.self(drop_count))
             ui.robberDrop(drop_count)
           } else {
             ui.appendStatus(GAME_MESSAGES.ROBBER.other())
@@ -59,8 +58,8 @@ export default class SocketActions {
         [CONST.GAME_STATES.ROBBER_MOVE]: _ => {
           ui.hideRobberDrop()
           if (active_player.id === this.player.id) {
-            ui.alert(GAME_MESSAGES.ROBBER_MOVE.self(), true)
-            ui.robberMove()
+            ui.alert(GAME_MESSAGES.ROBBER_MOVE.self())
+            ui.showRobberMovement()
           } else {
             ui.setStatus(GAME_MESSAGES.ROBBER_MOVE.other(active_player.name))
           }
@@ -78,7 +77,7 @@ export default class SocketActions {
       const message = this.getMessage(active_player, msg_key)
       if (active_player.id === this.player.id) {
         ui.showInitialBuild()
-        ui.alert(message, true)
+        ui.alert(message)
       } else {
         ui.setStatus(message)
       }
@@ -159,6 +158,25 @@ export default class SocketActions {
       ui.hideRobberDrop()
       ui.setStatus(GAME_MESSAGES.ROBBER.other())
     })
+
+    /** @event Robber-Moved */
+    socket.on(SOC.ROBBER_MOVE, (active_player, id) => {
+      ui.moveRobber(id)
+      const tile = ui.board.findTile(id).type
+      const num = ui.board.findTile(id).num || ''
+      ui.setStatus(this.getMessage(active_player, MSGKEY.ROBBER_MOVED_TILE, tile, num ))
+    })
+
+    /** @event Notify-Stolen-Info */
+    socket.on(SOC.STOLEN_INFO, (p1, p2, res) => {
+      if (p1.id === this.player.id) {
+        res && ui.appendStatus(GAME_MESSAGES.PLAYER_STOLE_RES.self({ p2: p2.name }, res))
+      } else if (p2.id === this.player.id) {
+        res && ui.appendStatus(GAME_MESSAGES.PLAYER_STOLE_RES.self({ p1: p1.name }, res))
+      } else {
+        ui.appendStatus(GAME_MESSAGES.PLAYER_STOLE_RES.other({ p1: p1.name, p2: p2.name }))
+      }
+    })
   }
 
   getMessage(alert_player, msg_key, ...data) {
@@ -196,6 +214,8 @@ export default class SocketActions {
   endTurn() { this.socket.emit(SOC.END_TURN) }
 
   sendRobberDrop(cards) { this.socket.emit(SOC.ROBBER_DROP, cards) }
+
+  sendRobberMove(tile_id, stolen_pid) { this.socket.emit(SOC.ROBBER_MOVE, tile_id, stolen_pid) }
 
   saveStatus(message) { this.socket.emit(SOC.SAVE_STATUS, message) }
 }

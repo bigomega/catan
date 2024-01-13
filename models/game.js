@@ -161,10 +161,28 @@ export default class Game {
   }
 
   /** Robber Movement */
-  #expectedRobberMove(pid) {
-    const moved_id = this.#getRandom(this.board.getRobbableTiles())
-    this.board.moveRobber(moved_id)
-    this.#io_manager.moveRobber(moved_id)
+  #expectedRobberMove(pid, { tile_id, stolen_pid } = {}) {
+    const valid_locs = this.board.getRobbableTiles()
+    if (!valid_locs.includes(tile_id)) { tile_id = this.#getRandom(valid_locs) }
+    const player = this.getPlayer(pid)
+    this.board.moveRobber(tile_id)
+    this.#io_manager.moveRobber(player, tile_id)
+
+    const opp_c_pids = this.board.findTile(tile_id)?.getAllCorners()
+      .filter(c => c.piece && (c.player_id !== pid)).map(_ => _.player_id)
+    ;
+    if (opp_c_pids.length) {
+      // Steal
+      if (!opp_c_pids.includes(stolen_pid)) { stolen_pid = this.#getRandom(tile_opp_pids) }
+      const stolen_p = this.getPlayer(stolen_pid)
+      const [stolen_res] = stolen_p.takeRandomResource()
+      if (stolen_res) {
+        player.giveCard(stolen_res)
+        this.#io_manager.updateStolen(player, stolen_p)
+        this.#io_manager.updateStolen_Private(this.getPlayerSoc(pid), player, stolen_p, stolen_res)
+        this.#io_manager.updateStolen_Private(this.getPlayerSoc(stolen_pid), player, stolen_p, stolen_res)
+      }
+    }
     this.#gotoNextState()
   }
   //#endregion
@@ -186,6 +204,7 @@ export default class Game {
     if (pid !== this.active_player) return
     if (this.state !== ST.PLAYER_ACTIONS) return
     const player = this.getActivePlayer()
+    // Validate & Build
     if (loc_type === CONST.LOCS.EDGE) {
       const valid_locs = this.board.getRoadLocationsFromRoads(player.pieces.R)
       if (valid_locs.includes(id) && player.canBuy('R')) {
@@ -223,17 +242,27 @@ export default class Game {
     if (!this.robbing_players.includes(pid)) return
     const expected_index = this.expected_actions.findIndex(_ =>_.type === ST.ROBBER_DROP && _.pid === pid)
     if (expected_index < 0) return
-    const expected_obj = this.expected_actions[expected_index]
+    const { drop_count, callback } = this.expected_actions[expected_index]
     const total_given = Object.entries(resources).reduce((mem, [_, v]) => mem + v, 0)
-    if (total_given < expected_obj.drop_count) return
+    if (total_given < drop_count) return
 
-    expected_obj.callback(pid, { drop_count: expected_obj.drop_count, resources })
+    callback(pid, { drop_count, resources })
     this.expected_actions.splice(expected_index, 1)
     if (this.robbing_players.length) {
       this.#io_manager.updateRobbed_Private(this.getPlayerSoc(pid))
     } else {
-      // this.#next()
+      this.#next()
     }
+  }
+
+  robberMoveIO(pid, tile_id, stolen_pid) {
+    if (pid !== this.active_player) return
+    if (this.state !== ST.ROBBER_MOVE) return
+    const expected_index = this.expected_actions.findIndex(_ => _.type === ST.ROBBER_MOVE)
+    const { callback } = this.expected_actions[expected_index]
+    callback(pid, { tile_id, stolen_pid })
+    this.expected_actions.splice(expected_index, 1)
+    this.#next()
   }
 
   playerRollIO() { this.#next() }
@@ -278,7 +307,7 @@ export default class Game {
 
   #onPlayerUpdate(pid, key, context) {
     const private_json = this.getPlayer(pid)?.toJSON(1)
-    this.#io_manager.updatePublicPlayerData(this.getPlayer(pid)?.toJSON(), key)
+    this.#io_manager.updatePlayerData(this.getPlayer(pid)?.toJSON(), key)
     this.#io_manager.updatePlayerData_Private(this.getPlayerSoc(pid), private_json, key, context)
   }
   //#endregion
@@ -325,6 +354,7 @@ export default class Game {
       active_player: this.active_player,
       state: this.state,
       dev_cards_len: this.dev_cards.length,
+      robber_loc: this.board?.robber_loc,
       timer: timer_left > 1 ? timer_left : 0,
     }
   }

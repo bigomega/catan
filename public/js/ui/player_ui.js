@@ -24,7 +24,7 @@ export default class PlayerUI {
     // this.hand.L = 7
     // this.hand.B = 6
     // this.hand.dK = 3
-    // // delete this.hand.O
+    // delete this.hand.O
     // this.hand.dM = 1
     // this.hand.dR = 1
     // this.hand.dY = 1

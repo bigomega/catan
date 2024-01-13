@@ -26,7 +26,7 @@ export default class Player {
   setSocket(sid) { this.socket_id = sid }
   deleteSocket(sid) { if (sid == this.socket_id) { delete this.socket_id } }
 
-  giveCard(card_type, count) {
+  giveCard(card_type, count = 1) {
     this.closed_cards[card_type] += count
     const change_type = (card_type in CONST.RESOURCES) ? 'res' : 'dc'
     if (change_type === 'res') { this.resource_count += count }
@@ -35,7 +35,7 @@ export default class Player {
     this.onChange(this.id, `closed_cards.${change_type}`, { card_type, count })
   }
 
-  takeCard(card_type, count) {
+  takeCard(card_type, count = 1) {
     if (this.closed_cards[card_type] - count < 0) { throw "Cannot take more" }
     this.closed_cards[card_type] -= count
     if (card_type in CONST.RESOURCES) { this.resource_count -= count }
@@ -72,11 +72,14 @@ export default class Player {
   }
 
   takeRandomResource(count = 1) {
+    const all_picked_res = []
     for (let i = 0; i < count; i++) {
       const avail_res = Object.keys(CONST.RESOURCES).filter(k => this.closed_cards[k] > 0)
       const picked_res = avail_res[Math.floor(Math.random() * avail_res.length)]
+      all_picked_res.push(picked_res)
       this.takeCard(picked_res, 1)
     }
+    return all_picked_res
   }
 
   canBuy(type) {

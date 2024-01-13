@@ -4,6 +4,10 @@
  * BOARD
  * -------------
 */
+@keyframes tile-blink {
+  0% { filter: brightness(1.2); }
+  100% { filter: brightness(.8);}
+}
 .board {
   position: relative;
   margin: 30px 0px 150px;
@@ -22,10 +26,19 @@
     height: 176px;
     display: inline-block;
     vertical-align: top;
-    background-size: cover;
     position: relative;
 
+    .background {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      left: 0;
+      top: 0;
+      background-size: cover;
+    }
+
     .number {
+      z-index: 3;
       width: 50px;
       height: 50px;
       border-radius: 50%;
@@ -52,13 +65,54 @@
         top: 15px;
       }
 
-      &.red::before {
-        color: red;
-      }
+      &.red::before { color: #d21c0e; }
+    }
 
-      /* &.robber::before {
-        content: ''
-      } */
+    &.shown .number,
+    &.shown.D .background {
+      cursor: pointer;
+      animation: tile-blink .7s infinite alternate ease-in-out;
+    }
+    &.shown:has(.background:hover, .background~.number:hover){
+      cursor: pointer;
+      .background {
+        z-index: 1;
+        top: -3px;
+        left: -3px;
+        animation: none;
+        filter: drop-shadow(5px 5px 5px #000) sepia(.8) brightness(0.9);
+      }
+      .number {
+        margin-left: 45px;
+        margin-top: 57px;
+        animation: none;
+        background: #999;
+        &::before { color: #666; }
+      }
+    }
+
+    &.robbed::before {
+      content: '';
+      display: block;
+      z-index: 4;
+      position: absolute;
+      background-image: url(/images/ninja.png);
+      left: 45px;
+      top: 22px;
+      height: 90px;
+      width: 65px;
+      /* background-image: url(/images/robber.png);
+      left: 54px;
+      top: 25px;
+      height: 76px;
+      width: 38px; */
+      filter: drop-shadow(0px 0px 2px var(--sand-color)) drop-shadow(0px 0px 2px var(--sand-color)) drop-shadow(0px 0px 6px var(--sand-color));
+      opacity: 1;
+      background-size: cover;
+    }
+
+    &.robbed:hover::before {
+      opacity: 0.5;
     }
 
     /* &:has(.number:hover),
@@ -73,14 +127,14 @@
  * -------------
 */
 .board .tile {
-  &.G { background-image:url('/images/tiles/Grassland.png'); }
-  &.J { background-image:url('/images/tiles/Jungle.png'); }
-  &.C { background-image:url('/images/tiles/Clay Pit.png'); }
-  &.M { background-image:url('/images/tiles/Mountain.png'); }
-  &.F { background-image:url('/images/tiles/Fields.png'); }
-  &.D { background-image:url('/images/tiles/Desert.png'); }
+  &.G .background { background-image:url('/images/tiles/Grassland.png'); }
+  &.J .background { background-image:url('/images/tiles/Jungle.png'); }
+  &.C .background { background-image:url('/images/tiles/Clay Pit.png'); }
+  &.M .background { background-image:url('/images/tiles/Mountain.png'); }
+  &.F .background { background-image:url('/images/tiles/Fields.png'); }
+  &.D .background { background-image:url('/images/tiles/Desert.png'); }
 
-  &:not(.S) {
+  &:not(.S) .background {
     /* filter: drop-shadow(0px 0px 1px #000); */
   }
   /* &.S { background-image:url('/images/tiles/Sea.png'); } */
@@ -128,7 +182,7 @@
     background: #fff9;
     border-radius: 30px;
     position: absolute;
-    z-index: 2;
+    z-index: 3;
     visibility: hidden;
 
     &:not(.taken) {
@@ -156,7 +210,7 @@
       /* filter: drop-shadow(-3px 3px 2px #000) drop-shadow(-3px 3px 4px var(--sand-color)) drop-shadow(-3px 3px 5px var(--sand-color)); */
       filter: drop-shadow(-3px 3px 2px #000) drop-shadow(1px -1px 3px var(--sand-color)) drop-shadow(3px -3px 5px var(--sand-color)) drop-shadow(-3px 3px 5px var(--sand-color)) drop-shadow(-3px 3px 4px var(--sand-color));
 
-      &.shown[data-taken=S] {
+      &.shown {
         animation: piece-settlement-blink 1s infinite;
         filter: drop-shadow(1px 0px 0px #fff) drop-shadow(-1px 0px 0px #fff) drop-shadow(0px 1px 0px #fff)drop-shadow(0px -1px 0px #fff);
 
@@ -223,7 +277,7 @@
     height: 50px;
     background: #fff9;
     position: absolute;
-    z-index: 1;
+    z-index: 2;
     cursor: pointer;
     visibility: hidden;
 

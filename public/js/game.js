@@ -33,14 +33,16 @@ export default class Game {
     this.ui.active_player_id = this.active_player
     this.ui.updateExistingBoard()
     this.ui.setDevCardCount(this.dev_cards_len)
+    game_obj.robber_loc && this.ui.moveRobber(game_obj.robber_loc)
     this.timer && this.ui.setTimer(this.timer, this.active_player)
+    // State updates
     if (this.player.id === this.active_player) {
       switch (this.state) {
         case ST.INITIAL_SETUP: this.ui.showInitialBuild(); break;
         case ST.PLAYER_ROLL: this.ui.toggleDice(true); break;
         case ST.PLAYER_ACTIONS: this.ui.toggleActions(true); break;
         case ST.ROBBER_DROP: break;
-        case ST.ROBBER_MOVE: this.ui.robberMove(); break;
+        case ST.ROBBER_MOVE: this.ui.showRobberMovement(); break;
       }
     }
     if (this.state === ST.ROBBER_DROP) {

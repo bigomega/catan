@@ -1,8 +1,11 @@
 import * as CONST from "../public/js/const.js"
+import Game from "./game.js"
 const SOC = CONST.SOCKET_EVENTS
 
 export default class IOManager {
-  #game; #io;
+  /** @type {Game} */
+  #game;
+  #io;
 
   constructor({ game, io }) {
     this.#game = game
@@ -41,6 +44,9 @@ export default class IOManager {
 
     /** @event Robber-Drop */
     socket.on(SOC.ROBBER_DROP, cards => game.robberDropIO(pid, cards))
+
+    /** @event Robber-Move-Steal */
+    socket.on(SOC.ROBBER_MOVE, (t_id, s_pid) => game.robberMoveIO(pid, t_id, s_pid))
   }
 
   updateWaitingRoom(player) { this.emit(SOC.JOINED_WAITING_ROOM, player) }
@@ -53,7 +59,7 @@ export default class IOManager {
 
   updateBuild(player, piece, loc) { this.emit(SOC.BUILD, player, piece, loc) }
 
-  updatePublicPlayerData(p_json, key) { this.emit(SOC.UPDATE_PLAYER, p_json, key) }
+  updatePlayerData(p_json, key) { this.emit(SOC.UPDATE_PLAYER, p_json, key) }
   updatePlayerData_Private(player_socket_id, p_json, key, data) {
     this.#io.to(player_socket_id).emit(SOC.UPDATE_PLAYER, p_json, key, data)
   }
@@ -66,9 +72,14 @@ export default class IOManager {
     this.#io.to(player_socket_id).emit(SOC.RES_RECEIVED, total_resouces)
   }
 
-  updateRobbed_Private(player_socket_id) { this.emit(SOC.ROBBER_DROP) }
+  updateRobbed_Private(player_socket_id) { this.#io.to(player_socket_id).emit(SOC.ROBBER_DROP) }
 
-  moveRobber(id) { this.emit(SOC.ROBBER_MOVE, id) }
+  moveRobber(active_player, id) { this.emit(SOC.ROBBER_MOVE, active_player, id) }
+
+  updateStolen(p1, p2) { this.emit(SOC.STOLEN_INFO, p1, p2) }
+  updateStolen_Private(player_socket_id, p1, p2, res) {
+    this.#io.to(player_socket_id).emit(SOC.STOLEN_INFO, p1, p2, res)
+  }
 
   emit(type, ...data) { this.#io.to(this.#game.id).emit(type, ...data) }
 }

@@ -11,6 +11,7 @@ export const TILES = {
 export const RESOURCES = { S: 'Sheep', L: 'Lumber', B: 'Brick', O: 'Ore', W: 'Wheat'}
 
 export const RESOURCE_EMOJIS = { S: '🐑', L: '🪵', B: '🧱', O: '🏔', W: '🌾' }
+export const TILE_EMOJIS = { G: '🐑', J: '🪵', C: '🧱', M: '🏔', F: '🌾', S: '🌊', D: '🌵' }
 
 export const SEA_REGEX = `S\\((?<dir>tl|tr|l|r|bl|br)-(?<res>${Object.keys(RESOURCES).join('|')}|\\*)(?<num>\\d*)\\)`
 
@@ -58,8 +59,10 @@ export const GAME_CONFIG = {
   strategize: { time: 120 },
   initial_build: { time: 60 },
   roll: { time: 15 },
-  player_turn: {},
+  player_turn: { time: 60 },
+  robber: { drop_time: 60, move_time: 30 },
   win_points: 10,
+  alert: { time: 3 },
 }
 
 export const GAME_STATES = {
@@ -84,7 +87,7 @@ export const SOCKET_EVENTS = {
   END_TURN: 'end_turn',
   // Both
   INITIAL_SETUP: 'ask/return_initial_setup',
-  ROBBER_DROP: 'resources_dropped_to_robber/update_the_same',
+  ROBBER_DROP: 'resources_dropped_to_robber/server_update',
   ROBBER_MOVE: 'robber_is_moved',
   // Server Sends…
   JOINED_WAITING_ROOM: 'joined_waiting_room',
@@ -95,6 +98,7 @@ export const SOCKET_EVENTS = {
   DICE_VALUE: 'value_of_rolled_dice',
   RES_RECEIVED: 'total_resources_received', // Private
   DEV_CARD_TAKEN: 'developer_card_deck_taken',
+  STOLEN_INFO: 'notify_stolen_resource',
 
 
 

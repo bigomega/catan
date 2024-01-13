@@ -86,8 +86,16 @@ const GAME_MESSAGES = {
     other: _ => ` 🥷 Robber is actived. Opponents are dropping resources.`,
   },
   ROBBER_MOVE: {
-    self: _ => `Move the Robber 🥷.`,
-    other: (pname) => `${pname} is moving the robber 🥷.`,
+    self: _ => `Move the Robber 🥷 and steal.`,
+    other: (pname) => `${pname} is moving the robber 🥷 and stealing.`,
+  },
+  ROBBER_MOVED_TILE: {
+    self: (tile, num) => `You have moved the 🥷 Robber to ${CONST.TILE_EMOJIS[tile]} ${CONST.TILES[tile]} - ${num}.`,
+    other: (tile, num, pname) => `${pname} has moved the 🥷 Robber to ${CONST.TILE_EMOJIS[tile]} ${CONST.TILES[tile]} - ${num}.`,
+  },
+  PLAYER_STOLE_RES: {
+    self: ({ p1, p2 }, res) => ` ${p1 ? p1 + ' has' : 'You have'} stolen a ${CONST.RESOURCE_EMOJIS[res]} ${CONST.RESOURCES[res]} from ${p2 || 'you'}.`,
+    other: (p1, p2) => ` ${p1} has stolen a resource from ${p2}.`,
   },
 }
 

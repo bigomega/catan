@@ -1,5 +1,6 @@
 import Board from "./board/board.js"
 import * as CONST from "./const.js"
+import SocketActions from "./socket_actions.js"
 import AllPlayersUI from "./ui/all_players_ui.js"
 import BoardUI from "./ui/board_ui.js"
 import PlayerUI from "./ui/player_ui.js";
@@ -7,7 +8,9 @@ const $ = document.querySelector.bind(document)
 const ST = CONST.GAME_STATES
 
 export default class UI {
-  #initial_setup; #socket_actions; board; player; opponents; alert_timer;
+  /** @type {SocketActions} */
+  #socket_actions;
+  #initial_setup; board; player; opponents; alert_timer;
   active_player_id;
   player_ui; board_ui; game_state;
   #temp = {}
@@ -38,7 +41,7 @@ export default class UI {
     this.$splash.classList.add('hide')
   }
 
-  alert(message, status_also) {
+  alert(message, no_status) {
     this.$alert.classList.add('show')
     this.$alert_parchment.innerHTML = message
     this.$alert_text.innerHTML = message
@@ -46,7 +49,7 @@ export default class UI {
     this.alert_timer = setTimeout(_ => {
       this.$alert.classList.remove('show')
     }, CONST.GAME_CONFIG.alert.time * 1000)
-    status_also && this.setStatus(message)
+    no_status || this.setStatus(message)
   }
 
   showDiceValue() {
@@ -72,8 +75,6 @@ export default class UI {
       && pid === this.active_player_id
       && this.game_state === ST.PLAYER_ACTIONS
   }
-
-  robberMove() {}
 
   renderRobberDrop(count) {
     const holding_res = Object.entries(this.player.closed_cards).filter(([k, v]) => v).map(([k]) => k)
@@ -210,6 +211,8 @@ export default class UI {
     this.showCorners(this.board.getSettlementLocations(-1).map(s => s.id))
   }
 
+  showRobberMovement() { this.showTiles(this.board.getRobbableTiles()) }
+
   build(pid, piece, loc) {
     this.hideAllShown()
     this.board.build(pid, piece, loc)
@@ -220,9 +223,14 @@ export default class UI {
     }
   }
 
+  moveRobber(id) {
+    this.board.moveRobber(id)
+    this.board_ui.moveRobber(id)
+  }
+
   #onBoardClick(location_type, id) {
     this.hideAllShown()
-    if (this.#initial_setup) {
+    if (this.#initial_setup && this.game_state === ST.INITIAL_SETUP) {
       if (location_type === 'C') {
         this.showCorners([id])
         this.#temp.settlement_loc = id
@@ -234,11 +242,29 @@ export default class UI {
       }
       return
     }
+    if (this.game_state === ST.ROBBER_MOVE) {
+      if (location_type === 'T') {
+        const opp_taken_corners = this.board.findTile(id)?.getAllCorners()
+          .filter(c => c.piece && (c.player_id !== this.player.id))
+        const taken_oppponents_count = [...new Set(opp_taken_corners.map(_ => _.player_id))].length
+        if (taken_oppponents_count > 1) {
+          this.#temp = { _robber_tile: id }
+          this.showCorners(opp_taken_corners.map(_ => _.id))
+        } else {
+          this.#socket_actions.sendRobberMove(id)
+        }
+      } else if (location_type === 'C') {
+        const stolen_pid = this.board.findCorner(id).player_id
+        this.#socket_actions.sendRobberMove(this.#temp._robber_tile, stolen_pid)
+      }
+      return
+    }
+    // Normal Actions
     this.#socket_actions.sendLocationClick(location_type, id)
   }
 
   showCorners(ids) { this.board_ui.showCorners(ids) }
   showEdges(ids) { this.board_ui.showEdges(ids) }
-  showTiles(ids) {}
+  showTiles(ids) { this.board_ui.showTiles(ids) }
   hideAllShown() { this.board_ui.hideAllShown() }
 }
