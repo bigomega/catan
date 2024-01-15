@@ -45,6 +45,7 @@ export default class SocketActions {
         },
         [CONST.GAME_STATES.PLAYER_ACTIONS]: _ => {
           if (active_player.id === this.player.id) {
+            ui.player_ui.toggleShow(1)
             ui.toggleActions(1)
           }
         },
@@ -56,6 +57,7 @@ export default class SocketActions {
           } else {
             ui.appendStatus(GAME_MESSAGES.ROBBER.other())
           }
+          ui.player_ui.toggleShow()
         },
         [CONST.GAME_STATES.ROBBER_MOVE]: _ => {
           ui.hideRobberDrop()
@@ -65,6 +67,7 @@ export default class SocketActions {
           } else {
             ui.setStatus(GAME_MESSAGES.ROBBER_MOVE.other(active_player.name))
           }
+          ui.player_ui.toggleShow()
         },
       })[state]?.()
     })
