@@ -160,7 +160,7 @@ export default class Game {
 
   // Build Update
   updateBuildSoc(player, piece, loc) {
-    if (player.id === this.#player.id) {
+    if (this.#isMyPid(player.id)) {
       const aud_file = ({
         S: AUDIO.BUILD_SETTLEMENT,
         C: AUDIO.BUILD_CITY,
@@ -168,10 +168,9 @@ export default class Game {
       })[piece]
       aud_file && this.#audio_manager.play(aud_file)
     }
-    console.log(player.id, piece, loc);
     this.#board.build(player.id, piece, loc)
     this.#ui.build(player.id, piece, loc)
-    this.#amIActing(player.id) && this.updateAllPossibleLocations()
+    this.#amIActing(player.id) && this.#ui.toggleActions(1)
     this.#ui.alert_ui.setStatus(this.#ui.alert_ui.getMessage(player, MSGKEY.BUILDING, piece))
   }
 
@@ -185,7 +184,7 @@ export default class Game {
       }
     }
     this.#isMyPid(update_player.id) && this.#player.update(update_player)
-    this.#amIActing(update_player.id) &&this.#ui.player_ui.checkAndToggleActions(true)
+    this.#amIActing(update_player.id) && this.#ui.toggleActions(1)
   }
 
   // Dice Value Update
