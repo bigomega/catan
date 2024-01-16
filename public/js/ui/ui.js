@@ -5,6 +5,7 @@ import BoardUI from "./board_ui.js"
 import PlayerUI from "./player_ui.js"
 import AlertUI from "./alert_ui.js"
 import RobberDropUI from "./robber_drop_ui.js"
+import AllPlayersUI from "./all_players_ui.js"
 const $ = document.querySelector.bind(document)
 
 export default class UI {
@@ -33,13 +34,13 @@ export default class UI {
       onTakenBack: type => this.player_ui.toggleHandResource(type, true),
       playRobberAudio: _ => game.playRobberAudio(),
     })
-    // this.all_players_ui = new AllPlayersUI(player, opponents, this)
+    this.all_players_ui = new AllPlayersUI(player, opponents)
   }
 
   render() {
     this.board_ui.render()
     this.player_ui.render()
-    // this.all_players_ui.render()
+    this.all_players_ui.render()
     this.alert_ui.render()
     this.$splash.classList.add('hide')
   }

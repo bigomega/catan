@@ -2,12 +2,12 @@ import * as CONST from "../const.js"
 const $ = document.querySelector.bind(document)
 
 export default class AllPlayersUI {
-  player; opponents;
+  player; opponents
   $el = $('#game > .all-players')
   player_refs = []
 
   constructor(player, opponents) {
-    this.player = player;
+    this.player = player
     this.opponents = opponents
   }
 
@@ -42,14 +42,14 @@ export default class AllPlayersUI {
   }
 
   updatePlayer(player, key) {
-    const _player = this.player_refs[player.id]
-    if (!_player) return
+    const { $el, $vps } = this.player_refs[player.id]
+    if (!$el) return
     switch (key) {
-      case 'public_vps': _player.$vps.innerHTML = player[key]; break;
-      case 'closed_cards.res': break;
-      case 'closed_cards.dc': break;
-      case 'closed_cards': break;
-      case 'pieces': break;
+      case 'public_vps': $vps.innerHTML = player[key]; break
+      case 'closed_cards.res': break
+      case 'closed_cards.dc': break
+      case 'closed_cards': break
+      case 'pieces': break
     }
   }
 }
