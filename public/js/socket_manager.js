@@ -16,7 +16,7 @@ export default class SocketManager {
     this.#socket.emit(SOC.PLAYER_ONLINE)
 
     /** @event State-Change */
-    this.#socket.on(SOC.STATE_CHANGE, (state, active_player) => game.onStateChangeSoc(state, active_player))
+    this.#socket.on(SOC.STATE_CHANGE, (state, active_player) => game.updateStateChangeSoc(state, active_player))
 
     /** @event Set-Timer */
     this.#socket.on(SOC.SET_TIMER, (t, pid) => game.setTimerSoc(t, pid))
@@ -36,10 +36,19 @@ export default class SocketManager {
     this.#socket.on(SOC.DICE_VALUE, (dice_val, active_player) => game.updateDiceValueSoc(dice_val, active_player))
 
     /** @event PRIVATE--Total-Resources-Received */
-    this.#socket.on(SOC.RES_RECEIVED, res_obj => game.onTotalResReceivedInfo(res_obj))
+    this.#socket.on(SOC.RES_RECEIVED, res_obj => game.updateTotalResReceivedInfoSoc(res_obj))
 
     /** @event Development-Card-Taken */
-    this.#socket.on(SOC.DEV_CARD_TAKEN, (active_player, count) => game.onDevCardTaken(active_player, count))
+    this.#socket.on(SOC.DEV_CARD_TAKEN, (active_player, count) => game.updateDevCardTakenSoc(active_player, count))
+
+    /** @event PRIVATE--Robber-Drop-Done */
+    this.#socket.on(SOC.ROBBER_DROP, () => game.updateRobberDroppedSoc())
+
+    /** @event Robber-Moved */
+    this.#socket.on(SOC.ROBBER_MOVE, (active_player, id) => game.updateRobberMovementSoc(active_player, id))
+
+    /** @event Notify-Stolen-Info */
+    this.#socket.on(SOC.STOLEN_INFO, (p1, p2, res) => game.updateStoleInfoSoc(p1, p2, res))
   }
 
   sendInitialSetup({ settlement_loc, road_loc }) {

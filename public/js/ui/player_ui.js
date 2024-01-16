@@ -226,8 +226,9 @@ export default class PlayerUI {
     this.$hand.querySelectorAll(res_selector).forEach($el => $el.classList.add('active'))
   }
 
-  toggleHandResource(type, show) {
-    if (show) {
+  /** During Robber Drop */
+  toggleHandResource(type, add) {
+    if (add) {
       const count = +this.$hand.querySelector(`.card-group[data-type="${type}"] .card-count`).innerHTML
       this.$hand.querySelector(`.card-group[data-type="${type}"] .card-count`).innerHTML = count + 1
       this.$hand.querySelector(`.card-group[data-type="${type}"]`).classList.remove('disabled')
