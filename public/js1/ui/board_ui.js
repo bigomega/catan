@@ -1,19 +1,17 @@
-import Board from "../board/board.js"
 import * as CONST from "../const.js"
 const $ = document.querySelector.bind(document)
 const oKeys = Object.keys
 
 export default class BoardUI {
-  #board; #onClick;
+  board;
   $el = $('#game > .board')
 
-  /** @param {Board} board  */
   constructor(board, onClick) {
-    this.#board = board
-    this.#onClick = onClick
+    this.board = board
+    this.onClick = onClick
   }
 
-  toggleHide(bool) { this.$el.classList[bool ? 'add' : 'remove']('hide') }
+  toggleHide(bool) { this.$el.classList[bool?'add':'remove']('hide') }
 
   render() {
     let startDiff = 0
@@ -76,7 +74,7 @@ export default class BoardUI {
     function _renderRow(row) {
       return row.map((tile, j) =>
         `<div
-          class="tile ${tile.type} ${tile.robbed ? 'robbed' : ''}"
+          class="tile ${tile.type} ${tile.robbed ?'robbed':''}"
           data-id="${tile.id}"
           ${(tile.type === 'S' && tile.trade_edge)
           ? `data-trade="${tile.trade_type}" data-trade-dir="${tile.trade_edge}"`
@@ -99,7 +97,7 @@ export default class BoardUI {
       ).join('')
     }
 
-    this.$el.innerHTML = this.#board.tile_rows.map((row, i) => {
+    this.$el.innerHTML = this.board.tile_rows.map((row, i) => {
       startDiff += (row.diff || 0)
       if (startDiff < maxLeft) { maxLeft = startDiff }
       if (row.length > maxLength) { maxLength = row.length }
@@ -123,32 +121,32 @@ export default class BoardUI {
     this.$el.querySelectorAll('.corner').forEach($corner => {
       $corner.addEventListener('click', e => {
         if (!e.target.classList.contains('shown')) return
-        this.#onClick(CONST.LOCS.CORNER, +e.target.dataset.id)
+        this.onClick(CONST.LOCS.CORNER, +e.target.dataset.id)
       })
     })
     this.$el.querySelectorAll('.edge').forEach($edge => {
       $edge.addEventListener('click', e => {
         if (!e.target.classList.contains('shown')) return
-        this.#onClick(CONST.LOCS.EDGE, +e.target.dataset.id)
+        this.onClick(CONST.LOCS.EDGE, +e.target.dataset.id)
       })
     })
     this.$el.querySelectorAll('.background, .number').forEach($tile => {
       $tile.addEventListener('click', e => {
         if (!e.target.parentElement.classList.contains('shown')) return
-        this.#onClick(CONST.LOCS.TILE, +e.target.parentElement.dataset.id)
+        this.onClick(CONST.LOCS.TILE, +e.target.parentElement.dataset.id)
       })
     })
   }
 
   build(pid, piece, location) {
     if (piece === 'S' || piece === 'C') {
-      const $corner = this.#$getCorner(location)
-      if (!$corner) return
+      const $corner = this.#getCorner$(location)
+      if(!$corner) return
       $corner.classList.remove('shown')
       $corner.dataset.taken = piece
       piece === 'S' && $corner.classList.add('taken', `p${pid}`)
     } else if (piece === 'R') {
-      const $edge = this.#$getEdge(location)
+      const $edge = this.#getEdge$(location)
       $edge?.classList.remove('shown')
       $edge?.classList.add('taken', 'p' + pid)
     }
@@ -156,16 +154,16 @@ export default class BoardUI {
 
   moveRobber(id) {
     this.$el.querySelector('.tile.robbed')?.classList.remove('robbed')
-    this.#$getTile(id)?.classList.add('robbed')
+    this.#getTile$(id)?.classList.add('robbed')
   }
 
-  #$getCorner(id) { return this.$el.querySelector(`.corner[data-id="${id}"]`) }
-  #$getEdge(id) { return this.$el.querySelector(`.edge[data-id="${id}"]`) }
-  #$getTile(id) { return this.$el.querySelector(`.tile[data-id="${id}"]`) }
+  #getCorner$(id) { return this.$el.querySelector(`.corner[data-id="${id}"]`) }
+  #getEdge$(id) { return this.$el.querySelector(`.edge[data-id="${id}"]`) }
+  #getTile$(id) { return this.$el.querySelector(`.tile[data-id="${id}"]`) }
 
-  showCorners(ids = []) { ids.forEach(id => this.#$getCorner(id)?.classList.add('shown')) }
-  showEdges(ids = []) { ids.forEach(id => this.#$getEdge(id)?.classList.add('shown')) }
-  showTiles(ids = []) { ids.forEach(id => this.#$getTile(id)?.classList.add('shown')) }
+  showCorners(ids = []) { ids.forEach(id => this.#getCorner$(id)?.classList.add('shown')) }
+  showEdges(ids = []) { ids.forEach(id => this.#getEdge$(id)?.classList.add('shown')) }
+  showTiles(ids = []) { ids.forEach(id => this.#getTile$(id)?.classList.add('shown')) }
 
   hideAllShown() {
     this.$el.querySelectorAll('.corner.shown, .edge.shown, .tile.shown').forEach($el => {
