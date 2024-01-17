@@ -8,6 +8,8 @@ Free to play multiplayer catan style board game
 ## Status
 ### In Progress
   ##### Jan '24
+  - [ ] Trade
+  - [x] ~~Keyboard Shortcuts~~
   - [x] ~~Client Refactor~~
   - [x] ~~Robber~~
   - [x] ~~Basic Turn Actions~~
@@ -33,7 +35,6 @@ Free to play multiplayer catan style board game
   - [x] ~~Decoding the map from key~~
 ### Next Steps
   - Dev Card Actions
-  - Trade
   - End Game
   - Opponents UI
   - Shuffler

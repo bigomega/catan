@@ -3,16 +3,17 @@ const $ = document.querySelector.bind(document)
 const oKeys = Object.keys
 
 export default class PlayerUI {
-  #ui; #onDiceClick; #onPieceClick; #onBuyDevCardClick; #onEndTurnClick; #onCardClick;
-  #getPossibleLocations;
-  player; timer; hand;
+  #ui; #onDiceClick; #onPieceClick; #onBuyDevCardClick; #onEndTurnClick; #onCardClick
+  #getPossibleLocations
+  player; timer; hand
 
   $timer; $dice; $build_road; $build_settlement; $build_city; $buy_dev_card; $end_turn;
   $el = $('#game > .current-player')
   $hand = this.$el.querySelector('.hand')
   $action_bar = this.$el.querySelector('.actions')
 
-  constructor(player, { onDiceClick, onPieceClick, onBuyDevCardClick, onEndTurnClick, onCardClick, getPossibleLocations }) {
+  constructor(player, { onDiceClick, onPieceClick, onBuyDevCardClick, onEndTurnClick,
+    onCardClick, getPossibleLocations }) {
     this.player = player
     this.#onDiceClick = onDiceClick
     this.#onPieceClick = onPieceClick
@@ -51,14 +52,14 @@ export default class PlayerUI {
     this.$action_bar.innerHTML = `
       <div class="timer disabled">0:00</div>
       <div class="roll-dice disabled" title="Roll Dice (SPACE)">🎲🎲</div>
-      <div class="build-road disabled" title="Build Road (R)"></div>
-      <div class="build-settlement disabled" title="Build Settlement (S)"></div>
-      <div class="build-city disabled" title="Build City (C)"></div>
-      <div class="dev-card disabled" title="Buy Development Card (D)" data-count="-">
+      <div class="build-road disabled" title="Build Road (r)"></div>
+      <div class="build-settlement disabled" title="Build Settlement (s)"></div>
+      <div class="build-city disabled" title="Build City (c)"></div>
+      <div class="dev-card disabled" title="Buy Development Card (d)" data-count="-">
         <img src="/images/dc-back.png"/>
       </div>
-      <div class="trade disabled">Trade</div>
-      <div class="end-turn disabled" title="End Turn (E)">End Turn</div>
+      <div class="trade disabled" title="Trade (t)">Trade</div>
+      <div class="end-turn disabled" title="End Turn (e)">End Turn</div>
     `
     this.#setRefs()
     this.#setupActionEvents()
@@ -74,6 +75,13 @@ export default class PlayerUI {
     this.$end_turn = this.$action_bar.querySelector('.end-turn')
   }
 
+  #$keyToEl(key) {
+    return ({
+      R: this.$build_road, S: this.$build_settlement,
+      C: this.$build_city, DEV_C: this.$buy_dev_card,
+    })[key]
+  }
+
   #setupActionEvents() {
     // Dice Click
     this.$dice.addEventListener('click', e => {
@@ -83,7 +91,7 @@ export default class PlayerUI {
     })
     // Road, Settlement & City Click
     const getEventCb = piece => e => {
-      const classList = e.target.classList
+      const classList = this.#$keyToEl(piece).classList
       if (classList.contains('disabled')) return
       this.#onPieceClick(piece, classList.contains('active'))
       classList.toggle('active')
@@ -101,13 +109,32 @@ export default class PlayerUI {
       if (e.target.classList.contains('disabled')) return
       this.#onEndTurnClick()
     })
-  }
-
-  keyTo$El(key) {
-    return ({
-      R: this.$build_road, S: this.$build_settlement,
-      C: this.$build_city, DEV_C: this.$buy_dev_card,
-    })[key]
+    // Keyboard shortcuts
+    document.addEventListener('keydown', e => {
+      switch (e.code) {
+        case 'KeyR': getEventCb('R')(); break
+        case 'KeyS': getEventCb('S')(); break
+        case 'KeyC': getEventCb('C')(); break
+        case 'KeyD':
+          !this.$buy_dev_card.classList.contains('disabled') && this.#onBuyDevCardClick()
+          break
+        case 'KeyE':
+          !this.$end_turn.classList.contains('disabled') && this.#onEndTurnClick()
+          break
+        case 'Space':
+          e.target === document.body && e.preventDefault()
+          if (this.$dice.classList.contains('disabled')) { break }
+          this.#onDiceClick()
+          e.target.classList.add('disabled')
+          break
+        case 'Escape':
+          if (this.isAnyActionActive()) {
+            this.removeActiveActions()
+            this.#onPieceClick('', true)
+          }
+          break
+      }
+    })
   }
 
   canIBuy(type) {
@@ -124,13 +151,21 @@ export default class PlayerUI {
       oKeys(CONST.COST).forEach(key => {
         const can_act = this.canIBuy(key)
           && (key == 'DEV_C' || this.#getPossibleLocations(key).length)
-        this.toggleAction(this.keyTo$El(key), can_act)
+        this.toggleAction(this.#$keyToEl(key), can_act)
       })
     } else {
       for (const $el of this.$action_bar.children) {
         this.toggleAction($el)
       }
     }
+  }
+
+  isAnyActionActive() {
+    let active = false
+    for (const $el of this.$action_bar.children) {
+      if ($el.classList.contains('active')) { active = true; break }
+    }
+    return active
   }
 
   removeActiveActions() {
