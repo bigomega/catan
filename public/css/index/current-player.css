@@ -321,13 +321,15 @@
     b { color: #77450b; }
     small { opacity: 0.7; }
   }
+
   &.show .hand,
   &:not(.show) .hand:has(~.actions:hover, ~ .status-bar:hover) { bottom: -120px; }
+
   &.show .actions,
   &:not(.show) .actions:hover,
   &:not(.show) .actions:has(~ .status-bar:hover) {
     bottom: 0;
-    .roll-dice { top: -10px; }
+    .roll-dice:not(.disabled) { top: -10px; }
     .timer {
       top: 0;
       color: inherit;
