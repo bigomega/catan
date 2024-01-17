@@ -7,7 +7,8 @@ export default class Tile {
   trade_edge; trade_type;
   robbed = false
 
-  constructor({ id, type = 'S', num, left, top_left, top_right, trade_edge, trade_type, robbed, createCorner, createEdge } = {}) {
+  constructor({ id, type = 'S', num, left, top_left, top_right,
+    trade_edge, trade_type, trade_ratio, robbed, createCorner, createEdge } = {}) {
     this.id = id
     this.type = Object.keys(CONST.TILES).includes(type) ? type : 'S'
     this.num = num
@@ -63,6 +64,7 @@ export default class Tile {
     if (this.type == 'S') {
       this.trade_edge = trade_edge
       this.trade_type = trade_type
+      this.trade_ratio = trade_ratio
       const EDGE_2_CORNERS = {
         top_left: ['top', 'top_left'],
         top_right: ['top', 'top_right'],
@@ -71,10 +73,9 @@ export default class Tile {
         bottom_left: ['bottom', 'bottom_left'],
         bottom_right: ['bottom', 'bottom_right'],
       }
-
-        ; (EDGE_2_CORNERS[trade_edge] || []).forEach(dir => {
-          this.corners[dir]?.setTrade(trade_type)
-        })
+      EDGE_2_CORNERS[trade_edge]?.forEach(dir => {
+        this.corners[dir]?.setTrade(trade_type, trade_ratio)
+      })
     }
   }
 

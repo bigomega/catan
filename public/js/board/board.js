@@ -63,6 +63,7 @@ export default class Board {
             r: 'right', bl: 'bottom_left', br: 'bottom_right',
           })[dir]
           tile_params.trade_type = res
+          tile_params.trade_ratio = num
           tile_params.type = 'S'
         } else if (tile_map[0] == 'D') {
           tile_params.type = 'D'

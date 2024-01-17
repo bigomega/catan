@@ -12,7 +12,7 @@ export default class Corner {
 
   addTile(tile) { this.tiles.push(tile) }
   addEdge(dir, edge) { this.edges[dir] = edge }
-  setTrade(type) { this.trade = type }
+  setTrade(type, ratio) { this.trade = type + ratio }
 
   buildSettlement(player_id) { this.piece = 'S'; this.player_id = player_id }
   buildCity() {
