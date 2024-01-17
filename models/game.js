@@ -27,7 +27,7 @@ export default class Game {
 
   get state() { return this.#state }
   set state(s) {
-    this.#io_manager.updateState(s, this.getActivePlayer())
+    this.#io_manager.updateState(s, this.getActivePlayer().toJSON())
     this.#state = s
   }
   get active_player() { return this.#active_player + 1 }
@@ -40,7 +40,7 @@ export default class Game {
     this.id = id
     this.config = config
     this.player_count = player_count
-    this.#io_manager = new IOManager({ game: this, io, })
+    this.#io_manager = new IOManager({ game: this, io })
     this.players.push(new Player(host_name, 1, this.#onPlayerUpdate.bind(this)))
     this.expected_actions.add = (...elems) => elems.forEach(obj => {
       this.expected_actions.push(Object.assign({ type: this.state, pid: this.active_player }, obj))
@@ -71,7 +71,7 @@ export default class Game {
 
     if (this.turn < 3) {
       this.expected_actions.add({ callback: this.#expectedInitialBuild.bind(this) })
-      this.#io_manager.requestInitialSetup(this.getActivePlayer(), this.turn)
+      this.#io_manager.requestInitialSetup(this.getActivePlayer().toJSON(), this.turn)
       this.setTimer(this.config.initial_build.time)
       return
     }
@@ -135,6 +135,7 @@ export default class Game {
   #expectedRoll(pid) {
     this.dice_value = [CONST.ROLL(), CONST.ROLL()]
     this.#io_manager.updateDiceValue(this.dice_value, this.getActivePlayer())
+    this.#io_manager.updateDiceValue(this.dice_value, this.getActivePlayer().toJSON())
     const dice_total = this.dice_value[0] + this.dice_value[1]
     if (dice_total === 7) {
       const drop = this.players.filter(p => p.resource_count > 7).length
@@ -166,7 +167,7 @@ export default class Game {
     if (!valid_locs.includes(tile_id)) { tile_id = this.#getRandom(valid_locs) }
     const player = this.getPlayer(pid)
     this.board.moveRobber(tile_id)
-    this.#io_manager.moveRobber(player, tile_id)
+    this.#io_manager.moveRobber(player.toJSON(), tile_id)
 
     const opp_c_pids = this.board.findTile(tile_id)?.getAllCorners()
       .filter(c => c.piece && (c.player_id !== pid)).map(_ => _.player_id)
@@ -178,9 +179,10 @@ export default class Game {
       const [stolen_res] = stolen_p.takeRandomResource()
       if (stolen_res) {
         player.giveCard(stolen_res)
-        this.#io_manager.updateStolen(player, stolen_p)
-        this.#io_manager.updateStolen_Private(this.getPlayerSoc(pid), player, stolen_p, stolen_res)
-        this.#io_manager.updateStolen_Private(this.getPlayerSoc(stolen_pid), player, stolen_p, stolen_res)
+        const playerJson = player.toJSON()
+        this.#io_manager.updateStolen(playerJson, stolen_p)
+        this.#io_manager.updateStolen_Private(this.getPlayerSoc(pid), playerJson, stolen_p, stolen_res)
+        this.#io_manager.updateStolen_Private(this.getPlayerSoc(stolen_pid), playerJson, stolen_p, stolen_res)
       }
     }
     this.#gotoNextState()
@@ -234,7 +236,7 @@ export default class Game {
     if (!this.dev_cards.length) return
     const player = this.getActivePlayer()
     player.canBuy('DEV_C') && player.bought('DEV_C', this.dev_cards.pop())
-    this.#io_manager.updateDevCardTaken(player, this.dev_cards.length)
+    this.#io_manager.updateDevCardTaken(player.toJSON(), this.dev_cards.length)
   }
 
   robberDropIO(pid, resources) {
@@ -302,7 +304,7 @@ export default class Game {
     this.board.build(pid, piece, loc)
     this.getPlayer(pid)?.addPiece(loc, piece)
     this.map_changes.push({ pid, piece, loc })
-    this.#io_manager.updateBuild(this.getPlayer(pid), piece, loc)
+    this.#io_manager.updateBuild(this.getPlayer(pid)?.toJSON(), piece, loc)
   }
 
   #onPlayerUpdate(pid, key, context) {
