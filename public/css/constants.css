@@ -5,6 +5,10 @@
   --sand-color: #e8d49c;
   --sand-color-dark: color-mix(in srgb, var(--sand-color) 50%, #000);
 
+  --trade-positive: #64b864;
+  --trade-negative: #ff4f4f;
+  /* --trade-negative: #ff4f7b; */
+
   /* --player-1-color: #f21313; */
   /* --player-1-color: #fb4646; */
   --player-1-color: #e53a3a;

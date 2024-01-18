@@ -51,6 +51,9 @@ export const TRADE_OFFERS = {
   B2: 'Brick 2:1',
   O2: 'Ore 2:1',
   W2: 'Wheat 2:1',
+  '*3': '3:1',
+  '*4': '4:1',
+  Px: 'Player Trade',
 }
 
 export const ROLL = _ => Math.ceil(Math.random() * 6)

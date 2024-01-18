@@ -1,5 +1,3 @@
-@import '../constants.css';
-
 #game > .all-players {
   display: flex;
   justify-content: center;

@@ -93,6 +93,7 @@ export default class Game {
       case ST.ROBBER_MOVE: this.#onRobberMove(); break
     }
   }
+  //#region
   // STATE - Initial Setup
   #onInitialSetup() {
     const time = this.config.strategize.time
@@ -144,6 +145,7 @@ export default class Game {
       this.#ui.alert_ui.setStatus(GAME_MESSAGES.ROBBER_MOVE.other(this.active_player.name))
     }
   }
+  //#endregion
 
   // Initial Setup Request
   requestInitialSetupSoc(active_player, turn) {
@@ -281,6 +283,7 @@ export default class Game {
     this.#socket_manager.sendLocationClick(location_type, id)
   }
 
+  // Road, Settlement and City building
   onPieceClick(piece, is_active) {
     this.#ui.hideAllShown()
     if (is_active) return
@@ -288,6 +291,7 @@ export default class Game {
     piece === 'R' ? this.#ui.showEdges(locs) : this.#ui.showCorners(locs)
   }
 
+  // Development Card use + during Robber & Trade
   onCardClick(type) {
     if (this.state === ST.ROBBER_DROP) {
       if (this.#ui.robber_drop_ui.hasReachedGoal()) return
@@ -297,6 +301,13 @@ export default class Game {
     }
   }
 
+  // Trade Proposal
+  onTradeProposal(type, giving, taking, counter_id) {
+    // this.#ui.trade_ui.renderNewNotification()
+    //
+  }
+
+  onTradeResponse(trade_id, accepted) { /* ---- */ }
   onGiveToRobber(cards) { this.#socket_manager.sendRobberDrop(cards) }
   onBuyDevCardClick() { this.#socket_manager.buyDevCard() }
   onDiceClick() { this.#socket_manager.sendDiceClick() }
@@ -304,7 +315,7 @@ export default class Game {
   //#endregion
 
   playRobberAudio() { this.#audio_manager.play(AUDIO.ROBBER) }
-  #amIActing(pid) {
+  #amIActing(pid = this.active_player.id) {
     return this.#isMyPid(pid)
     && pid === this.active_player.id
     && this.state === ST.PLAYER_ACTIONS

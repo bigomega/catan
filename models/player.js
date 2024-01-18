@@ -13,13 +13,14 @@ export default class Player {
     ...Helper.newObject(CONST.DEVELOPMENT_CARDS, 0),
   }
   open_dev_cards = {}
-  trade_offers = Helper.newObject(CONST.TRADE_OFFERS)
+  trade_offers = Helper.newObject(CONST.TRADE_OFFERS, false)
 
   constructor(name, id, onChange) {
     this.id = id
     this.name = name || Player.#names[this.id - 1]
     this.onChange = onChange
-    this.trade_offers['*4'] = 1
+    this.trade_offers.Px = true
+    this.trade_offers['*4'] = true
   }
 
   getSocket() { return this.socket_id }

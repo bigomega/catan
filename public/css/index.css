@@ -1,8 +1,10 @@
 @import './constants.css';
+@import './resources.css';
 @import './index/all-players.css';
 @import './index/board.css';
 @import './index/current-player.css';
 @import './index/robber-drop.css';
+@import './index/trade.css';
 
 body {
   margin: 0;

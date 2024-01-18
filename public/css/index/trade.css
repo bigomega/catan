@@ -1,0 +1,229 @@
+#game > .trade-zone {
+  position: fixed;
+  top: 0;
+  left: 0px;
+  width: 100%;
+  /* border-bottom: 5px solid var(--sand-color-dark); */
+  box-shadow: 0 0px 15px 0px #000;
+  font-family: sans-serif;
+
+  .trade-notifications {}
+
+  .trade-type-selection {
+    display: flex; justify-content: center; align-items: center;
+    background: var(--sand-color);
+    /* background: var(--water-color); */
+    border: 2px solid var(--sand-color-dark);
+    padding: 0 5px;
+
+    &.hide { display: none; }
+
+    > div {
+      cursor: pointer;
+      &.hide { display: none; }
+    }
+
+    .trade-type:not(.Px) {
+      width: 50px; height: 60px;
+      position: relative;
+      border: 0px solid transparent;
+      border-width: 10px 7px;
+      &._4 { width: 91px; }
+      &.active { background: var(--sand-color-dark); }
+
+      &::before {
+        content: '';
+        position: absolute; left: 0; top: 0;
+        width: 100%; height: 100%;
+        background-size: contain; background-repeat: no-repeat;
+      }
+
+      &:hover::before { filter: drop-shadow(2px 2px 3px #000a); top: -2px; left: -2px;}
+
+      &.B2::before { background-image: url(/images/trade/Brick.png); }
+      &.L2::before { background-image: url(/images/trade/Lumber.png); }
+      &.O2::before { background-image: url(/images/trade/Ore.png); }
+      &.S2::before { background-image: url(/images/trade/Sheep.png); }
+      &.W2::before { background-image: url(/images/trade/Wheat.png); }
+      &._3::before { background-image: url(/images/trade/*3.png); }
+      &._4::before { background-image: url(/images/trade/trader-*4.png); }
+    }
+
+
+    .trade-type.Px {
+      display: flex; align-items: center;
+      background: #fff;
+      padding: 5px 10px;
+      height: 20px;
+      border: 0px solid var(--sand-color);
+      border-width: 25px 10px;
+      &:hover { background: var(--sand-color-dark); color: #fff; }
+      &.active { border-color: var(--sand-color-dark); }
+    }
+
+    .cancel {
+      display: flex; justify-content: center; align-items: center;
+      font-family: monospace;
+      /* font-weight: 600; */
+      font-size: 15px;
+      /* background: #fff; */
+      color: var(--trade-negative);
+      width: 25px; height: 25px;
+      margin: 10px 10px;
+      border-radius: 50%;
+      /* box-shadow: 0 0 5px -1px #000; */
+      border: 1px solid var(--trade-negative);
+      &:hover { background: var(--trade-negative); color: #fff; }
+    }
+  }
+
+  .trade-card-selection {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    background-color: color-mix(in srgb, var(--sand-color-dark) 80%, transparent);
+    color: #fff;
+    /* background-color: var(--sand-color); */
+    padding-top: 20px;
+    /* &.hide { display: none; } */
+
+    .card-section {
+      display: flex; flex-wrap: wrap; justify-content: center;
+
+      .card-container {
+        width: 140px;
+        height: 212px;
+        border-radius: 15px;
+        /* box-shadow: 2px 2px 5px 1px #0006; */
+        margin: 0 0 20px 20px;
+
+        .card {
+          height: 106px;
+          position: relative;
+          cursor: pointer;
+          &.disabled { cursor: not-allowed; filter: grayscale(1) brightness(0.7); }
+
+          /* Card Image */
+          &::before {
+            content: '';
+            display: block;
+            background-color: #ebd290;
+            background-image: url(/images/cards_sprite.png);
+            width: 100%; height: 100%;
+            box-sizing: border-box;
+            box-shadow: 2px 2px 5px 1px #0006;
+            border: 1px solid #5a460e;
+          }
+          &.giving-card::before {
+            border-bottom: 3px solid var(--sand-color-dark);
+            border-radius: 15px 15px 0 0;
+          }
+          &.taking-card::before {
+            border-top: 3px solid var(--sand-color-dark);
+            border-radius: 0 0 15px 15px;
+          }
+
+          /* Text on Card */
+          &:not(.disabled){
+            &::after {
+              position: absolute;
+              width: 35px; height: 25px; padding: 0 3px;
+              display: flex; align-items: center;
+              transition: all .05s linear;
+            }
+            &.giving-card::after {
+              content: attr(data-count) ' →'; bottom: 3px; left: 1px;
+              background-color: var(--trade-negative);
+              border-top-right-radius: 20px; justify-content: flex-start;
+            }
+            &.taking-card::after {
+              content: '← ' attr(data-count); top: 3px; right: 1px;
+              background-color: var(--trade-positive);
+              border-bottom-left-radius: 20px; justify-content: flex-end;
+            }
+
+            &:hover{
+              &::after {
+                width: calc(100% - 2px); height: calc(100% - 3px - 1px); padding: 0;
+                display: flex; align-items: center; justify-content: center;
+                text-shadow: 0 0 1px #000, 0 0 1px #000, 0 0 2px #000, 0 0 2px #000;
+              }
+              &.giving-card::after {
+                content: 'Give ' attr(data-count) ' →';
+                border-radius: 13px 13px 0 0;
+                background-color: color-mix(in srgb, var(--trade-negative) 60%, transparent);
+              }
+              &.taking-card::after {
+                content: '← Take ' attr(data-count);
+                border-radius: 0 0 13px 13px;
+                background-color: color-mix(in srgb, var(--trade-positive) 60%, transparent);
+              }
+            }
+          }
+        }
+        &[data-type=S] .card::before { background-size: 1100px; background-position: -176px -13px; }
+        &[data-type=L] .card::before { background-size: 1109px; background-position: -639px -9px; }
+        &[data-type=B] .card::before { background-size: 1077px; background-position: -12px -15px; }
+        &[data-type=O] .card::before { background-size: 1074px; background-position: -326px -5px; }
+        &[data-type=W] .card::before { background-size: 1097px; background-position: -484px -9px; }
+
+        &[data-type=S] .taking-card::before { background-position-y: calc(-106px - 13px); }
+        &[data-type=L] .taking-card::before { background-position-y: calc(-106px - 9px); }
+        &[data-type=B] .taking-card::before { background-position-y: calc(-106px - 15px); }
+        &[data-type=O] .taking-card::before { background-position-y: calc(-106px - 5px); }
+        &[data-type=W] .taking-card::before { background-position-y: calc(-106px - 9px); }
+      }
+    }
+
+    .info-section {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      margin-left: 30px;
+
+      .giving-text, .taking-text {
+        &::before { text-shadow: 0 0 5px #000c; }
+      }
+      .giving-text {
+        &::before {
+          content: 'Giving…';
+          color: var(--trade-negative);
+        }
+      }
+
+      .taking-text {
+        margin-bottom: 20px;
+        &::before {
+          content: 'Taking…';
+          color: var(--trade-positive);
+        }
+      }
+
+      .action-container { display: flex; align-items: center; }
+
+      .reset {
+        width: 35px; height: 35px; border-radius: 30px;
+        font-size: 30px; line-height: 32px; text-align: center;
+        background-color: var(--sand-color-dark); color: var(--sand-color);
+        border: 2px solid; cursor: pointer;
+        &:hover { background-color: var(--sand-color); color: #333; }
+      }
+
+      .submit {
+        margin: 20px 10px;
+        padding: 7px 15px;
+        /* width: 100%; */
+        box-sizing: border-box;
+        border: 2px solid transparent;
+        text-align: center;
+        background: #ccc; color: #999;
+        border-radius: 5px;
+        font-size: 1.2em; font-weight: bold;
+        cursor: not-allowed;
+
+        background: #333; color: var(--sand-color);
+        cursor: pointer; border-color: var(--sand-color);
+
+        &:hover {
+          box-shadow: 0 0 10px 0px var(--sand-color), 0 0 20px 0px var(--sand-color);
+        }
+      }
+    }
+  }
+}

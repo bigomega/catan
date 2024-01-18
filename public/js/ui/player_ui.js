@@ -3,21 +3,22 @@ const $ = document.querySelector.bind(document)
 const oKeys = Object.keys
 
 export default class PlayerUI {
-  #ui; #onDiceClick; #onPieceClick; #onBuyDevCardClick; #onEndTurnClick; #onCardClick
-  #getPossibleLocations
+  #ui; #onDiceClick; #onPieceClick; #onBuyDevCardClick; #onTradeClick; #onEndTurnClick
+  #onCardClick; #getPossibleLocations
   player; timer; hand
 
-  $timer; $dice; $build_road; $build_settlement; $build_city; $buy_dev_card; $end_turn;
+  $timer; $dice; $build_road; $build_settlement; $build_city; $buy_dev_card; $trade_btn; $end_turn
   $el = $('#game > .current-player')
   $hand = this.$el.querySelector('.hand')
   $action_bar = this.$el.querySelector('.actions')
 
-  constructor(player, { onDiceClick, onPieceClick, onBuyDevCardClick, onEndTurnClick,
-    onCardClick, getPossibleLocations }) {
+  constructor(player, { onDiceClick, onPieceClick, onBuyDevCardClick, onTradeClick,
+    onEndTurnClick, onCardClick, getPossibleLocations }) {
     this.player = player
     this.#onDiceClick = onDiceClick
     this.#onPieceClick = onPieceClick
     this.#onBuyDevCardClick = onBuyDevCardClick
+    this.#onTradeClick = onTradeClick
     this.#onEndTurnClick = onEndTurnClick
     this.#onCardClick = onCardClick
     this.#getPossibleLocations = getPossibleLocations
@@ -72,6 +73,7 @@ export default class PlayerUI {
     this.$build_settlement = this.$action_bar.querySelector('.build-settlement')
     this.$build_city = this.$action_bar.querySelector('.build-city')
     this.$buy_dev_card = this.$action_bar.querySelector('.dev-card')
+    this.$trade_btn = this.$action_bar.querySelector('.trade')
     this.$end_turn = this.$action_bar.querySelector('.end-turn')
   }
 
@@ -104,6 +106,12 @@ export default class PlayerUI {
       if (e.target.classList.contains('disabled')) return
       this.#onBuyDevCardClick()
     })
+    // Trade
+    this.$trade_btn.addEventListener('click', e => {
+      if (this.$trade_btn.classList.contains('disabled')) return
+      this.#onTradeClick(this.$trade_btn.classList.contains('active'))
+      this.$trade_btn.classList.toggle('active')
+    })
     // End Turn
     this.$end_turn.addEventListener('click', e => {
       if (e.target.classList.contains('disabled')) return
@@ -120,6 +128,11 @@ export default class PlayerUI {
           break
         case 'KeyE':
           !this.$end_turn.classList.contains('disabled') && this.#onEndTurnClick()
+          break
+        case 'KeyT':
+          if (this.$trade_btn.classList.contains('disabled')) { break }
+          this.#onTradeClick(this.$trade_btn.classList.contains('active'))
+          this.$trade_btn.classList.toggle('active')
           break
         case 'Space':
           e.target === document.body && e.preventDefault()
@@ -148,6 +161,7 @@ export default class PlayerUI {
     this.removeActiveActions()
     if (toggle) {
       this.toggleAction(this.$end_turn, true)
+      this.toggleAction(this.$trade_btn, true)
       oKeys(CONST.COST).forEach(key => {
         const can_act = this.canIBuy(key)
           && (key == 'DEV_C' || this.#getPossibleLocations(key).length)
@@ -261,7 +275,7 @@ export default class PlayerUI {
     this.$hand.querySelectorAll(res_selector).forEach($el => $el.classList.add('active'))
   }
 
-  /** During Robber Drop */
+  /** During Trade & Robber Drop */
   toggleHandResource(type, add) {
     if (add) {
       const count = +this.$hand.querySelector(`.card-group[data-type="${type}"] .card-count`).innerHTML

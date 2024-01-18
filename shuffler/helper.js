@@ -19,7 +19,14 @@ export function shuffle(array) {
 }
 
 export function newObject(obj = {}, val = 0) {
-  return Object.keys(obj).reduce((mem, k) => (mem[k] = val, mem), {})
+  return Object.fromEntries(Object.keys(obj).map(k => [k, val]))
+  // ----
+  // return Object.keys(obj).reduce((mem, k) => (mem[k] = val, mem), {})
+  // ----
+  // const ret_obj = {}
+  // for (const k in obj) { ret_obj[k] = val }
+  // return ret_obj
+  // ----
 }
 
 // Binary to Base64

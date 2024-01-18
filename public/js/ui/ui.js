@@ -6,12 +6,13 @@ import PlayerUI from "./player_ui.js"
 import AlertUI from "./alert_ui.js"
 import RobberDropUI from "./robber_drop_ui.js"
 import AllPlayersUI from "./all_players_ui.js"
+import TradeUI from "./trade_ui.js"
 const $ = document.querySelector.bind(document)
 
 export default class UI {
-  #game; #board; #player;
-  #temp;
-  board_ui; player_ui; alert_ui;
+  #game; #board; #player
+  board_ui; player_ui; alert_ui; trade_ui
+  #temp = {}
   $splash = $('.splash')
 
   /** @param {Game} game, @param {Board} board, @param {Player} player  */
@@ -24,6 +25,7 @@ export default class UI {
       onDiceClick: _ => game.onDiceClick(),
       onPieceClick: (piece, is_active) => game.onPieceClick(piece, is_active),
       onBuyDevCardClick: _ => game.onBuyDevCardClick(),
+      onTradeClick: hide => hide ? this.trade_ui.clearSelections() : this.trade_ui.renderTrade(),
       onEndTurnClick: _ => game.onEndTurn(),
       onCardClick: type => game.onCardClick(type),
       getPossibleLocations: p => game.getPossibleLocations(p),
@@ -35,6 +37,10 @@ export default class UI {
       playRobberAudio: _ => game.playRobberAudio(),
     })
     this.all_players_ui = new AllPlayersUI(player, opponents)
+    this.trade_ui = new TradeUI(player, {
+      onTradeProposal: (...params) => game.onTradeProposal(...params),
+      onTradeResponse: (id, resp) => game.onTradeResponse(id, resp),
+    })
   }
 
   render() {
@@ -42,6 +48,7 @@ export default class UI {
     this.player_ui.render()
     this.all_players_ui.render()
     this.alert_ui.render()
+    this.trade_ui.render()
     this.$splash.classList.add('hide')
   }
 
