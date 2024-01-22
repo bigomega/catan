@@ -67,7 +67,7 @@ export default class Game {
   // ===================
   #next() {
     this.clearTimer()
-    if (!this.#resolvePendingActions()) return
+    this.#resolvePendingActions()
 
     if (this.turn < 3) {
       this.expected_actions.add({ callback: this.#expectedInitialBuild.bind(this) })
@@ -77,15 +77,20 @@ export default class Game {
     }
 
     // this.state just started
-    if (this.state === ST.PLAYER_ROLL) {
+    switch (this.state) {
+      case ST.PLAYER_ROLL:
       this.expected_actions.add({ callback: this.#expectedRoll.bind(this) })
       this.setTimer(this.config.roll.time)
-    } else if (this.state === ST.PLAYER_ACTIONS) {
-      this.expected_actions.add({
-        callback: _ => (this.active_player++, this.#gotoNextState()),
-      })
+        break
+
+      case ST.PLAYER_ACTIONS:
+        this.expected_actions.add({ callback: _ => {
+          this.active_player++; this.#gotoNextState(); this.ongoing_trades = []
+        }})
       this.setTimer(this.config.player_turn.time)
-    } else if (this.state === ST.ROBBER_DROP) {
+        break
+
+      case ST.ROBBER_DROP:
       this.robbing_players = []
       this.players.forEach(pl => {
         if (pl.resource_count > 7) {
@@ -97,9 +102,12 @@ export default class Game {
         }
       })
       this.setTimer(this.config.robber.drop_time)
-    } else if (this.state === ST.ROBBER_MOVE) {
+        break
+
+      case ST.ROBBER_MOVE:
       this.expected_actions.add({ callback: this.#expectedRobberMove.bind(this) })
       this.setTimer(this.config.robber.move_time)
+        break
     }
   }
 
@@ -107,10 +115,8 @@ export default class Game {
   // #region ==========================
 
   #resolvePendingActions() {
-    let continue_next = true
     this.expected_actions.forEach(({ type, pid, callback, ...params }) => callback(pid, params))
     this.expected_actions.splice(0, this.expected_actions.length)
-    return continue_next
   }
 
   /** Initial Build */
@@ -192,6 +198,7 @@ export default class Game {
   // ===================
   //      IO EVENTS
   //#region ===================
+  /** Initial Build Locations */
   initialBuildIO(pid, settlement_loc, road_loc) {
     const expected_index = this.expected_actions.findIndex(_ => _.type === ST.INITIAL_SETUP)
     const { pid: expected_pid, callback } = this.expected_actions[expected_index]
@@ -202,6 +209,7 @@ export default class Game {
     }
   }
 
+  /** Building - Edge & Corner click (other than initial-build) */
   clickedLocationIO(pid, loc_type, id) {
     if (pid !== this.active_player) return
     if (this.state !== ST.PLAYER_ACTIONS) return
@@ -230,6 +238,7 @@ export default class Game {
     }
   }
 
+  /** Development Card buying click */
   buyDevCardIO(pid) {
     if (pid !== this.active_player) return
     if (this.state !== ST.PLAYER_ACTIONS) return
@@ -239,6 +248,7 @@ export default class Game {
     this.#io_manager.updateDevCardTaken(player.toJSON(), this.dev_cards.length)
   }
 
+  /** Cards dropped to robber */
   robberDropIO(pid, resources) {
     if (this.state !== ST.ROBBER_DROP) return
     if (!this.robbing_players.includes(pid)) return
@@ -257,6 +267,7 @@ export default class Game {
     }
   }
 
+  /** Robber movement location and stolen player */
   robberMoveIO(pid, tile_id, stolen_pid) {
     if (pid !== this.active_player) return
     if (this.state !== ST.ROBBER_MOVE) return
@@ -267,6 +278,7 @@ export default class Game {
     this.#next()
   }
 
+  /** Request a Trade */
   tradeRequestIO(pid, type, giving, taking, counter_id) {
     if (pid !== this.active_player) return
     if (this.state !== ST.PLAYER_ACTIONS) return
