@@ -100,8 +100,8 @@ const GAME_MESSAGES = {
     },
   },
   PLAYER_STOLE_RES: {
-    self: ({ p1, p2 }, res) => ` ${p1 ? p1 + ' has' : 'You have'} stolen 1<div class="res-icon ${res}"></div> from ${p2 || 'you'}.`,
-    other: (p1, p2) => ` ${p1} has stolen a resource from ${p2}.`,
+    self: ({ p1, p2 }, res) => ` Stole 1<div class="res-icon ${res}"></div> from ${p2 || 'you'}.`,
+    other: (p1, p2) => ` Stole a resource from ${p2}.`,
   },
 }
 

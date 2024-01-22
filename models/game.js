@@ -301,10 +301,12 @@ export default class Game {
   }
 
   build(pid, piece, loc) {
+    const player = this.getPlayer(pid)
     this.board.build(pid, piece, loc)
-    this.getPlayer(pid)?.addPiece(loc, piece)
+    player?.addPiece(loc, piece)
+    piece === 'S' && player?.addPort(this.board.findCorner(loc)?.trade)
     this.map_changes.push({ pid, piece, loc })
-    this.#io_manager.updateBuild(this.getPlayer(pid)?.toJSON(), piece, loc)
+    this.#io_manager.updateBuild(player?.toJSON(), piece, loc)
   }
 
   #onPlayerUpdate(pid, key, context) {

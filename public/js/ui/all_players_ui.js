@@ -50,6 +50,7 @@ export default class AllPlayersUI {
       case 'closed_cards.dc': break
       case 'closed_cards': break
       case 'pieces': break
+      case 'trade_offers': break
     }
   }
 }

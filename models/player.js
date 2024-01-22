@@ -68,6 +68,12 @@ export default class Player {
     this.onChange(this.id, 'public_vps', { public_vps: this.public_vps })
   }
 
+  addPort(type) {
+    if (!CONST.TRADE_OFFERS[type]) { return }
+    this.trade_offers[type] = true
+    this.onChange(this.id, 'trade_offers', { [type]: true })
+  }
+
   openDevelopmentCard(card_type) {
     //
   }

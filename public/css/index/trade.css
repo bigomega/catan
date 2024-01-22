@@ -101,8 +101,8 @@
           height: 106px;
           position: relative;
           cursor: pointer;
-          &.disabled { cursor: not-allowed; filter: grayscale(1) brightness(0.5); }
-          &.disabled[data-type=L] { filter: grayscale(1) brightness(0.6); }
+          &.disabled { cursor: not-allowed; filter: grayscale(1) brightness(0.4); }
+          &.disabled[data-type=L] { filter: grayscale(1) brightness(0.5); }
           &.full { cursor: not-allowed; }
           &.taking-card { height: 110px; }
 
