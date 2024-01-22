@@ -101,10 +101,27 @@
           height: 106px;
           position: relative;
           cursor: pointer;
+          box-shadow: 2px 2px 5px 1px #0006;
           &.disabled { cursor: not-allowed; filter: grayscale(1) brightness(0.4); }
           &.disabled[data-type=L] { filter: grayscale(1) brightness(0.5); }
           &.full { cursor: not-allowed; }
-          &.taking-card { height: 110px; }
+
+          &.giving-card {
+            border-radius: 15px 15px 0 0;
+            &:not(.disabled):not([data-count="0"]) {
+              z-index: 1; box-shadow: 0px 0px 5px 5px var(--trade-negative);
+              &::before { border-color: color-mix(in srgb, var(--trade-negative), #000); }
+              &.full::before { border-color: var(--trade-negative); }
+            }
+          }
+          &.taking-card {
+            height: 110px; border-radius: 0 0 15px 15px;
+            &:not(.disabled):not([data-count="0"]) {
+              z-index: 1; box-shadow: 0px 0px 5px 5px var(--trade-positive);
+              &::before { border-color: color-mix(in srgb, var(--trade-positive), #000); }
+              &.full::before { border-color: var(--trade-positive); }
+            }
+          }
 
           /* Card Image */
           &::before {
@@ -114,7 +131,6 @@
             background-image: url(/images/cards_sprite.png);
             width: 100%; height: 100%;
             box-sizing: border-box;
-            box-shadow: 2px 2px 5px 1px #0006;
             border: 1px solid #5a460e;
           }
           &.giving-card::before {
@@ -149,13 +165,13 @@
             &.giving-card::after {
               content: attr(data-count) ' →'; bottom: 3px; left: 1px;
               background-color: var(--trade-negative);
-              border-width: 2px 2px 0 0; border-color: color-mix(in srgb, var(--trade-negative), #000);
+              border-width: 1px 1px 0 0; border-color: color-mix(in srgb, var(--trade-negative), #000);
               border-top-right-radius: 20px; justify-content: flex-start;
             }
             &.taking-card::after {
               content: '← ' attr(data-count); top: 3px; right: 1px;
               background-color: var(--trade-positive);
-              border-width: 0 0 2px 2px; border-color: color-mix(in srgb, var(--trade-positive), #000);
+              border-width: 0 0 1px 1px; border-color: color-mix(in srgb, var(--trade-positive), #000);
               border-bottom-left-radius: 20px; justify-content: flex-end;
             }
 
