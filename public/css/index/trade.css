@@ -167,12 +167,12 @@
                 border-width: 0;
               }
               &.giving-card::after {
-                content: 'Give ' attr(data-count) ' →';
+                content: 'Give 2 →';
                 border-radius: 13px 13px 0 0;
                 background-color: color-mix(in srgb, var(--trade-negative) 60%, transparent);
               }
               &.taking-card::after {
-                content: '← Take ' attr(data-count);
+                content: '← Take 1';
                 border-radius: 0 0 13px 13px;
                 background-color: color-mix(in srgb, var(--trade-positive) 60%, transparent);
               }
@@ -188,7 +188,7 @@
 
       .giving-text, .taking-text {
         height: 20px;
-        &::before { text-shadow: 0 0 5px #000c; margin-right: 10px; }
+        &::before { text-shadow: 0 0 5px #000c; margin-right: 5px; }
       }
       .giving-text::before {
         content: 'Giving…';
@@ -237,6 +237,10 @@
     }
     &[data-trade_type="Px"] .info-section .taking-text::before { content: 'Asking…'; }
     &[data-trade_type="Px"] .info-section .submit::before { content: 'Send Request'; }
-    &[data-trade_type="Px"] .card-section .card-container .card.taking-card:not(.disabled):not(.full):hover::after { content: '← Ask ' attr(data-count); }
+    &[data-trade_type="Px"] .card-section .card-container .card.giving-card:not(.disabled):not(.full):hover::after { content: 'Give 1 →' }
+    &[data-trade_type="Px"] .card-section .card-container .card.taking-card:not(.disabled):not(.full):hover::after { content: '← Ask 1' }
+
+    &[data-trade_type="*3"] .card-section .card-container .card.giving-card:not(.disabled):not(.full):hover::after { content: 'Give 3 →' }
+    &[data-trade_type="*4"] .card-section .card-container .card.giving-card:not(.disabled):not(.full):hover::after { content: 'Give 4 →' }
   }
 }

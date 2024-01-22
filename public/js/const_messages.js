@@ -48,7 +48,7 @@ const GAME_MESSAGES = {
       const res_keys = Object.keys(res_obj)
       if (!res_keys.length) return ''
       return ' :: took→ ' + res_keys.map(k => {
-        return res_obj[k] + CONST.RESOURCE_EMOJIS[k]
+        return `${res_obj[k]}<div class="res-icon ${k}"></div>`
       }).join(',')
     },
     other: _ => '',
@@ -90,11 +90,17 @@ const GAME_MESSAGES = {
     other: (pname) => `${pname} is moving the Robber 🥷 and stealing.`,
   },
   ROBBER_MOVED_TILE: {
-    self: (tile, num) => `You have moved the 🥷 Robber to ${CONST.TILE_EMOJIS[tile]} ${CONST.TILES[tile]} - ${num}.`,
-    other: (tile, num, pname) => `${pname} has moved the 🥷 Robber to ${CONST.TILE_EMOJIS[tile]} ${CONST.TILES[tile]} - ${num}.`,
+    self: (tile, num) => {
+      const t_emoji = CONST.TILE_RES[tile] ? `<div class="res-icon ${CONST.TILE_RES[tile]}"></div>` : CONST.TILE_EMOJIS[tile]
+      return `You have moved the 🥷 Robber to ${t_emoji}${CONST.TILES[tile]} @ <b>${num}</b>.`
+    },
+    other: (tile, num, pname) => {
+      const t_emoji = CONST.TILE_RES[tile] ? `<div class="res-icon ${CONST.TILE_RES[tile]}"></div>` : CONST.TILE_EMOJIS[tile]
+      return `${pname} has moved the 🥷 Robber to ${t_emoji}${CONST.TILES[tile]} @ <b>${num}</b>.`
+    },
   },
   PLAYER_STOLE_RES: {
-    self: ({ p1, p2 }, res) => ` ${p1 ? p1 + ' has' : 'You have'} stolen a ${CONST.RESOURCE_EMOJIS[res]} ${CONST.RESOURCES[res]} from ${p2 || 'you'}.`,
+    self: ({ p1, p2 }, res) => ` ${p1 ? p1 + ' has' : 'You have'} stolen 1<div class="res-icon ${res}"></div> from ${p2 || 'you'}.`,
     other: (p1, p2) => ` ${p1} has stolen a resource from ${p2}.`,
   },
 }
