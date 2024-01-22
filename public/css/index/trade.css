@@ -30,6 +30,7 @@
       border-width: 10px 7px;
       &._4 { width: 91px; }
       &.active { background: var(--sand-color-dark); }
+      &.disabled { filter: grayscale(1) brightness(.6) opacity(.5); cursor: not-allowed; }
 
       &::before {
         content: '';
@@ -38,7 +39,7 @@
         background-size: contain; background-repeat: no-repeat;
       }
 
-      &:hover::before { filter: drop-shadow(2px 2px 3px #000a); top: -2px; left: -2px;}
+      &:not(.disabled):hover::before { filter: drop-shadow(2px 2px 3px #000a); top: -2px; left: -2px;}
 
       &.B2::before { background-image: url(/images/trade/Brick.png); }
       &.L2::before { background-image: url(/images/trade/Lumber.png); }
@@ -52,13 +53,14 @@
 
     .trade-type.Px {
       display: flex; align-items: center;
-      background: #fff;
+      background: var(--sand-color-dark);
+      color: #fff;
       padding: 5px 10px;
       height: 20px;
       border: 0px solid var(--sand-color);
       border-width: 25px 10px;
-      &:hover { background: var(--sand-color-dark); color: #fff; }
       &.active { border-color: var(--sand-color-dark); }
+      &:not(.active):hover { background: #fff; color: #333; }
     }
 
     .cancel {
@@ -72,25 +74,25 @@
       margin: 10px 10px;
       border-radius: 50%;
       /* box-shadow: 0 0 5px -1px #000; */
-      border: 1px solid var(--trade-negative);
+      /* border: 1px solid var(--trade-negative); */
       &:hover { background: var(--trade-negative); color: #fff; }
     }
   }
 
   .trade-card-selection {
     display: flex; flex-wrap: wrap; justify-content: center;
-    background-color: color-mix(in srgb, var(--sand-color-dark) 80%, transparent);
+    background-color: color-mix(in srgb, var(--sand-color-dark) 90%, transparent);
     color: #fff;
     /* background-color: var(--sand-color); */
     padding-top: 20px;
-    /* &.hide { display: none; } */
+    &.hide { display: none; }
 
     .card-section {
       display: flex; flex-wrap: wrap; justify-content: center;
 
       .card-container {
         width: 140px;
-        height: 212px;
+        height: 216px;
         border-radius: 15px;
         /* box-shadow: 2px 2px 5px 1px #0006; */
         margin: 0 0 20px 20px;
@@ -99,7 +101,10 @@
           height: 106px;
           position: relative;
           cursor: pointer;
-          &.disabled { cursor: not-allowed; filter: grayscale(1) brightness(0.7); }
+          &.disabled { cursor: not-allowed; filter: grayscale(1) brightness(0.5); }
+          &.disabled[data-type=L] { filter: grayscale(1) brightness(0.6); }
+          &.full { cursor: not-allowed; }
+          &.taking-card { height: 110px; }
 
           /* Card Image */
           &::before {
@@ -120,31 +125,46 @@
             border-top: 3px solid var(--sand-color-dark);
             border-radius: 0 0 15px 15px;
           }
+          &[data-type=S]::before { background-size: 1100px; background-position: -176px -13px; }
+          &[data-type=L]::before { background-size: 1109px; background-position: -639px -9px; }
+          &[data-type=B]::before { background-size: 1077px; background-position: -12px -15px; }
+          &[data-type=O]::before { background-size: 1074px; background-position: -326px -5px; }
+          &[data-type=W]::before { background-size: 1097px; background-position: -484px -9px; }
+
+          &.taking-card[data-type=S]::before { background-position-y: calc(-106px - 13px); }
+          &.taking-card[data-type=L]::before { background-position-y: calc(-106px - 9px); }
+          &.taking-card[data-type=B]::before { background-position-y: calc(-106px - 15px); }
+          &.taking-card[data-type=O]::before { background-position-y: calc(-106px - 5px); }
+          &.taking-card[data-type=W]::before { background-position-y: calc(-106px - 9px); }
+          &.full:not(.disabled)::before { filter: brightness(0.5); }
 
           /* Text on Card */
           &:not(.disabled){
             &::after {
               position: absolute;
-              width: 35px; height: 25px; padding: 0 3px;
+              width: 40px; height: 25px; padding: 0 3px; border-style: solid;
               display: flex; align-items: center;
               transition: all .05s linear;
             }
             &.giving-card::after {
               content: attr(data-count) ' →'; bottom: 3px; left: 1px;
               background-color: var(--trade-negative);
+              border-width: 2px 2px 0 0; border-color: color-mix(in srgb, var(--trade-negative), #000);
               border-top-right-radius: 20px; justify-content: flex-start;
             }
             &.taking-card::after {
               content: '← ' attr(data-count); top: 3px; right: 1px;
               background-color: var(--trade-positive);
+              border-width: 0 0 2px 2px; border-color: color-mix(in srgb, var(--trade-positive), #000);
               border-bottom-left-radius: 20px; justify-content: flex-end;
             }
 
-            &:hover{
+            &:not(.full):hover{
               &::after {
                 width: calc(100% - 2px); height: calc(100% - 3px - 1px); padding: 0;
                 display: flex; align-items: center; justify-content: center;
                 text-shadow: 0 0 1px #000, 0 0 1px #000, 0 0 2px #000, 0 0 2px #000;
+                border-width: 0;
               }
               &.giving-card::after {
                 content: 'Give ' attr(data-count) ' →';
@@ -159,32 +179,20 @@
             }
           }
         }
-        &[data-type=S] .card::before { background-size: 1100px; background-position: -176px -13px; }
-        &[data-type=L] .card::before { background-size: 1109px; background-position: -639px -9px; }
-        &[data-type=B] .card::before { background-size: 1077px; background-position: -12px -15px; }
-        &[data-type=O] .card::before { background-size: 1074px; background-position: -326px -5px; }
-        &[data-type=W] .card::before { background-size: 1097px; background-position: -484px -9px; }
-
-        &[data-type=S] .taking-card::before { background-position-y: calc(-106px - 13px); }
-        &[data-type=L] .taking-card::before { background-position-y: calc(-106px - 9px); }
-        &[data-type=B] .taking-card::before { background-position-y: calc(-106px - 15px); }
-        &[data-type=O] .taking-card::before { background-position-y: calc(-106px - 5px); }
-        &[data-type=W] .taking-card::before { background-position-y: calc(-106px - 9px); }
       }
     }
 
     .info-section {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      margin-left: 30px;
+      margin-left: 30px; color: var(--sand-color);
 
       .giving-text, .taking-text {
-        &::before { text-shadow: 0 0 5px #000c; }
+        height: 20px;
+        &::before { text-shadow: 0 0 5px #000c; margin-right: 10px; }
       }
-      .giving-text {
-        &::before {
-          content: 'Giving…';
-          color: var(--trade-negative);
-        }
+      .giving-text::before {
+        content: 'Giving…';
+        color: var(--trade-negative);
       }
 
       .taking-text {
@@ -217,13 +225,18 @@
         font-size: 1.2em; font-weight: bold;
         cursor: not-allowed;
 
-        background: #333; color: var(--sand-color);
-        cursor: pointer; border-color: var(--sand-color);
-
-        &:hover {
-          box-shadow: 0 0 10px 0px var(--sand-color), 0 0 20px 0px var(--sand-color);
+        &::before { content: 'Trade'; }
+        &.active {
+          background: #333; color: var(--sand-color);
+          cursor: pointer; border-color: var(--sand-color);
+          &:hover {
+            box-shadow: 0 0 10px 0px var(--sand-color), 0 0 20px 0px var(--sand-color);
+          }
         }
       }
     }
+    &[data-trade_type="Px"] .info-section .taking-text::before { content: 'Asking…'; }
+    &[data-trade_type="Px"] .info-section .submit::before { content: 'Send Request'; }
+    &[data-trade_type="Px"] .card-section .card-container .card.taking-card:not(.disabled):not(.full):hover::after { content: '← Ask ' attr(data-count); }
   }
 }

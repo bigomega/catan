@@ -44,8 +44,6 @@ export const COST = {
 }
 
 export const TRADE_OFFERS = {
-  '*4': '4:1',
-  '*3': '3:1',
   S2: 'Sheep 2:1',
   L2: 'Lumber 2:1',
   B2: 'Brick 2:1',

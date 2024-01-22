@@ -20,24 +20,31 @@ export default class UI {
     this.#game = game
     this.#board = board
     this.#player = player
+
+    this.alert_ui = new AlertUI(player, st => game.saveStatus(st), game.config.alert.time)
     this.board_ui = new BoardUI(board, (loc, id) => game.onBoardClick(loc, id))
+    this.all_players_ui = new AllPlayersUI(player, opponents)
+
     this.player_ui = new PlayerUI(player, {
       onDiceClick: _ => game.onDiceClick(),
       onPieceClick: (piece, is_active) => game.onPieceClick(piece, is_active),
       onBuyDevCardClick: _ => game.onBuyDevCardClick(),
-      onTradeClick: hide => hide ? this.trade_ui.clearSelections() : this.trade_ui.renderTrade(),
+      onTradeClick: hide => hide ? this.trade_ui.clearSelections() : this.trade_ui.renderTradeSelection(),
       onEndTurnClick: _ => game.onEndTurn(),
       onCardClick: type => game.onCardClick(type),
       getPossibleLocations: p => game.getPossibleLocations(p),
     })
-    this.alert_ui = new AlertUI(player, st => this.#game.saveStatus(st), game.config.alert.time)
+
     this.robber_drop_ui = new RobberDropUI({
       onDropSubmit: res => game.onGiveToRobber(res),
       onTakenBack: type => this.player_ui.toggleHandResource(type, true),
       playRobberAudio: _ => game.playRobberAudio(),
     })
-    this.all_players_ui = new AllPlayersUI(player, opponents)
+
     this.trade_ui = new TradeUI(player, {
+      toggleHandRes: type => this.player_ui.toggleHandResource(type),
+      resetHand: _ => this.player_ui.renderHand(),
+      toggleBoardHide: hide => this.board_ui.toggleHide(hide),
       onTradeProposal: (...params) => game.onTradeProposal(...params),
       onTradeResponse: (id, resp) => game.onTradeResponse(id, resp),
     })
