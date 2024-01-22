@@ -86,6 +86,7 @@ export const SOCKET_EVENTS = {
   CLICK_LOC: 'clicked_location',
   BUY_DEV: 'buy_development_card',
   END_TURN: 'end_turn',
+  TRADE_REQ: 'request_trade',
   // Both
   INITIAL_SETUP: 'ask/return_initial_setup',
   ROBBER_DROP: 'resources_dropped_to_robber/server_update',
@@ -100,6 +101,7 @@ export const SOCKET_EVENTS = {
   RES_RECEIVED: 'total_resources_received', // Private
   DEV_CARD_TAKEN: 'developer_card_deck_taken',
   STOLEN_INFO: 'notify_stolen_resource',
+  TRADED_INFO: 'notify_traded_info',
 
 
 

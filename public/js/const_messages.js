@@ -1,5 +1,8 @@
 import * as CONST from "./const.js"
 
+const resToText = obj => Object.keys(obj).filter(k => obj[k])
+  .map(k => `${obj[k]}<div class="res-icon ${k}"></div>`).join(' ')
+
 const GAME_MESSAGES = {
   // --- ALERTS ---
   STRATEGIZE: {
@@ -45,11 +48,8 @@ const GAME_MESSAGES = {
   },
   RES_TO_EMOJI: {
     self: res_obj => {
-      const res_keys = Object.keys(res_obj)
-      if (!res_keys.length) return ''
-      return ' :: took→ ' + res_keys.map(k => {
-        return `${res_obj[k]}<div class="res-icon ${k}"></div>`
-      }).join(',')
+      if (!Object.keys(res_obj).length) { return '' }
+      return ' :: took→ ' + resToText(res_obj)
     },
     other: _ => '',
   },
@@ -101,7 +101,11 @@ const GAME_MESSAGES = {
   },
   PLAYER_STOLE_RES: {
     self: ({ p1, p2 }, res) => ` Stole 1<div class="res-icon ${res}"></div> from ${p2 || 'you'}.`,
-    other: (p1, p2) => ` Stole a resource from ${p2}.`,
+    other: ({ p1, p2 }) => ` Stole a resource from ${p2}.`,
+  },
+  PLAYER_TRADE_INFO: {
+    self: ({ p1, p2, board }, given, taken) => `<b>Trade:</b> ${p1 || 'You'} gave ${resToText(given)} to ${board ? 'the board' : (p2 || 'you')} and took ${resToText(taken)}.`,
+    other: _ => '',
   },
 }
 

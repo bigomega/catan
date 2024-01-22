@@ -241,6 +241,16 @@ export default class Game {
     }
   }
 
+  updateTradedInfoSoc(p1, given, taken, p2) {
+    let msg = GAME_MESSAGES.PLAYER_TRADE_INFO.self({ p1: p1.name, p2: p2?.name, board: !p2 }, given, taken)
+    if (this.#isMyPid(p1.id)) {
+      msg = GAME_MESSAGES.PLAYER_TRADE_INFO.self({ p2: p2?.name, board: !p2 }, given, taken)
+    } else if (this.#isMyPid(p2?.id)) {
+      msg = GAME_MESSAGES.PLAYER_TRADE_INFO.self({ p1: p1.name, board: !p2 }, given, taken)
+    }
+    this.#ui.alert_ui.setStatus(msg)
+  }
+
   setTimerSoc(t, pid) { this.#ui.player_ui.resetTimer(t, this.#isMyPid(pid)) }
   //#endregion
 
@@ -304,7 +314,7 @@ export default class Game {
   // Trade Proposal
   onTradeProposal(type, giving, taking, counter_id) {
     // this.#ui.trade_ui.renderNewNotification()
-    //
+    this.#socket_manager.sendTradeRequest(type, giving, taking, counter_id)
   }
 
   onTradeResponse(trade_id, accepted) { /* ---- */ }

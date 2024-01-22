@@ -267,6 +267,36 @@ export default class Game {
     this.#next()
   }
 
+  tradeRequestIO(pid, type, giving, taking, counter_id) {
+    if (pid !== this.active_player) return
+    if (this.state !== ST.PLAYER_ACTIONS) return
+    const giving_total = Object.values(giving).reduce((m, v) => m + v, 0)
+    const taking_total = Object.values(taking).reduce((m, v) => m + v, 0)
+    const player = this.getPlayer(pid)
+    // Notify others of the Trade Request
+    if (type === 'Px') {
+      return
+    }
+    // Trade with the Game
+    const tradeCards = _ => {
+      Object.entries(giving).forEach(([res, v]) => v && player.takeCard(res, v))
+      Object.entries(taking).forEach(([res, v]) => v && player.giveCard(res, v))
+      this.#io_manager.updateTradeInfo(player, giving, taking)
+    }
+    if (['S2','L2','B2','O2','W2'].includes(type)) {
+      const res = type[0]
+      if (giving[res] === (taking_total * 2) && giving_total === giving[res]) {
+        tradeCards()
+      }
+    } else if (type === '*3' || type === '*4') {
+      const count = type[1]
+      const non_multiples = Object.values(giving).filter(v => v%count).length
+      if (!non_multiples && giving_total === (taking_total * count)) {
+        tradeCards()
+      }
+    }
+  }
+
   playerRollIO() { this.#next() }
   endTurnIO() { this.#next() }
   saveStatusIO(pid, text) { this.getPlayer(pid).setLastStatus(text) }

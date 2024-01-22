@@ -47,6 +47,9 @@ export default class IOManager {
 
     /** @event Robber-Move-Steal */
     socket.on(SOC.ROBBER_MOVE, (t_id, s_pid) => game.robberMoveIO(pid, t_id, s_pid))
+
+    /** @event Trade-Request */
+    socket.on(SOC.TRADE_REQ, (type, giving, taking, counter_id) => game.tradeRequestIO(pid, type, giving, taking, counter_id))
   }
 
   updateWaitingRoom(player) { this.emit(SOC.JOINED_WAITING_ROOM, player) }
@@ -80,6 +83,8 @@ export default class IOManager {
   updateStolen_Private(player_socket_id, p1, p2, res) {
     this.#io.to(player_socket_id).emit(SOC.STOLEN_INFO, p1, p2, res)
   }
+
+  updateTradeInfo(player, given, taken) { this.emit(SOC.TRADED_INFO, player, given, taken) }
 
   emit(type, ...data) { this.#io.to(this.#game.id).emit(type, ...data) }
 }

@@ -90,9 +90,15 @@ export default class TradeUI {
         this.validateAndUpdateTrade()
       })
     })
+    // Reset Card selection
     this.$card_selection.querySelector('.info-section .reset').addEventListener('click', e => {
       this.renderCardSelection(this.#trade_type)
       this.#resetHand()
+    })
+    // Submit Trade
+    this.$card_selection.querySelector('.info-section .submit').addEventListener('click', e => {
+      this.#onTradeProposal(this.#trade_type, this.#giving_res, this.#taking_res, this.#counter_id)
+      this.clearSelections()
     })
   }
 
@@ -181,10 +187,8 @@ export default class TradeUI {
     if (['S2','L2','B2','O2','W2'].includes(this.#trade_type)) {
       const res = this.#trade_type[0]
       _calculateAndUpdate(2, res)
-    } else if (this.#trade_type === '*3') {
-      _calculateAndUpdate(3, ...Object.keys(CONST.RESOURCES))
-    } else if (this.#trade_type === '*4') {
-      _calculateAndUpdate(4, ...Object.keys(CONST.RESOURCES))
+    } else if (this.#trade_type === '*3' || this.#trade_type === '*4') {
+      _calculateAndUpdate(this.#trade_type[1], ...Object.keys(CONST.RESOURCES))
     } else if (this.#trade_type === 'Px') {
       this.$card_selection.querySelectorAll('.card').forEach($el => {
         const res = $el.dataset.type
