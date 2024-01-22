@@ -3,8 +3,8 @@ const $ = document.querySelector.bind(document)
 const oKeys = Object.keys
 
 export default class PlayerUI {
-  #ui; #onDiceClick; #onPieceClick; #onBuyDevCardClick; #onTradeClick; #onEndTurnClick
-  #onCardClick; #getPossibleLocations
+  #ui; #onDiceClick; #onPieceClick; #onBuyDevCardClick; #onTradeClick; #onExitTrade;
+  #onEndTurnClick; #onCardClick; #getPossibleLocations
   player; timer; hand
 
   $timer; $dice; $build_road; $build_settlement; $build_city; $buy_dev_card; $trade_btn; $end_turn
@@ -13,12 +13,13 @@ export default class PlayerUI {
   $action_bar = this.$el.querySelector('.actions')
 
   constructor(player, { onDiceClick, onPieceClick, onBuyDevCardClick, onTradeClick,
-    onEndTurnClick, onCardClick, getPossibleLocations }) {
+    onExitTrade, onEndTurnClick, onCardClick, getPossibleLocations }) {
     this.player = player
     this.#onDiceClick = onDiceClick
     this.#onPieceClick = onPieceClick
     this.#onBuyDevCardClick = onBuyDevCardClick
     this.#onTradeClick = onTradeClick
+    this.#onExitTrade = onExitTrade
     this.#onEndTurnClick = onEndTurnClick
     this.#onCardClick = onCardClick
     this.#getPossibleLocations = getPossibleLocations
@@ -59,7 +60,7 @@ export default class PlayerUI {
       <div class="dev-card disabled" title="Buy Development Card (d)" data-count="-">
         <img src="/images/dc-back.png"/>
       </div>
-      <div class="trade disabled" title="Trade (t)">Trade</div>
+      <div class="trade disabled" title="Trade (t/Esc)">Trade</div>
       <div class="end-turn disabled" title="End Turn (e)">End Turn</div>
     `
     this.#setRefs()
@@ -109,8 +110,7 @@ export default class PlayerUI {
     // Trade
     this.$trade_btn.addEventListener('click', e => {
       if (this.$trade_btn.classList.contains('disabled')) return
-      this.#onTradeClick(this.$trade_btn.classList.contains('active'))
-      this.$trade_btn.classList.toggle('active')
+      this.#onTradeClick()
     })
     // End Turn
     this.$end_turn.addEventListener('click', e => {
@@ -131,8 +131,7 @@ export default class PlayerUI {
           break
         case 'KeyT':
           if (this.$trade_btn.classList.contains('disabled')) { break }
-          this.#onTradeClick(this.$trade_btn.classList.contains('active'))
-          this.$trade_btn.classList.toggle('active')
+          this.#onTradeClick()
           break
         case 'Space':
           e.target === document.body && e.preventDefault()
@@ -145,6 +144,7 @@ export default class PlayerUI {
             this.removeActiveActions()
             this.#onPieceClick('', true)
           }
+          this.#onExitTrade()
           break
       }
     })
