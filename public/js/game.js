@@ -11,7 +11,8 @@ const AUDIO = CONST.AUDIO_FILES
 const MSGKEY = Object.keys(GAME_MESSAGES).reduce((m, k) => (m[k] = k, m), {})
 
 export default class Game {
-  id; config; mapkey; map_changes; active_player; state; dev_cards_len; timer; robber_loc
+  id; config; mapkey; map_changes; active_player; state; dev_cards_len; timer
+  robber_loc; ongoing_trades; opponents
   #board; #player; #ui; #socket_manager; #audio_manager
   #temp = {}
   possible_locations = { R: [], S: [], C: [] }
@@ -26,6 +27,8 @@ export default class Game {
     this.dev_cards_len = game_obj.dev_cards_len
     this.timer = game_obj.timer
     this.robber_loc = game_obj.robber_loc
+    this.ongoing_trades = game_obj.ongoing_trades
+    this.opponents = opponents_obj
 
     this.#board = new Board(game_obj.mapkey, game_obj.map_changes)
     this.#player = new Player(player_obj)
@@ -50,6 +53,11 @@ export default class Game {
     if (this.robber_loc) {
       this.#board.moveRobber(this.robber_loc)
       this.#ui.moveRobber(this.robber_loc)
+    }
+    if (this.ongoing_trades.length) {
+      this.ongoing_trades.forEach(({ pid, giving, asking, id }) => {
+        this.#ui.trade_ui.renderNewRequest(this.getPlayer(pid), { giving, asking, id })
+      })
     }
     // Active Player State updates
     if (this.#player.id === this.active_player) {
@@ -104,6 +112,7 @@ export default class Game {
   #onPlayerRoll() {
     this.#ui.toggleActions(0)
     this.#ui.hideAllShown(0)
+    this.#ui.trade_ui.clearRequests()
     const message = this.#ui.alert_ui.getMessage(this.active_player, MSGKEY.ROLL_TURN)
     if (this.#isMyPid(this.active_player.id)) {
       this.#ui.alert_ui.alert(message)
@@ -241,6 +250,7 @@ export default class Game {
     }
   }
 
+  // Trade Success data
   updateTradedInfoSoc(p1, given, taken, p2) {
     let msg = GAME_MESSAGES.PLAYER_TRADE_INFO.self({ p1: p1.name, p2: p2?.name, board: !p2 }, given, taken)
     if (this.#isMyPid(p1.id)) {
@@ -249,6 +259,11 @@ export default class Game {
       msg = GAME_MESSAGES.PLAYER_TRADE_INFO.self({ p1: p1.name, board: !p2 }, given, taken)
     }
     this.#ui.alert_ui.setStatus(msg)
+  }
+
+  // Trade Request
+  requestTradeSoc(player, trade_obj) {
+    this.#ui.trade_ui.renderNewRequest(player, trade_obj)
   }
 
   setTimerSoc(t, pid) { this.#ui.player_ui.resetTimer(t, this.#isMyPid(pid)) }
@@ -313,7 +328,6 @@ export default class Game {
 
   // Trade Proposal
   onTradeProposal(type, giving, taking, counter_id) {
-    // this.#ui.trade_ui.renderNewNotification()
     this.#socket_manager.sendTradeRequest(type, giving, taking, counter_id)
   }
 
@@ -332,4 +346,9 @@ export default class Game {
   }
   saveStatus(text) { this.#socket_manager.saveStatus(text) }
   #isMyPid(pid) { return pid === this.#player.id }
+
+  getPlayer(pid) {
+    if (this.#player.id === pid) { return this.#player }
+    else { return this.opponents.find(_ => _.id === pid) }
+  }
 }

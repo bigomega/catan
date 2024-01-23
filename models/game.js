@@ -20,7 +20,8 @@ export default class Game {
   #active_player = 0
   config = CONST.GAME_CONFIG
   /** @type {Player[]} */ players = []
-  ready_players = {}; map_changes = []; expected_actions = []; robbing_players = [];
+  ready_players = {}; map_changes = []; expected_actions = []; robbing_players = []
+  ongoing_trades = []
   turn = 1; dice_value = 2
   mapkey = `S(br-S2).S.S(bl-B2).S\n-S.M5.J10.J8.S(bl-*3)\n-S(r-O2).J2.C9.G11.C4.S\n-S.G6.J4.D.F3.F11.S(l-W2)\n+S(r-L2).F3.G5.C6.M12.S\n+S.F8.G10.M9.S(tl-*3)\n+S(tr-*3).S.S(tl-*3).S`
   dev_cards = Helper.shuffle(CONST.DEVELOPMENT_CARDS_DECK.slice())
@@ -282,18 +283,30 @@ export default class Game {
   tradeRequestIO(pid, type, giving, taking, counter_id) {
     if (pid !== this.active_player) return
     if (this.state !== ST.PLAYER_ACTIONS) return
+    // Trading the same resources
+    if (Object.entries(giving).filter(([k, v]) => v && taking[k]).length) return
+    const player = this.getPlayer(pid)
+    const can_give = Object.entries(giving).reduce((mem, [res, v]) => {
+      return mem && (player.closed_cards[res] >= v)
+    }, true)
+    if (!can_give) return
     const giving_total = Object.values(giving).reduce((m, v) => m + v, 0)
     const taking_total = Object.values(taking).reduce((m, v) => m + v, 0)
-    const player = this.getPlayer(pid)
+    if (!(giving && taking_total)) return
     // Notify others of the Trade Request
     if (type === 'Px') {
+      const total_requests = this.ongoing_trades.filter(_ => _.pid == pid).length
+      if (total_requests >= this.config.trade.max_requests) return
+      const id = this.ongoing_trades.length
+      this.ongoing_trades.push({ pid, giving, asking: taking, id })
+      this.#io_manager.requestPlayerTrade(player.toJSON(), { giving, asking: taking, id })
       return
     }
     // Trade with the Game
     const tradeCards = _ => {
       Object.entries(giving).forEach(([res, v]) => v && player.takeCard(res, v))
       Object.entries(taking).forEach(([res, v]) => v && player.giveCard(res, v))
-      this.#io_manager.updateTradeInfo(player, giving, taking)
+      this.#io_manager.updateTradeInfo(player.toJSON(), giving, taking)
     }
     if (['S2','L2','B2','O2','W2'].includes(type)) {
       const res = type[0]
@@ -404,6 +417,7 @@ export default class Game {
       state: this.state,
       dev_cards_len: this.dev_cards.length,
       robber_loc: this.board?.robber_loc,
+      ongoing_trades: this.ongoing_trades,
       timer: timer_left > 1 ? timer_left : 0,
     }
   }

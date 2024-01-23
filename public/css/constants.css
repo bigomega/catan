@@ -4,6 +4,7 @@
   --water-color: #1691c6;
   --sand-color: #e8d49c;
   --sand-color-dark: color-mix(in srgb, var(--sand-color) 50%, #000);
+  --sand-color-text-dark: #9c5e15;
 
   --trade-positive: #64b864;
   --trade-negative: #ff4f4f;

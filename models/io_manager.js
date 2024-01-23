@@ -86,5 +86,7 @@ export default class IOManager {
 
   updateTradeInfo(player, given, taken) { this.emit(SOC.TRADED_INFO, player, given, taken) }
 
+  requestPlayerTrade(player, trade_obj) { this.emit(SOC.TRADE_REQ, player, trade_obj) }
+
   emit(type, ...data) { this.#io.to(this.#game.id).emit(type, ...data) }
 }

@@ -1,17 +1,20 @@
 import * as CONST from "../const.js"
+import { resToText } from "../const_messages.js";
 import { newObject } from "../utils.js";
 
 export default class TradeUI {
-  #giving_res; #taking_res; #trade_type; #counter_id
+  #giving_res; #taking_res; #trade_type; #counter_id; #game_config
   #player; #onTradeProposal; #onTradeResponse; #toggleHandRes; #resetHand; #toggleBoardHide
   $submit; $giving_text; $taking_text;
   $el = document.querySelector('#game > .trade-zone')
-  $notifications = this.$el.querySelector('.trade-notifications')
+  $requests = this.$el.querySelector('.trade-requests')
   $type_selection = this.$el.querySelector('.trade-type-selection')
   $card_selection = this.$el.querySelector('.trade-card-selection')
 
-  constructor(player, { onTradeProposal, onTradeResponse, toggleHandRes, resetHand, toggleBoardHide }) {
+  constructor(player, game_config, { onTradeProposal, onTradeResponse,
+    toggleHandRes, resetHand, toggleBoardHide }) {
     this.#player = player
+    this.#game_config = game_config
     this.#onTradeProposal = onTradeProposal
     this.#onTradeResponse = onTradeResponse
     this.#toggleHandRes = toggleHandRes
@@ -103,6 +106,8 @@ export default class TradeUI {
   }
 
   renderTradeSelection() {
+    const $og_req = this.$requests.querySelectorAll('.ongoing[data-id="-1"] .og-request')
+    if ($og_req.length >= this.#game_config.trade.max_requests) { return }
     this.$type_selection.classList.remove('hide')
     Object.entries(this.#player.trade_offers).forEach(([type, allowed]) => {
       const $el = this.$type_selection.querySelector(`.trade-type[data-type="${type}"]`)
@@ -210,10 +215,56 @@ export default class TradeUI {
     this.$type_selection.classList.add('hide')
     this.$card_selection.classList.add('hide')
     this.#toggleBoardHide()
-    this.#resetHand()
+    // this.#resetHand()
   }
 
-  renderNewNotification() {}
+  renderNewRequest(player, { giving={}, asking={}, id } = {}) {
+    if (player.id === this.#player.id) {
+      this.#renderOngoing(giving, asking, id)
+      return
+    }
 
-  clearNotifications() { this.$notifications.innerHTML = '' }
+    this.$requests.innerHTML += `
+      <div class="request" data-id="${id}">
+        <div class="text">
+          ${player.name} is<span class="giving">giving ${resToText(giving)}</span>
+          &<span class="asking disabled">asking ${resToText(asking)}</span>from you
+        </div>
+        <div class="actions">
+          <div class="confirm" data-id="${id}">Trade</div>
+          <div class="counter" data-id="${id}">Counter</div>
+          <div class="ignore">Ignore</div>
+        </div>
+      </div>
+    `
+    const $req = this.$requests.querySelector(`.request[data-id="${id}"]`)
+    if (!this.$requests.querySelector('.ongoing[data-id="-1"]')) {
+      $req.querySelector(`.counter`).classList.add('active')
+    }
+    if (this.#player.hasAllResources(asking)) {
+      $req.querySelector('.asking').classList.remove('disabled')
+      $req.querySelector('.confirm').classList.add('active')
+    }
+    // Event Handlers
+  }
+
+  #renderOngoing(giving, asking, id) {
+    const $all_req = this.$requests.querySelector('.ongoing[data-id="-1"]')
+    const $og_req = `
+      <div class="og-request" data-id="${id}">
+        <span class="giving">→ ${resToText(giving)}</span>for
+        <span class="asking"> ← ${resToText(asking)}</span>
+      </div>
+    `
+    if ($all_req) { $all_req.innerHTML += $og_req }
+    else {
+      this.$requests.innerHTML = `
+        <div class="ongoing" data-id="-1">
+          <span class="text">Max 3 Trade Requests: </span>${$og_req}
+        </div>
+      ` + this.$requests.innerHTML
+    }
+  }
+
+  clearRequests() { this.$requests.innerHTML = '' }
 }

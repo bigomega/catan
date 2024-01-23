@@ -52,6 +52,9 @@ export default class SocketManager {
 
     /** @event Notify-Traded-Info */
     this.#socket.on(SOC.TRADED_INFO, (player, given, taken) => game.updateTradedInfoSoc(player, given, taken))
+
+    /** @event Player-Trade-Request */
+    this.#socket.on(SOC.TRADE_REQ, (player, trade_obj) => game.requestTradeSoc(player, trade_obj))
   }
 
   sendInitialSetup({ settlement_loc, road_loc }) {

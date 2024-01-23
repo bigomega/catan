@@ -62,6 +62,7 @@ export const GAME_CONFIG = {
   roll: { time: 15 },
   player_turn: { time: 60 },
   robber: { drop_time: 60, move_time: 30 },
+  trade: { max_requests: 3 },
   win_points: 10,
   alert: { time: 3 },
 }
@@ -86,11 +87,11 @@ export const SOCKET_EVENTS = {
   CLICK_LOC: 'clicked_location',
   BUY_DEV: 'buy_development_card',
   END_TURN: 'end_turn',
-  TRADE_REQ: 'request_trade',
   // Both
   INITIAL_SETUP: 'ask/return_initial_setup',
-  ROBBER_DROP: 'resources_dropped_to_robber/server_update',
+  ROBBER_DROP: 'resources_dropped_to_robber/server_update', // Private
   ROBBER_MOVE: 'robber_is_moved',
+  TRADE_REQ: 'request_trade',
   // Server Sends…
   JOINED_WAITING_ROOM: 'joined_waiting_room',
   STATE_CHANGE: 'state_change',
@@ -100,7 +101,7 @@ export const SOCKET_EVENTS = {
   DICE_VALUE: 'value_of_rolled_dice',
   RES_RECEIVED: 'total_resources_received', // Private
   DEV_CARD_TAKEN: 'developer_card_deck_taken',
-  STOLEN_INFO: 'notify_stolen_resource',
+  STOLEN_INFO: 'notify_stolen_resource', // Public & Private
   TRADED_INFO: 'notify_traded_info',
 
 

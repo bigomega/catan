@@ -10,7 +10,7 @@ import TradeUI from "./trade_ui.js"
 const $ = document.querySelector.bind(document)
 
 export default class UI {
-  #game; #board; #player
+  #game; #board; #player; #game_config
   board_ui; player_ui; alert_ui; trade_ui
   #temp = {}
   $splash = $('.splash')
@@ -20,6 +20,7 @@ export default class UI {
     this.#game = game
     this.#board = board
     this.#player = player
+    this.#game_config = game.config
 
     this.alert_ui = new AlertUI(player, st => game.saveStatus(st), game.config.alert.time)
     this.board_ui = new BoardUI(board, (loc, id) => game.onBoardClick(loc, id))
@@ -42,7 +43,7 @@ export default class UI {
       playRobberAudio: _ => game.playRobberAudio(),
     })
 
-    this.trade_ui = new TradeUI(player, {
+    this.trade_ui = new TradeUI(player, game.config, {
       toggleHandRes: type => this.player_ui.toggleHandResource(type),
       resetHand: _ => this.player_ui.renderHand(),
       toggleBoardHide: hide => this.board_ui.toggleHide(hide),
@@ -89,5 +90,9 @@ export default class UI {
   showCorners(ids) { this.player_ui.toggleHandBlur(1); this.board_ui.showCorners(ids) }
   showEdges(ids) { this.player_ui.toggleHandBlur(1); this.board_ui.showEdges(ids) }
   showTiles(ids) { this.player_ui.toggleHandBlur(1); this.board_ui.showTiles(ids) }
-  hideAllShown() { this.player_ui.toggleHandBlur(); this.board_ui.hideAllShown() }
+  hideAllShown() {
+    this.player_ui.toggleHandBlur()
+    this.board_ui.hideAllShown()
+    this.trade_ui.clearSelections()
+  }
 }

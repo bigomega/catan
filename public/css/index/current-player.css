@@ -310,7 +310,7 @@
 
   .status-bar {
     background: var(--sand-color);;
-    color: #9c5e15;
+    color: var(--sand-color-text-dark);
     border-top: 1px solid #aa8456;
     position: relative;
     text-align: center;
