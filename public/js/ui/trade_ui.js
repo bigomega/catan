@@ -106,8 +106,8 @@ export default class TradeUI {
   }
 
   renderTradeSelection() {
-    const $og_req = this.$requests.querySelectorAll('.ongoing[data-id="-1"] .og-request')
-    if ($og_req.length >= this.#game_config.trade.max_requests) { return }
+    const $og_req = this.$requests.querySelectorAll('.ongoing[data-id="-1"] .og-request:not(.deleted)')
+    const Px_limit_crossed = $og_req.length >= this.#game_config.trade.max_requests
     this.$type_selection.classList.remove('hide')
     Object.entries(this.#player.trade_offers).forEach(([type, allowed]) => {
       const $el = this.$type_selection.querySelector(`.trade-type[data-type="${type}"]`)
@@ -128,7 +128,7 @@ export default class TradeUI {
           !player_res.filter(([k, v]) => v > 3).length && $el.classList.add('disabled')
           break
         case 'Px':
-          !player_res.filter(([k, v]) => v > 0).length && $el.classList.add('disabled')
+          (Px_limit_crossed || !player_res.filter(([k, v]) => v > 0).length) && $el.classList.add('disabled')
           break
       }
       $el.classList.remove('active')
@@ -163,7 +163,6 @@ export default class TradeUI {
       $el.dataset.count = is_giving ? this.#giving_res[$el.dataset.type] : this.#taking_res[$el.dataset.type]
       $el.classList.remove('full'); $el.classList.add('disabled')
     })
-
     const giving_total = Object.values(this.#giving_res).reduce((m, v) => m + v, 0)
     const taking_total = Object.values(this.#taking_res).reduce((m, v) => m + v, 0)
 
@@ -193,7 +192,7 @@ export default class TradeUI {
       const res = this.#trade_type[0]
       _calculateAndUpdate(2, res)
     } else if (this.#trade_type === '*3' || this.#trade_type === '*4') {
-      _calculateAndUpdate(this.#trade_type[1], ...Object.keys(CONST.RESOURCES))
+      _calculateAndUpdate(+this.#trade_type[1], ...Object.keys(CONST.RESOURCES))
     } else if (this.#trade_type === 'Px') {
       this.$card_selection.querySelectorAll('.card').forEach($el => {
         const res = $el.dataset.type
@@ -218,51 +217,84 @@ export default class TradeUI {
     // this.#resetHand()
   }
 
-  renderNewRequest(player, { giving={}, asking={}, id } = {}) {
+  renderNewRequest(player, { giving={}, asking={}, id, ...params } = {}) {
     if (player.id === this.#player.id) {
-      this.#renderOngoing(giving, asking, id)
+      this.#renderOngoing({ giving, asking, id, ...params })
+      this.updateOngoing({ giving, asking, id, ...params })
       return
     }
-
-    this.$requests.innerHTML += `
-      <div class="request" data-id="${id}">
+    this.$requests.insertAdjacentHTML('beforeend', `
+      <div class="request p${player.id}" data-id="${id}">
         <div class="text">
           ${player.name} is<span class="giving">giving ${resToText(giving)}</span>
-          &<span class="asking disabled">asking ${resToText(asking)}</span>from you
+          &<span class="asking disabled">asking ${resToText(asking)}</span> from you
         </div>
         <div class="actions">
           <div class="confirm" data-id="${id}">Trade</div>
           <div class="counter" data-id="${id}">Counter</div>
-          <div class="ignore">Ignore</div>
+          <div class="ignore" data-id="${id}">Ignore</div>
         </div>
       </div>
-    `
+    `)
     const $req = this.$requests.querySelector(`.request[data-id="${id}"]`)
-    if (!this.$requests.querySelector('.ongoing[data-id="-1"]')) {
-      $req.querySelector(`.counter`).classList.add('active')
-    }
-    if (this.#player.hasAllResources(asking)) {
-      $req.querySelector('.asking').classList.remove('disabled')
-      $req.querySelector('.confirm').classList.add('active')
-    }
-    // Event Handlers
+    this.#setupRequestActionEvents($req)
+    this.updateOngoing({ giving, asking, id, ...params })
   }
 
-  #renderOngoing(giving, asking, id) {
+  #setupRequestActionEvents($el) {
+    $el.querySelector('.confirm').addEventListener('click', e => {
+      if (!e.target.classList.contains('active')) return
+      this.#onTradeResponse(e.target.dataset.id, true)
+    })
+    $el.querySelector('.counter').addEventListener('click', e => {
+      if (!e.target.classList.contains('active')) return
+    })
+    $el.querySelector('.ignore').addEventListener('click', e => {
+      this.#onTradeResponse(e.target.dataset.id)
+    })
+  }
+
+  #renderOngoing({ giving, asking, id }) {
     const $all_req = this.$requests.querySelector('.ongoing[data-id="-1"]')
     const $og_req = `
       <div class="og-request" data-id="${id}">
-        <span class="giving">→ ${resToText(giving)}</span>for
-        <span class="asking"> ← ${resToText(asking)}</span>
+        <span class="giving">→${resToText(giving)}</span>
+        <span class="for">for</span>
+        <span class="asking">←${resToText(asking)}</span>
+        <span class="cancel">Withdraw</span>
       </div>
     `
-    if ($all_req) { $all_req.innerHTML += $og_req }
-    else {
-      this.$requests.innerHTML = `
+    if ($all_req) {
+      $all_req.insertAdjacentHTML('beforeend', $og_req)
+    } else {
+      this.$requests.insertAdjacentHTML('afterbegin', `
         <div class="ongoing" data-id="-1">
-          <span class="text">Max 3 Trade Requests: </span>${$og_req}
+          <span class="text">Max Requests - ${this.#game_config.trade.max_requests}: </span>${$og_req}
         </div>
-      ` + this.$requests.innerHTML
+      `)
+    }
+    this.$requests.querySelector(`.ongoing[data-id="-1"] .og-request[data-id="${id}"] .cancel`).addEventListener('click', e => {
+      /** @todo Cancel Trade Request */
+    })
+  }
+
+  /**
+   *
+   * @param {{status:('open'|'closed'|'success'|'failed'|'deleted')}}
+   */
+  updateOngoing({ id, status, rejected, asking }) {
+    const $ongoing = this.$requests.querySelector(`.ongoing[data-id="-1"] .og-request[data-id="${id}"]`)
+    if ($ongoing) { $ongoing.className = 'og-request ' + status }
+    // Request list
+    const $req = this.$requests.querySelector(`.request[data-id="${id}"]`)
+    const show_req = status === 'open' && !rejected.includes(this.#player.id)
+    $req?.classList[show_req ? 'remove' : 'add']('hide')
+    if (show_req) {
+      const can_trade = this.#player.hasAllResources(asking)
+      $req?.querySelector('.asking').classList[can_trade ? 'remove' : 'add']('disabled')
+      $req?.querySelector('.confirm').classList[can_trade ? 'add' : 'remove']('active')
+      const show_counter = !this.$requests.querySelector('.ongoing[data-id="-1"]')
+      $req?.querySelector(`.counter`).classList[show_counter ? 'add' : 'remove']('active')
     }
   }
 

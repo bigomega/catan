@@ -50,6 +50,9 @@ export default class IOManager {
 
     /** @event Trade-Request */
     socket.on(SOC.TRADE_REQ, (type, giving, taking, counter_id) => game.tradeRequestIO(pid, type, giving, taking, counter_id))
+
+    /** @event Trade-Response */
+    socket.on(SOC.TRADE_RESP, (id, accepted) => game.tradeResponseIO(pid, id, accepted))
   }
 
   updateWaitingRoom(player) { this.emit(SOC.JOINED_WAITING_ROOM, player) }
@@ -84,9 +87,11 @@ export default class IOManager {
     this.#io.to(player_socket_id).emit(SOC.STOLEN_INFO, p1, p2, res)
   }
 
-  updateTradeInfo(player, given, taken) { this.emit(SOC.TRADED_INFO, player, given, taken) }
+  updateTradeInfo(p1, given, taken, p2) { this.emit(SOC.TRADED_INFO, p1, given, taken, p2) }
 
   requestPlayerTrade(player, trade_obj) { this.emit(SOC.TRADE_REQ, player, trade_obj) }
+
+  updateOngoingTrades(ongoing_trades) { this.emit(SOC.ONGOING_TRADES, ongoing_trades) }
 
   emit(type, ...data) { this.#io.to(this.#game.id).emit(type, ...data) }
 }

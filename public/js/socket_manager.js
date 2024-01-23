@@ -51,10 +51,13 @@ export default class SocketManager {
     this.#socket.on(SOC.STOLEN_INFO, (p1, p2, res) => game.updateStoleInfoSoc(p1, p2, res))
 
     /** @event Notify-Traded-Info */
-    this.#socket.on(SOC.TRADED_INFO, (player, given, taken) => game.updateTradedInfoSoc(player, given, taken))
+    this.#socket.on(SOC.TRADED_INFO, (p1, given, taken, p2) => game.updateTradedInfoSoc(p1, given, taken, p2))
 
     /** @event Player-Trade-Request */
     this.#socket.on(SOC.TRADE_REQ, (player, trade_obj) => game.requestTradeSoc(player, trade_obj))
+
+    /** @event Update-Ongoing-Trades */
+    this.#socket.on(SOC.ONGOING_TRADES, (ongoing_trades) => game.updateOngoingTradesSoc(ongoing_trades))
   }
 
   sendInitialSetup({ settlement_loc, road_loc }) {
@@ -74,6 +77,8 @@ export default class SocketManager {
   sendRobberMove(tile_id, stolen_pid) { this.#socket.emit(SOC.ROBBER_MOVE, tile_id, stolen_pid) }
 
   sendTradeRequest(type, giving, taking, counter_id) { this.#socket.emit(SOC.TRADE_REQ, type, giving, taking, counter_id) }
+
+  sendTradeResponse(id, accepted) { this.#socket.emit(SOC.TRADE_RESP, id, accepted) }
 
   saveStatus(message) { this.#socket.emit(SOC.SAVE_STATUS, message) }
 }

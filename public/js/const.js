@@ -92,6 +92,7 @@ export const SOCKET_EVENTS = {
   ROBBER_DROP: 'resources_dropped_to_robber/server_update', // Private
   ROBBER_MOVE: 'robber_is_moved',
   TRADE_REQ: 'request_trade',
+  TRADE_RESP: 'response_to_trade',
   // Server Sends…
   JOINED_WAITING_ROOM: 'joined_waiting_room',
   STATE_CHANGE: 'state_change',
@@ -103,6 +104,7 @@ export const SOCKET_EVENTS = {
   DEV_CARD_TAKEN: 'developer_card_deck_taken',
   STOLEN_INFO: 'notify_stolen_resource', // Public & Private
   TRADED_INFO: 'notify_traded_info',
+  ONGOING_TRADES: 'update_ongoing_trades_status',
 
 
 

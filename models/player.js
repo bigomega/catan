@@ -97,6 +97,12 @@ export default class Player {
     }, true)
   }
 
+  hasAllResources(res = {}) {
+    return this.closed_cards && Object.entries(res).reduce((mem, [k, v]) => {
+      return mem && (this.closed_cards[k] >= v)
+    }, true)
+  }
+
   setLastStatus(message) { this.last_status = message }
 
   toJSON(get_private) {

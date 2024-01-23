@@ -21,6 +21,7 @@ export default class Game {
   config = CONST.GAME_CONFIG
   /** @type {Player[]} */ players = []
   ready_players = {}; map_changes = []; expected_actions = []; robbing_players = []
+  /** @type {{ pid, giving, asking, id, status:('open'|'closed'|'success'|'failed'|'deleted'), rejected:number[] }[]} */
   ongoing_trades = []
   turn = 1; dice_value = 2
   mapkey = `S(br-S2).S.S(bl-B2).S\n-S.M5.J10.J8.S(bl-*3)\n-S(r-O2).J2.C9.G11.C4.S\n-S.G6.J4.D.F3.F11.S(l-W2)\n+S(r-L2).F3.G5.C6.M12.S\n+S.F8.G10.M9.S(tl-*3)\n+S(tr-*3).S.S(tl-*3).S`
@@ -37,10 +38,10 @@ export default class Game {
     this.#active_player = (pid - 1) % this.player_count
   }
 
-  constructor({ id, player_count = 2, host_name, config, io }) {
+  constructor({ id, host_name, config, io }) {
     this.id = id
     this.config = config
-    this.player_count = player_count
+    this.player_count = config.player_count
     this.#io_manager = new IOManager({ game: this, io })
     this.players.push(new Player(host_name, 1, this.#onPlayerUpdate.bind(this)))
     this.expected_actions.add = (...elems) => elems.forEach(obj => {
@@ -80,34 +81,34 @@ export default class Game {
     // this.state just started
     switch (this.state) {
       case ST.PLAYER_ROLL:
-      this.expected_actions.add({ callback: this.#expectedRoll.bind(this) })
-      this.setTimer(this.config.roll.time)
+        this.expected_actions.add({ callback: this.#expectedRoll.bind(this) })
+        this.setTimer(this.config.roll.time)
         break
 
       case ST.PLAYER_ACTIONS:
         this.expected_actions.add({ callback: _ => {
           this.active_player++; this.#gotoNextState(); this.ongoing_trades = []
         }})
-      this.setTimer(this.config.player_turn.time)
+        this.setTimer(this.config.player_turn.time)
         break
 
       case ST.ROBBER_DROP:
-      this.robbing_players = []
-      this.players.forEach(pl => {
-        if (pl.resource_count > 7) {
-          this.expected_actions.add({
-            pid: pl.id, drop_count: Math.floor(pl.resource_count / 2),
-            callback: this.#expectedRobberDrop.bind(this)
-          })
-          this.robbing_players.push(pl.id)
-        }
-      })
-      this.setTimer(this.config.robber.drop_time)
+        this.robbing_players = []
+        this.players.forEach(pl => {
+          if (pl.resource_count > 7) {
+            this.expected_actions.add({
+              pid: pl.id, drop_count: Math.floor(pl.resource_count / 2),
+              callback: this.#expectedRobberDrop.bind(this)
+            })
+            this.robbing_players.push(pl.id)
+          }
+        })
+        this.setTimer(this.config.robber.drop_time)
         break
 
       case ST.ROBBER_MOVE:
-      this.expected_actions.add({ callback: this.#expectedRobberMove.bind(this) })
-      this.setTimer(this.config.robber.move_time)
+        this.expected_actions.add({ callback: this.#expectedRobberMove.bind(this) })
+        this.setTimer(this.config.robber.move_time)
         break
     }
   }
@@ -221,6 +222,7 @@ export default class Game {
       if (valid_locs.includes(id) && player.canBuy('R')) {
         player.bought('R')
         this.build(pid, 'R', id)
+        this.#updateOngoingTrades(player)
       }
     } else if (loc_type === CONST.LOCS.CORNER) {
       const corner = this.board.findCorner(id)
@@ -229,11 +231,13 @@ export default class Game {
         if (valid_locs.includes(id) && player.canBuy('S')) {
           player.bought('S')
           this.build(pid, 'S', id)
+          this.#updateOngoingTrades(player)
         }
       } else if (corner.piece === 'S') {
         if (player.pieces.S.includes(id) && player.canBuy('C')) {
           player.bought('C')
           this.build(pid, 'C', id)
+          this.#updateOngoingTrades(player)
         }
       }
     }
@@ -245,8 +249,10 @@ export default class Game {
     if (this.state !== ST.PLAYER_ACTIONS) return
     if (!this.dev_cards.length) return
     const player = this.getActivePlayer()
-    player.canBuy('DEV_C') && player.bought('DEV_C', this.dev_cards.pop())
+    if (!player.canBuy('DEV_C')) return
+    player.bought('DEV_C', this.dev_cards.pop())
     this.#io_manager.updateDevCardTaken(player.toJSON(), this.dev_cards.length)
+    this.#updateOngoingTrades(player)
   }
 
   /** Cards dropped to robber */
@@ -283,13 +289,10 @@ export default class Game {
   tradeRequestIO(pid, type, giving, taking, counter_id) {
     if (pid !== this.active_player) return
     if (this.state !== ST.PLAYER_ACTIONS) return
-    // Trading the same resources
+    // Reject trading the same resources
     if (Object.entries(giving).filter(([k, v]) => v && taking[k]).length) return
     const player = this.getPlayer(pid)
-    const can_give = Object.entries(giving).reduce((mem, [res, v]) => {
-      return mem && (player.closed_cards[res] >= v)
-    }, true)
-    if (!can_give) return
+    if (!player.hasAllResources(giving)) return
     const giving_total = Object.values(giving).reduce((m, v) => m + v, 0)
     const taking_total = Object.values(taking).reduce((m, v) => m + v, 0)
     if (!(giving && taking_total)) return
@@ -297,28 +300,45 @@ export default class Game {
     if (type === 'Px') {
       const total_requests = this.ongoing_trades.filter(_ => _.pid == pid).length
       if (total_requests >= this.config.trade.max_requests) return
-      const id = this.ongoing_trades.length
-      this.ongoing_trades.push({ pid, giving, asking: taking, id })
-      this.#io_manager.requestPlayerTrade(player.toJSON(), { giving, asking: taking, id })
+      const trade_obj = { pid, giving, asking: taking, id: this.ongoing_trades.length, rejected: [], status: 'open' }
+      this.ongoing_trades.push(trade_obj)
+      this.#io_manager.requestPlayerTrade(player.toJSON(), trade_obj)
       return
     }
-    // Trade with the Game
-    const tradeCards = _ => {
-      Object.entries(giving).forEach(([res, v]) => v && player.takeCard(res, v))
-      Object.entries(taking).forEach(([res, v]) => v && player.giveCard(res, v))
-      this.#io_manager.updateTradeInfo(player.toJSON(), giving, taking)
-    }
+    // Trade with the Board
     if (['S2','L2','B2','O2','W2'].includes(type)) {
       const res = type[0]
       if (giving[res] === (taking_total * 2) && giving_total === giving[res]) {
-        tradeCards()
+        this.#tradeResources(player, giving, taking)
       }
     } else if (type === '*3' || type === '*4') {
       const count = type[1]
       const non_multiples = Object.values(giving).filter(v => v%count).length
       if (!non_multiples && giving_total === (taking_total * count)) {
-        tradeCards()
+        this.#tradeResources(player, giving, taking)
       }
+    }
+  }
+
+  /** Responding to a Trade */
+  tradeResponseIO(pid, id, accepted) {
+    if (this.state !== ST.PLAYER_ACTIONS) return
+    if (this.ongoing_trades.length <= id) return
+    const { pid: trading_pid, giving, asking } = this.ongoing_trades[id]
+    if (pid !== this.active_player && trading_pid !== this.active_player ) return
+    if (accepted) {
+      const p1 = this.getPlayer(trading_pid)
+      const p2 = this.getPlayer(pid)
+      if (!p1.hasAllResources(giving)) return
+      if (!p2.hasAllResources(asking)) return
+      this.ongoing_trades[id].status = 'success'
+      this.#tradeResources(p1, giving, asking, p2)
+    } else {
+      this.ongoing_trades[id].rejected.push(pid);
+      if (this.ongoing_trades[id].rejected.length >= (this.player_count - 1)) {
+        this.ongoing_trades[id].status = 'failed'
+      }
+      this.#io_manager.updateOngoingTrades(this.ongoing_trades)
     }
   }
 
@@ -368,6 +388,25 @@ export default class Game {
     const private_json = this.getPlayer(pid)?.toJSON(1)
     this.#io_manager.updatePlayerData(this.getPlayer(pid)?.toJSON(), key)
     this.#io_manager.updatePlayerData_Private(this.getPlayerSoc(pid), private_json, key, context)
+  }
+
+  #tradeResources(p1, giving, taking, p2) {
+    Object.entries(giving).forEach(([res, val]) => {
+      if (val) { p1.takeCard(res, val); p2?.giveCard(res, val) }
+    })
+    Object.entries(taking).forEach(([res, val]) => {
+      if (val) { p1.giveCard(res, val); p2?.takeCard(res, val) }
+    })
+    this.#io_manager.updateTradeInfo(p1.toJSON(), giving, taking, p2?.toJSON())
+    this.#updateOngoingTrades(p1)
+  }
+
+  #updateOngoingTrades() {
+    this.ongoing_trades.forEach(obj => {
+      if (!['open', 'closed'].includes(_.status)) { return }
+      obj.status = this.getPlayer(obj.pid)?.hasAllResources(obj.giving) ? 'open' : 'closed'
+    })
+    this.#io_manager.updateOngoingTrades(this.ongoing_trades)
   }
   //#endregion
 

@@ -1,7 +1,7 @@
 import * as CONST from "./const.js"
 
 export const resToText = obj => Object.keys(obj).filter(k => obj[k])
-  .map(k => `${obj[k]}<div class="res-icon ${k}"></div>`).join(' ')
+  .map(k => `<span class="res-count">${obj[k]}</span><div class="res-icon ${k}"></div>`).join(' ')
 
 const GAME_MESSAGES = {
   // --- ALERTS ---

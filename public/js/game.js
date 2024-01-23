@@ -55,8 +55,8 @@ export default class Game {
       this.#ui.moveRobber(this.robber_loc)
     }
     if (this.ongoing_trades.length) {
-      this.ongoing_trades.forEach(({ pid, giving, asking, id }) => {
-        this.#ui.trade_ui.renderNewRequest(this.getPlayer(pid), { giving, asking, id })
+      this.ongoing_trades.forEach(({ pid, ...params }) => {
+        this.#ui.trade_ui.renderNewRequest(this.getPlayer(pid), { pid, ...params })
       })
     }
     // Active Player State updates
@@ -156,7 +156,7 @@ export default class Game {
   }
   //#endregion
 
-  // Initial Setup Request
+  // SOC - Initial Setup Request
   requestInitialSetupSoc(active_player, turn) {
     this.#ui.hideAllShown()
     const msg_key = turn < 2 ? MSGKEY.INITIAL_BUILD : MSGKEY.INITIAL_BUILD_2
@@ -170,7 +170,7 @@ export default class Game {
     }
   }
 
-  // Build Update
+  // SOC - Build Update
   updateBuildSoc(player, piece, loc) {
     if (this.#isMyPid(player.id)) {
       const aud_file = ({
@@ -186,7 +186,7 @@ export default class Game {
     this.#ui.alert_ui.setStatus(this.#ui.alert_ui.getMessage(player, MSGKEY.BUILDING, piece))
   }
 
-  // Player Update
+  // SOC - Player Update
   updatePlayerSoc(update_player, key, context) {
     // this.#ui.all_players_ui.updatePlayer(update_player, key)
     if (key.includes('closed_cards') && context && this.#isMyPid(update_player.id)) {
@@ -199,7 +199,7 @@ export default class Game {
     this.#amIActing(update_player.id) && this.#ui.toggleActions(1)
   }
 
-  // Dice Value Update
+  // SOC - Dice Value Update
   updateDiceValueSoc([d1, d2], active_player) {
     this.#ui.player_ui.toggleDice(false)
     this.#ui.alert_ui.setStatus(this.#ui.alert_ui.getMessage(active_player, MSGKEY.ROLL_VALUE, d1, d2))
@@ -212,25 +212,25 @@ export default class Game {
     (d1 + d2) === 7 && setTimeout(_ => this.#audio_manager.play(AUDIO.ROBBER), 1000)
   }
 
-  // Private - Total Res received
+  // SOC_Private - Total Res received
   updateTotalResReceivedInfoSoc(res_obj) {
     this.#ui.alert_ui.appendStatus(GAME_MESSAGES.RES_TO_EMOJI.self(res_obj))
   }
 
-  // Dev Card taken
+  // SOC - Dev Card taken
   updateDevCardTakenSoc(active_player, count) {
     this.#ui.player_ui.setDevCardCount(count)
     this.#ui.alert_ui.setStatus(this.#ui.alert_ui.getMessage(active_player, MSGKEY.DEVELOPMENT_CARD_BUY))
   }
 
-  // Private - Update done: robber dropping cards
+  // SOC_Private - Update done: robber dropping cards
   updateRobberDroppedSoc() {
     this.#ui.robber_drop_ui.hide()
     this.#ui.board_ui.toggleHide()
     this.#ui.alert_ui.setStatus(GAME_MESSAGES.ROBBER.other())
   }
 
-  // Robber Movement update
+  // SOC - Robber Movement update
   updateRobberMovementSoc(active_player, id) {
     this.#board.moveRobber(id)
     this.#ui.moveRobber(id)
@@ -239,7 +239,7 @@ export default class Game {
     this.#ui.alert_ui.setStatus(this.#ui.alert_ui.getMessage(active_player, MSGKEY.ROBBER_MOVED_TILE, tile, num))
   }
 
-  // Stolen info Notification
+  // SOC - Stolen info Notification
   updateStoleInfoSoc(p1, p2, res) {
     if (this.#isMyPid(p1.id)) {
       res && this.#ui.alert_ui.appendStatus(GAME_MESSAGES.PLAYER_STOLE_RES.self({ p2: p2.name }, res))
@@ -250,7 +250,7 @@ export default class Game {
     }
   }
 
-  // Trade Success data
+  // SOC - Trade Success data
   updateTradedInfoSoc(p1, given, taken, p2) {
     let msg = GAME_MESSAGES.PLAYER_TRADE_INFO.self({ p1: p1.name, p2: p2?.name, board: !p2 }, given, taken)
     if (this.#isMyPid(p1.id)) {
@@ -261,11 +261,15 @@ export default class Game {
     this.#ui.alert_ui.setStatus(msg)
   }
 
-  // Trade Request
-  requestTradeSoc(player, trade_obj) {
-    this.#ui.trade_ui.renderNewRequest(player, trade_obj)
+  // SOC - Update Ongoing Trades
+  updateOngoingTradesSoc(ongoing_trades = []) {
+    ongoing_trades.filter(_ => _.status !== 'deleted').forEach(obj => {
+      this.#ui.trade_ui.updateOngoing(obj)
+    })
   }
 
+  // Trade Request
+  requestTradeSoc(player, trade_obj) { this.#ui.trade_ui.renderNewRequest(player, trade_obj) }
   setTimerSoc(t, pid) { this.#ui.player_ui.resetTimer(t, this.#isMyPid(pid)) }
   //#endregion
 
@@ -331,7 +335,7 @@ export default class Game {
     this.#socket_manager.sendTradeRequest(type, giving, taking, counter_id)
   }
 
-  onTradeResponse(trade_id, accepted) { /* ---- */ }
+  onTradeResponse(id, accepted) { this.#socket_manager.sendTradeResponse(id, accepted) }
   onGiveToRobber(cards) { this.#socket_manager.sendRobberDrop(cards) }
   onBuyDevCardClick() { this.#socket_manager.buyDevCard() }
   onDiceClick() { this.#socket_manager.sendDiceClick() }
