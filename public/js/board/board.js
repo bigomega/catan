@@ -168,6 +168,7 @@ export default class Board {
   /** @returns {Array[Object]} {pid, res, count}[] */
   distribute(number) {
     return this.numbers[number]?.reduce((mem, tile) => {
+      if (tile.robbed) return mem
       const res = CONST.TILE_RES[tile.type]
       return mem.concat(tile.getOccupiedCorners().map(corner =>
         ({ pid: corner.player_id, res, count: +(corner.piece === 'C') + 1 })

@@ -50,7 +50,7 @@ export default class AlertUI {
     if (this.#isMe(p)) this.alert(MSG.ROLL_TURN.self())
     else this.alert(MSG.ROLL_TURN.other(p))
   }
-  alertDiceValue(p, d1, d2) { this.setStatus(MSG.DICE_VALUE.all(d1, d2, this.#isNotMe(p))) }
+  alertDiceValue(p, d1, d2, rob_res) { this.setStatus(MSG.DICE_VALUE.all(d1, d2, this.#isNotMe(p), rob_res)) }
   alertBuild(p, piece) { this.setStatus(MSG.BUILDING.all(piece, this.#isNotMe(p))) }
   alertResTaken(res) { this.appendStatus(MSG.RES_TAKEN.all(res)) }
   alertDevCardTaken(p, card) { this.setStatus(MSG.DEVELOPMENT_CARD_BUY.all(this.#isNotMe(p), card)) }

@@ -200,8 +200,11 @@ export default class Game {
     } else {
       // this.#audio_manager.play(AUDIO.DICE, 0.2)
     }
-    (d1 + d2) === 7 && setTimeout(_ => this.#audio_manager.play(AUDIO.ROBBER), 1000)
-    this.#ui.alert_ui.alertDiceValue(this.getPlayer(pid), d1, d2)
+    const total = d1 + d2
+    total === 7 && setTimeout(_ => this.#audio_manager.play(AUDIO.ROBBER), 1000)
+    const robbed_tile = this.#board.findTile(this.robber_loc)
+    const rob_tile_type = robbed_tile.num === total && robbed_tile.type
+    this.#ui.alert_ui.alertDiceValue(this.getPlayer(pid), d1, d2, CONST.TILE_RES[rob_tile_type])
   }
 
   // SOC_Private - Total Res received
@@ -222,6 +225,7 @@ export default class Game {
 
   // SOC - Robber Movement update
   updateRobberMovementSoc(pid, id) {
+    this.robber_loc = id
     this.#board.moveRobber(id)
     this.#ui.moveRobber(id)
     const tile = this.#board.findTile(id).type

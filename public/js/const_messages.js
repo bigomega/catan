@@ -39,7 +39,7 @@ const GAME_MESSAGES = {
     self: _ => `🎖 You Won the game 🎖`,
     others: p => `${getName(p)} won the game.`,
   },
-  DICE_VALUE: { all: (n, m, p) => `🎲 ${getName(p)} rolled a <b>${n + m}</b><small>(${n}+${m})</small>.` },
+  DICE_VALUE: { all: (n, m, p, res) => `🎲 ${getName(p)} rolled a <b>${n + m}</b><small>(${n}+${m})</small>${res ? ` - 🥷 blocking <div class="res-icon ${res}"></div>` : ''}.` },
   RES_TAKEN: {//---
     all: res_obj => {
       if (!Object.keys(res_obj).length) { return '' }

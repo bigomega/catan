@@ -113,6 +113,7 @@ export default class TradeUI {
     Object.entries(this.#player.trade_offers).forEach(([type, allowed]) => {
       const $el = this.$type_selection.querySelector(`.trade-type[data-type="${type}"]`)
       $el.classList[allowed ? 'remove' : 'add']('hide')
+      $el.classList.remove('disabled')
       const player_res = Object.entries(this.#player.closed_cards).filter(([k]) => !!CONST.RESOURCES[k])
       const player_res_obj = Object.fromEntries(player_res)
       switch (type) {
