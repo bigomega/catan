@@ -1,7 +1,6 @@
 import Game from "./game.js"
 
 const socket = io()
-const game = new Game(window.game, window.player, window.opponents, socket)
-game.start()
+const game = new Game(window.game_obj, window.player_obj, window.opponents_obj, socket)
 
-window.game_obj = game
+window.game = game

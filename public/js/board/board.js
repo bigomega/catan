@@ -176,6 +176,7 @@ export default class Board {
     }, [])
   }
 
+  getRobbedTile() { return this.findTile(this.robber_loc) }
   findCorner(id) { return this.#corner_refs[id] }
   findEdge(id) { return this.#edge_refs[id] }
   findTile(id) { return this.#tile_refs[id] }

@@ -11,8 +11,7 @@ const AUDIO = CONST.AUDIO_FILES
 const MSGKEY = Object.keys(GAME_MESSAGES).reduce((m, k) => (m[k] = k, m), {})
 
 export default class Game {
-  id; config; mapkey; map_changes; active_pid; state; dev_cards_len; timer
-  robber_loc; ongoing_trades; opponents
+  id; config; active_pid; state; opponents
   #board; #player; #ui; #socket_manager; #audio_manager
   #temp = {}
   possible_locations = { R: [], S: [], C: [] }
@@ -20,14 +19,8 @@ export default class Game {
   constructor(game_obj, player_obj, opponents_obj, socket) {
     this.id = game_obj.id
     this.config = game_obj.config
-    this.mapkey = game_obj.mapkey
-    this.map_changes = game_obj.map_changes
     this.active_pid = game_obj.active_pid
     this.state = game_obj.state
-    this.dev_cards_len = game_obj.dev_cards_len
-    this.timer = game_obj.timer
-    this.robber_loc = game_obj.robber_loc
-    this.ongoing_trades = game_obj.ongoing_trades
     this.opponents = opponents_obj
 
     this.#board = new Board(game_obj.mapkey, game_obj.map_changes)
@@ -35,27 +28,22 @@ export default class Game {
     this.#ui = new UI(this, this.#board, this.#player, opponents_obj)
     this.#socket_manager = new SocketManager(this, socket)
     this.#audio_manager = new AudioManager()
-  }
 
-  start() {
     this.#ui.render()
-    this.#socket_manager.setUpEvents()
-    this.#existingUpdates()
-  }
 
-  #existingUpdates() {
+    // Existing Updates on Refresh
     this.#board.existing_changes.forEach(({ pid, piece, loc }) => {
       this.#board.build(pid, piece, loc)
       this.#ui.build(pid, piece, loc)
     })
-    this.#ui.player_ui.setDevCardCount(this.dev_cards_len)
-    this.timer && this.setTimerSoc(this.timer, this.active_pid)
-    if (this.robber_loc) {
-      this.#board.moveRobber(this.robber_loc)
-      this.#ui.moveRobber(this.robber_loc)
+    this.#ui.player_ui.setDevCardCount(game_obj.dev_cards_len)
+    game_obj.timer && this.setTimerSoc(game_obj.timer, this.active_pid)
+    if (game_obj.robber_loc) {
+      this.#board.moveRobber(game_obj.robber_loc)
+      this.#ui.moveRobber(game_obj.robber_loc)
     }
-    if (this.ongoing_trades.length) {
-      this.ongoing_trades.forEach(({ pid, ...params }) => {
+    if (game_obj.ongoing_trades.length) {
+      game_obj.ongoing_trades.forEach(({ pid, ...params }) => {
         this.#ui.trade_ui.renderNewRequest(this.getPlayer(pid), { pid, ...params })
       })
     }
@@ -164,14 +152,8 @@ export default class Game {
 
   // SOC - Build Update
   updateBuildSoc(pid, piece, loc) {
-    if (this.#isMyPid(pid)) {
-      const aud_file = ({
-        S: AUDIO.BUILD_SETTLEMENT,
-        C: AUDIO.BUILD_CITY,
-        R: AUDIO.BUILD_ROAD,
-      })[piece]
-      aud_file && this.#audio_manager.play(aud_file)
-    }
+    const aud_file = ({ S: AUDIO.BUILD_SETTLEMENT, C: AUDIO.BUILD_CITY, R: AUDIO.BUILD_ROAD })[piece]
+    aud_file && this.#audio_manager.play(aud_file, this.#isMyPid(pid) ? 1 : .5)
     this.#board.build(pid, piece, loc)
     this.#ui.build(pid, piece, loc)
     this.#amIActing(pid) && this.#ui.toggleActions(1)
@@ -184,7 +166,7 @@ export default class Game {
     if (key.includes('closed_cards') && context && this.#isMyPid(update_player.id)) {
       this.#ui.player_ui.updateHand(update_player, context)
       if (!context.taken) {
-        ;[...Array(context.count)].forEach(_ => this.#audio_manager.play(AUDIO.BOP))
+        ;[...Array(context.count)].forEach(_ => this.#audio_manager.play(AUDIO.CARD))
       }
     }
     this.#isMyPid(update_player.id) && this.#player.update(update_player)
@@ -194,16 +176,12 @@ export default class Game {
   // SOC - Dice Value Update
   updateDiceValueSoc([d1, d2], pid) {
     this.#ui.player_ui.toggleDice(false)
-    if (this.#isMyPid(pid)) {
-      this.#audio_manager.play(AUDIO.DICE)
-      this.#ui.showDiceValue(d1, d2)
-    } else {
-      // this.#audio_manager.play(AUDIO.DICE, 0.2)
-    }
+    this.#isMyPid(pid) && this.#ui.showDiceValue(d1, d2)
+    this.#audio_manager.play(AUDIO.DICE, this.#isMyPid(pid) ? 1 : 0.1)
     const total = d1 + d2
     total === 7 && setTimeout(_ => this.#audio_manager.play(AUDIO.ROBBER), 1000)
-    const robbed_tile = this.#board.findTile(this.robber_loc)
-    const rob_tile_type = robbed_tile.num === total && robbed_tile.type
+    const robbed_tile = this.#board.getRobbedTile()
+    const rob_tile_type = robbed_tile?.num === total && robbed_tile.type
     this.#ui.alert_ui.alertDiceValue(this.getPlayer(pid), d1, d2, CONST.TILE_RES[rob_tile_type])
   }
 
@@ -225,7 +203,6 @@ export default class Game {
 
   // SOC - Robber Movement update
   updateRobberMovementSoc(pid, id) {
-    this.robber_loc = id
     this.#board.moveRobber(id)
     this.#ui.moveRobber(id)
     const tile = this.#board.findTile(id).type
@@ -249,7 +226,11 @@ export default class Game {
   }
 
   // Trade Request
-  requestTradeSoc(pid, trade_obj) { this.#ui.trade_ui.renderNewRequest(this.getPlayer(pid), trade_obj) }
+  requestTradeSoc(pid, trade_obj) {
+    this.#ui.trade_ui.renderNewRequest(this.getPlayer(pid), trade_obj)
+    this.#audio_manager.play(AUDIO.TRADE_REQUEST)
+  }
+
   setTimerSoc(t, pid) { this.#ui.player_ui.resetTimer(t, this.#isMyPid(pid)) }
   //#endregion
 

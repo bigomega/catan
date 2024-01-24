@@ -7,62 +7,53 @@ export default class SocketManager {
 
   /** @param {Game} game  */
   constructor(game, socket) {
-    this.#game = game
     this.#socket = socket
-  }
-
-  setUpEvents() {
-    const game = this.#game
-    this.#socket.emit(SOC.PLAYER_ONLINE)
+    socket.emit(SOC.PLAYER_ONLINE)
 
     /** @event State-Change */
-    this.#socket.on(SOC.STATE_CHANGE, (state, active_pid) => game.updateStateChangeSoc(state, active_pid))
+    socket.on(SOC.STATE_CHANGE, (state, active_pid) => game.updateStateChangeSoc(state, active_pid))
 
     /** @event Set-Timer */
-    this.#socket.on(SOC.SET_TIMER, (t, pid) => game.setTimerSoc(t, pid))
+    socket.on(SOC.SET_TIMER, (t, pid) => game.setTimerSoc(t, pid))
 
     /** @event Initial-Setup-Request */
-    this.#socket.on(SOC.INITIAL_SETUP, (active_pid, turn) => game.requestInitialSetupSoc(active_pid, turn))
+    socket.on(SOC.INITIAL_SETUP, (active_pid, turn) => game.requestInitialSetupSoc(active_pid, turn))
 
     /** @event Build */
-    this.#socket.on(SOC.BUILD, (pid, piece, loc) => game.updateBuildSoc(pid, piece, loc))
+    socket.on(SOC.BUILD, (pid, piece, loc) => game.updateBuildSoc(pid, piece, loc))
 
     /** @event PRIVATE?--Update-Player-Info */
-    this.#socket.on(SOC.UPDATE_PLAYER, (update_player, key, context) => {
-      game.updatePlayerSoc(update_player, key, context)
-    })
+    socket.on(SOC.UPDATE_PLAYER, (update_player, key, context) => { game.updatePlayerSoc(update_player, key, context) })
 
     /** @event Show-Dice-Value */
-    this.#socket.on(SOC.DICE_VALUE, (dice_val, pid) => game.updateDiceValueSoc(dice_val, pid))
+    socket.on(SOC.DICE_VALUE, (dice_val, pid) => game.updateDiceValueSoc(dice_val, pid))
 
     /** @event PRIVATE--Total-Resources-Received */
-    this.#socket.on(SOC.RES_RECEIVED, res_obj => game.updateTotalResReceivedInfoSoc(res_obj))
+    socket.on(SOC.RES_RECEIVED, res_obj => game.updateTotalResReceivedInfoSoc(res_obj))
 
     /** @event Development-Card-Taken */
-    this.#socket.on(SOC.DEV_CARD_TAKEN, (pid, count, card) => game.updateDevCardTakenSoc(pid, count, card))
+    socket.on(SOC.DEV_CARD_TAKEN, (pid, count, card) => game.updateDevCardTakenSoc(pid, count, card))
 
     /** @event PRIVATE--Robber-Drop-Done */
-    this.#socket.on(SOC.ROBBER_DROP, () => game.updateRobberDroppedSoc())
+    socket.on(SOC.ROBBER_DROP, () => game.updateRobberDroppedSoc())
 
     /** @event Robber-Moved */
-    this.#socket.on(SOC.ROBBER_MOVE, (active_pid, id) => game.updateRobberMovementSoc(active_pid, id))
+    socket.on(SOC.ROBBER_MOVE, (active_pid, id) => game.updateRobberMovementSoc(active_pid, id))
 
     /** @event Notify-Stolen-Info */
-    this.#socket.on(SOC.STOLEN_INFO, (p1_id, p2_id, res) => game.updateStoleInfoSoc(p1_id, p2_id, res))
+    socket.on(SOC.STOLEN_INFO, (p1_id, p2_id, res) => game.updateStoleInfoSoc(p1_id, p2_id, res))
 
     /** @event Notify-Traded-Info */
-    this.#socket.on(SOC.TRADED_INFO, (p1_id, given, taken, p2_id) => game.updateTradedInfoSoc(p1_id, given, taken, p2_id))
+    socket.on(SOC.TRADED_INFO, (p1_id, given, taken, p2_id) => game.updateTradedInfoSoc(p1_id, given, taken, p2_id))
 
     /** @event Player-Trade-Request */
-    this.#socket.on(SOC.TRADE_REQ, (pid, trade_obj) => game.requestTradeSoc(pid, trade_obj))
+    socket.on(SOC.TRADE_REQ, (pid, trade_obj) => game.requestTradeSoc(pid, trade_obj))
 
     /** @event Update-Ongoing-Trades */
-    this.#socket.on(SOC.ONGOING_TRADES, (ongoing_trades) => game.updateOngoingTradesSoc(ongoing_trades))
+    socket.on(SOC.ONGOING_TRADES, (ongoing_trades) => game.updateOngoingTradesSoc(ongoing_trades))
   }
 
-  sendInitialSetup({ settlement_loc, road_loc }) {
-    this.#socket.emit(SOC.INITIAL_SETUP, settlement_loc, road_loc)
-  }
+  sendInitialSetup({ settlement_loc, road_loc }) { this.#socket.emit(SOC.INITIAL_SETUP, settlement_loc, road_loc) }
 
   sendDiceClick() { this.#socket.emit(SOC.ROLL_DICE) }
 

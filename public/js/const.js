@@ -121,9 +121,10 @@ export const AUDIO_FILES = {
   BUILD_ROAD: 'build-road.mp3',
   BUILD_SETTLEMENT: 'build-settlement.mp3',
   BUILD_CITY: 'build-city.mp3',
-  BOP: 'bop.mp3',
+  CARD: 'card-flip-2.mp3',
   DICE: 'dice.mp3',
   PLAYER_TURN: 'player-turn.mp3',
   ROBBER: 'robber.mp3',
   KNIGHT: 'knight.mp3',
+  TRADE_REQUEST: 'bop.mp3',
 }
