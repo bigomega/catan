@@ -36,7 +36,7 @@
         /* &.open:hover .cancel { display: inline-block; } */
         &.closed {
           border-color: #999; background-color: #ddd;
-          .giving { filter: grayscale(1); }
+          .giving { filter: grayscale(1) contrast(0.5) brightness(1.5); }
         }
         &.success, &.failed {
           color: #9998;

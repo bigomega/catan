@@ -57,22 +57,22 @@ export default class IOManager {
 
   updateWaitingRoom(player) { this.emit(SOC.JOINED_WAITING_ROOM, player) }
 
-  updateState(state, active_player) { this.emit(SOC.STATE_CHANGE, state, active_player) }
+  updateState(state, active_pid) { this.emit(SOC.STATE_CHANGE, state, active_pid) }
 
   updateTimer(time, pid) { this.emit(SOC.SET_TIMER, time, pid) }
 
-  requestInitialSetup(active_player, turn) { this.emit(SOC.INITIAL_SETUP, active_player, turn) }
+  requestInitialSetup(active_pid, turn) { this.emit(SOC.INITIAL_SETUP, active_pid, turn) }
 
-  updateBuild(player, piece, loc) { this.emit(SOC.BUILD, player, piece, loc) }
+  updateBuild(pid, piece, loc) { this.emit(SOC.BUILD, pid, piece, loc) }
 
   updatePlayerData(p_json, key) { this.emit(SOC.UPDATE_PLAYER, p_json, key) }
   updatePlayerData_Private(player_socket_id, p_json, key, data) {
     this.#io.to(player_socket_id).emit(SOC.UPDATE_PLAYER, p_json, key, data)
   }
 
-  updateDevCardTaken(active_player, count) { this.emit(SOC.DEV_CARD_TAKEN, active_player, count) }
+  updateDevCardTaken(pid, count) { this.emit(SOC.DEV_CARD_TAKEN, pid, count) }
 
-  updateDiceValue(dice_value, active_player) { this.emit(SOC.DICE_VALUE, dice_value, active_player) }
+  updateDiceValue(dice_value, pid) { this.emit(SOC.DICE_VALUE, dice_value, pid) }
 
   updateResourceReceived_Private(player_socket_id, total_resouces) {
     this.#io.to(player_socket_id).emit(SOC.RES_RECEIVED, total_resouces)
@@ -80,16 +80,16 @@ export default class IOManager {
 
   updateRobbed_Private(player_socket_id) { this.#io.to(player_socket_id).emit(SOC.ROBBER_DROP) }
 
-  moveRobber(active_player, id) { this.emit(SOC.ROBBER_MOVE, active_player, id) }
+  moveRobber(active_pid, id) { this.emit(SOC.ROBBER_MOVE, active_pid, id) }
 
-  updateStolen(p1, p2) { this.emit(SOC.STOLEN_INFO, p1, p2) }
-  updateStolen_Private(player_socket_id, p1, p2, res) {
-    this.#io.to(player_socket_id).emit(SOC.STOLEN_INFO, p1, p2, res)
+  updateStolen(p1_id, p2_id) { this.emit(SOC.STOLEN_INFO, p1_id, p2_id) }
+  updateStolen_Private(player_socket_id, p1_id, p2_id, res) {
+    this.#io.to(player_socket_id).emit(SOC.STOLEN_INFO, p1_id, p2_id, res)
   }
 
-  updateTradeInfo(p1, given, taken, p2) { this.emit(SOC.TRADED_INFO, p1, given, taken, p2) }
+  updateTradeInfo(p1_id, given, taken, p2_id) { this.emit(SOC.TRADED_INFO, p1_id, given, taken, p2_id) }
 
-  requestPlayerTrade(player, trade_obj) { this.emit(SOC.TRADE_REQ, player, trade_obj) }
+  requestPlayerTrade(pid, trade_obj) { this.emit(SOC.TRADE_REQ, pid, trade_obj) }
 
   updateOngoingTrades(ongoing_trades) { this.emit(SOC.ONGOING_TRADES, ongoing_trades) }
 

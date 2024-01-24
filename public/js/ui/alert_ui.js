@@ -42,6 +42,6 @@ export default class AlertUI {
   getMessage(alert_player, msg_key, ...data) {
     if (alert_player.id === this.#player.id)
       return GAME_MESSAGES[msg_key]?.self(...data)
-    return GAME_MESSAGES[msg_key]?.other(...data, alert_player.name)
+    return GAME_MESSAGES[msg_key]?.other(...data, alert_player)
   }
 }

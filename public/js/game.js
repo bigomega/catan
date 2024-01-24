@@ -11,7 +11,7 @@ const AUDIO = CONST.AUDIO_FILES
 const MSGKEY = Object.keys(GAME_MESSAGES).reduce((m, k) => (m[k] = k, m), {})
 
 export default class Game {
-  id; config; mapkey; map_changes; active_player; state; dev_cards_len; timer
+  id; config; mapkey; map_changes; active_pid; state; dev_cards_len; timer
   robber_loc; ongoing_trades; opponents
   #board; #player; #ui; #socket_manager; #audio_manager
   #temp = {}
@@ -22,7 +22,7 @@ export default class Game {
     this.config = game_obj.config
     this.mapkey = game_obj.mapkey
     this.map_changes = game_obj.map_changes
-    this.active_player = game_obj.active_player
+    this.active_pid = game_obj.active_pid
     this.state = game_obj.state
     this.dev_cards_len = game_obj.dev_cards_len
     this.timer = game_obj.timer
@@ -49,7 +49,7 @@ export default class Game {
       this.#ui.build(pid, piece, loc)
     })
     this.#ui.player_ui.setDevCardCount(this.dev_cards_len)
-    this.timer && this.setTimerSoc(this.timer, this.active_player.id)
+    this.timer && this.setTimerSoc(this.timer, this.active_pid)
     if (this.robber_loc) {
       this.#board.moveRobber(this.robber_loc)
       this.#ui.moveRobber(this.robber_loc)
@@ -60,7 +60,7 @@ export default class Game {
       })
     }
     // Active Player State updates
-    if (this.#player.id === this.active_player) {
+    if (this.#player.id === this.active_pid) {
       switch (this.state) {
         case ST.INITIAL_SETUP: this.#ui.showInitialBuild(); break
         case ST.PLAYER_ROLL: this.#ui.player_ui.toggleDice(true); this.#ui.player_ui.toggleShow(1); break
@@ -90,9 +90,9 @@ export default class Game {
   //   SOCKET UPDATES
   //#region -----------
 
-  updateStateChangeSoc(state, active_player) {
+  updateStateChangeSoc(state, active_pid) {
     this.state = state
-    this.active_player = active_player
+    this.active_pid = active_pid
     switch (state) {
       case ST.INITIAL_SETUP: this.#onInitialSetup(); break
       case ST.PLAYER_ROLL: this.#onPlayerRoll(); break
@@ -113,8 +113,8 @@ export default class Game {
     this.#ui.toggleActions(0)
     this.#ui.hideAllShown(0)
     this.#ui.trade_ui.clearRequests()
-    const message = this.#ui.alert_ui.getMessage(this.active_player, MSGKEY.ROLL_TURN)
-    if (this.#isMyPid(this.active_player.id)) {
+    const message = this.#ui.alert_ui.getMessage(this.getActivePlayer(), MSGKEY.ROLL_TURN)
+    if (this.#isMyPid(this.active_pid)) {
       this.#ui.alert_ui.alert(message)
       this.#audio_manager.play(AUDIO.PLAYER_TURN)
       this.#ui.player_ui.toggleDice(1)
@@ -126,7 +126,7 @@ export default class Game {
   }
   // STATE - Player Action
   #onPlayerAction() {
-    if (this.#isMyPid(this.active_player.id)) {
+    if (this.#isMyPid(this.active_pid)) {
       this.#ui.player_ui.toggleShow(1)
       this.#ui.toggleActions(1)
     }
@@ -146,22 +146,23 @@ export default class Game {
   #onRobberMove() {
     this.#ui.robber_drop_ui.hide()
     this.#ui.board_ui.toggleHide()
-    if (this.#isMyPid(this.active_player.id)) {
+    if (this.#isMyPid(this.active_pid)) {
       this.#ui.alert_ui.alert(GAME_MESSAGES.ROBBER_MOVE.self())
       this.#ui.showTiles(this.#board.getRobbableTiles())
       this.#ui.player_ui.toggleShow()
     } else {
-      this.#ui.alert_ui.setStatus(GAME_MESSAGES.ROBBER_MOVE.other(this.active_player.name))
+      this.#ui.alert_ui.setStatus(GAME_MESSAGES.ROBBER_MOVE.other(this.getActivePlayer()?.name))
     }
   }
   //#endregion
 
   // SOC - Initial Setup Request
-  requestInitialSetupSoc(active_player, turn) {
+  requestInitialSetupSoc(active_pid, turn) {
     this.#ui.hideAllShown()
+    this.active_pid = active_pid
     const msg_key = turn < 2 ? MSGKEY.INITIAL_BUILD : MSGKEY.INITIAL_BUILD_2
-    const message = this.#ui.alert_ui.getMessage(active_player, msg_key)
-    if (this.#isMyPid(active_player.id)) {
+    const message = this.#ui.alert_ui.getMessage(this.getActivePlayer(), msg_key)
+    if (this.#isMyPid(active_pid)) {
       this.#temp = {}
       this.#ui.showCorners(this.#board.getSettlementLocations(-1).map(s => s.id))
       this.#ui.alert_ui.alert(message)
@@ -171,8 +172,8 @@ export default class Game {
   }
 
   // SOC - Build Update
-  updateBuildSoc(player, piece, loc) {
-    if (this.#isMyPid(player.id)) {
+  updateBuildSoc(pid, piece, loc) {
+    if (this.#isMyPid(pid)) {
       const aud_file = ({
         S: AUDIO.BUILD_SETTLEMENT,
         C: AUDIO.BUILD_CITY,
@@ -180,10 +181,10 @@ export default class Game {
       })[piece]
       aud_file && this.#audio_manager.play(aud_file)
     }
-    this.#board.build(player.id, piece, loc)
-    this.#ui.build(player.id, piece, loc)
-    this.#amIActing(player.id) && this.#ui.toggleActions(1)
-    this.#ui.alert_ui.setStatus(this.#ui.alert_ui.getMessage(player, MSGKEY.BUILDING, piece))
+    this.#board.build(pid, piece, loc)
+    this.#ui.build(pid, piece, loc)
+    this.#amIActing(pid) && this.#ui.toggleActions(1)
+    this.#ui.alert_ui.setStatus(this.#ui.alert_ui.getMessage(this.getPlayer(pid), MSGKEY.BUILDING, piece))
   }
 
   // SOC - Player Update
@@ -200,10 +201,10 @@ export default class Game {
   }
 
   // SOC - Dice Value Update
-  updateDiceValueSoc([d1, d2], active_player) {
+  updateDiceValueSoc([d1, d2], pid) {
     this.#ui.player_ui.toggleDice(false)
-    this.#ui.alert_ui.setStatus(this.#ui.alert_ui.getMessage(active_player, MSGKEY.ROLL_VALUE, d1, d2))
-    if (this.#isMyPid(active_player.id)) {
+    this.#ui.alert_ui.setStatus(this.#ui.alert_ui.getMessage(this.getPlayer(pid), MSGKEY.ROLL_VALUE, d1, d2))
+    if (this.#isMyPid(pid)) {
       this.#audio_manager.play(AUDIO.DICE)
       this.#ui.showDiceValue(d1, d2)
     } else {
@@ -218,9 +219,9 @@ export default class Game {
   }
 
   // SOC - Dev Card taken
-  updateDevCardTakenSoc(active_player, count) {
+  updateDevCardTakenSoc(pid, count) {
     this.#ui.player_ui.setDevCardCount(count)
-    this.#ui.alert_ui.setStatus(this.#ui.alert_ui.getMessage(active_player, MSGKEY.DEVELOPMENT_CARD_BUY))
+    this.#ui.alert_ui.setStatus(this.#ui.alert_ui.getMessage(this.getPlayer(pid), MSGKEY.DEVELOPMENT_CARD_BUY))
   }
 
   // SOC_Private - Update done: robber dropping cards
@@ -231,32 +232,33 @@ export default class Game {
   }
 
   // SOC - Robber Movement update
-  updateRobberMovementSoc(active_player, id) {
+  updateRobberMovementSoc(pid, id) {
     this.#board.moveRobber(id)
     this.#ui.moveRobber(id)
     const tile = this.#board.findTile(id).type
     const num = this.#board.findTile(id).num || ''
-    this.#ui.alert_ui.setStatus(this.#ui.alert_ui.getMessage(active_player, MSGKEY.ROBBER_MOVED_TILE, tile, num))
+    this.#ui.alert_ui.setStatus(this.#ui.alert_ui.getMessage(this.getPlayer(pid), MSGKEY.ROBBER_MOVED_TILE, tile, num))
   }
 
   // SOC - Stolen info Notification
-  updateStoleInfoSoc(p1, p2, res) {
-    if (this.#isMyPid(p1.id)) {
-      res && this.#ui.alert_ui.appendStatus(GAME_MESSAGES.PLAYER_STOLE_RES.self({ p2: p2.name }, res))
-    } else if (this.#isMyPid(p2.id)) {
-      res && this.#ui.alert_ui.appendStatus(GAME_MESSAGES.PLAYER_STOLE_RES.self({ p1: p1.name }, res))
+  updateStoleInfoSoc(p1_id, p2_id, res) {
+    if (this.#isMyPid(p1_id)) {
+      res && this.#ui.alert_ui.appendStatus(GAME_MESSAGES.PLAYER_STOLE_RES.self({ p2: this.getPlayer(p2_id) }, res))
+    } else if (this.#isMyPid(p2_id)) {
+      res && this.#ui.alert_ui.appendStatus(GAME_MESSAGES.PLAYER_STOLE_RES.self({ p1: getPlayer(p1_id) }, res))
     } else {
-      this.#ui.alert_ui.appendStatus(GAME_MESSAGES.PLAYER_STOLE_RES.other({ p1: p1.name, p2: p2.name }))
+      this.#ui.alert_ui.appendStatus(GAME_MESSAGES.PLAYER_STOLE_RES.other({ p1: this.getPlayer(p1_id), p2: this.getPlayer(p2_id) }))
     }
   }
 
   // SOC - Trade Success data
-  updateTradedInfoSoc(p1, given, taken, p2) {
-    let msg = GAME_MESSAGES.PLAYER_TRADE_INFO.self({ p1: p1.name, p2: p2?.name, board: !p2 }, given, taken)
-    if (this.#isMyPid(p1.id)) {
-      msg = GAME_MESSAGES.PLAYER_TRADE_INFO.self({ p2: p2?.name, board: !p2 }, given, taken)
-    } else if (this.#isMyPid(p2?.id)) {
-      msg = GAME_MESSAGES.PLAYER_TRADE_INFO.self({ p1: p1.name, board: !p2 }, given, taken)
+  updateTradedInfoSoc(p1_id, given, taken, p2_id) {
+    const p1 = this.getPlayer(p1_id); const p2 = p2_id && this.getPlayer(p2_id)
+    let msg = GAME_MESSAGES.PLAYER_TRADE_INFO.self({ p1, p2, board: !p2 }, given, taken)
+    if (this.#isMyPid(p1_id)) {
+      msg = GAME_MESSAGES.PLAYER_TRADE_INFO.self({ p2, board: !p2 }, given, taken)
+    } else if (this.#isMyPid(p2_id)) {
+      msg = GAME_MESSAGES.PLAYER_TRADE_INFO.self({ p1, board: !p2 }, given, taken)
     }
     this.#ui.alert_ui.setStatus(msg)
   }
@@ -269,7 +271,7 @@ export default class Game {
   }
 
   // Trade Request
-  requestTradeSoc(player, trade_obj) { this.#ui.trade_ui.renderNewRequest(player, trade_obj) }
+  requestTradeSoc(pid, trade_obj) { this.#ui.trade_ui.renderNewRequest(this.getPlayer(pid), trade_obj) }
   setTimerSoc(t, pid) { this.#ui.player_ui.resetTimer(t, this.#isMyPid(pid)) }
   //#endregion
 
@@ -343,10 +345,10 @@ export default class Game {
   //#endregion
 
   playRobberAudio() { this.#audio_manager.play(AUDIO.ROBBER) }
-  #amIActing(pid = this.active_player.id) {
+  #amIActing(pid) {
     return this.#isMyPid(pid)
-    && pid === this.active_player.id
-    && this.state === ST.PLAYER_ACTIONS
+      && pid === this.active_pid
+      && this.state === ST.PLAYER_ACTIONS
   }
   saveStatus(text) { this.#socket_manager.saveStatus(text) }
   #isMyPid(pid) { return pid === this.#player.id }
@@ -355,4 +357,5 @@ export default class Game {
     if (this.#player.id === pid) { return this.#player }
     else { return this.opponents.find(_ => _.id === pid) }
   }
+  getActivePlayer() { return this.getPlayer(this.active_pid) }
 }

@@ -17,7 +17,7 @@ export default class Game {
   /** @type {Board} */ board;
   id; player_count;
   #state; #timer; #io_manager;
-  #active_player = 0
+  #active_pid = 0
   config = CONST.GAME_CONFIG
   /** @type {Player[]} */ players = []
   ready_players = {}; map_changes = []; expected_actions = []; robbing_players = []
@@ -29,13 +29,13 @@ export default class Game {
 
   get state() { return this.#state }
   set state(s) {
-    this.#io_manager.updateState(s, this.getActivePlayer().toJSON())
+    this.#io_manager.updateState(s, this.active_pid)
     this.#state = s
   }
-  get active_player() { return this.#active_player + 1 }
-  set active_player(pid) {
+  get active_pid() { return this.#active_pid + 1 }
+  set active_pid(pid) {
     if (pid < 1 || pid > this.player_count) { this.turn++ }
-    this.#active_player = (pid - 1) % this.player_count
+    this.#active_pid = (pid - 1) % this.player_count
   }
 
   constructor({ id, host_name, config, io }) {
@@ -45,7 +45,7 @@ export default class Game {
     this.#io_manager = new IOManager({ game: this, io })
     this.players.push(new Player(host_name, 1, this.#onPlayerUpdate.bind(this)))
     this.expected_actions.add = (...elems) => elems.forEach(obj => {
-      this.expected_actions.push(Object.assign({ type: this.state, pid: this.active_player }, obj))
+      this.expected_actions.push(Object.assign({ type: this.state, pid: this.active_pid }, obj))
     })
   }
 
@@ -73,7 +73,7 @@ export default class Game {
 
     if (this.turn < 3) {
       this.expected_actions.add({ callback: this.#expectedInitialBuild.bind(this) })
-      this.#io_manager.requestInitialSetup(this.getActivePlayer().toJSON(), this.turn)
+      this.#io_manager.requestInitialSetup(this.active_pid, this.turn)
       this.setTimer(this.config.initial_build.time)
       return
     }
@@ -87,7 +87,7 @@ export default class Game {
 
       case ST.PLAYER_ACTIONS:
         this.expected_actions.add({ callback: _ => {
-          this.active_player++; this.#gotoNextState(); this.ongoing_trades = []
+          this.active_pid++; this.#gotoNextState(); this.ongoing_trades = []
         }})
         this.setTimer(this.config.player_turn.time)
         break
@@ -131,9 +131,11 @@ export default class Game {
     this.build(pid, 'S', s_id)
     this.build(pid, 'R', r_id)
     if (this.turn === 1) {
-      this.active_player < this.player_count ? this.active_player++ : this.turn++
+      this.active_pid < this.player_count ? this.active_pid++ : this.turn++
     } else {
       this.#distributeCornerResources(s_id)
+      if (this.active_pid == 1) { this.turn++, this.#gotoNextState() }
+      else { this.active_pid-- }
       if (this.active_player == 1) { this.turn++, this.#gotoNextState() }
       else { this.active_player-- }
     }
@@ -143,7 +145,7 @@ export default class Game {
   #expectedRoll(pid) {
     this.dice_value = [CONST.ROLL(), CONST.ROLL()]
     this.#io_manager.updateDiceValue(this.dice_value, this.getActivePlayer())
-    this.#io_manager.updateDiceValue(this.dice_value, this.getActivePlayer().toJSON())
+    this.#io_manager.updateDiceValue(this.dice_value, this.active_pid)
     const dice_total = this.dice_value[0] + this.dice_value[1]
     if (dice_total === 7) {
       const drop = this.players.filter(p => p.resource_count > 7).length
@@ -175,7 +177,7 @@ export default class Game {
     if (!valid_locs.includes(tile_id)) { tile_id = this.#getRandom(valid_locs) }
     const player = this.getPlayer(pid)
     this.board.moveRobber(tile_id)
-    this.#io_manager.moveRobber(player.toJSON(), tile_id)
+    this.#io_manager.moveRobber(pid, tile_id)
 
     const opp_c_pids = this.board.findTile(tile_id)?.getAllCorners()
       .filter(c => c.piece && (c.player_id !== pid)).map(_ => _.player_id)
@@ -187,10 +189,9 @@ export default class Game {
       const [stolen_res] = stolen_p.takeRandomResource()
       if (stolen_res) {
         player.giveCard(stolen_res)
-        const playerJson = player.toJSON()
-        this.#io_manager.updateStolen(playerJson, stolen_p)
-        this.#io_manager.updateStolen_Private(this.getPlayerSoc(pid), playerJson, stolen_p, stolen_res)
-        this.#io_manager.updateStolen_Private(this.getPlayerSoc(stolen_pid), playerJson, stolen_p, stolen_res)
+        this.#io_manager.updateStolen(pid, stolen_pid)
+        this.#io_manager.updateStolen_Private(this.getPlayerSoc(pid), player.id, stolen_pid, stolen_res)
+        this.#io_manager.updateStolen_Private(this.getPlayerSoc(stolen_pid), player.id, stolen_pid, stolen_res)
       }
     }
     this.#gotoNextState()
@@ -213,7 +214,7 @@ export default class Game {
 
   /** Building - Edge & Corner click (other than initial-build) */
   clickedLocationIO(pid, loc_type, id) {
-    if (pid !== this.active_player) return
+    if (pid !== this.active_pid) return
     if (this.state !== ST.PLAYER_ACTIONS) return
     const player = this.getActivePlayer()
     // Validate & Build
@@ -245,13 +246,13 @@ export default class Game {
 
   /** Development Card buying click */
   buyDevCardIO(pid) {
-    if (pid !== this.active_player) return
+    if (pid !== this.active_pid) return
     if (this.state !== ST.PLAYER_ACTIONS) return
     if (!this.dev_cards.length) return
     const player = this.getActivePlayer()
     if (!player.canBuy('DEV_C')) return
     player.bought('DEV_C', this.dev_cards.pop())
-    this.#io_manager.updateDevCardTaken(player.toJSON(), this.dev_cards.length)
+    this.#io_manager.updateDevCardTaken(pid, this.dev_cards.length)
     this.#updateOngoingTrades(player)
   }
 
@@ -276,7 +277,7 @@ export default class Game {
 
   /** Robber movement location and stolen player */
   robberMoveIO(pid, tile_id, stolen_pid) {
-    if (pid !== this.active_player) return
+    if (pid !== this.active_pid) return
     if (this.state !== ST.ROBBER_MOVE) return
     const expected_index = this.expected_actions.findIndex(_ => _.type === ST.ROBBER_MOVE)
     const { callback } = this.expected_actions[expected_index]
@@ -287,7 +288,7 @@ export default class Game {
 
   /** Request a Trade */
   tradeRequestIO(pid, type, giving, taking, counter_id) {
-    if (pid !== this.active_player) return
+    if (pid !== this.active_pid) return
     if (this.state !== ST.PLAYER_ACTIONS) return
     // Reject trading the same resources
     if (Object.entries(giving).filter(([k, v]) => v && taking[k]).length) return
@@ -302,7 +303,7 @@ export default class Game {
       if (total_requests >= this.config.trade.max_requests) return
       const trade_obj = { pid, giving, asking: taking, id: this.ongoing_trades.length, rejected: [], status: 'open' }
       this.ongoing_trades.push(trade_obj)
-      this.#io_manager.requestPlayerTrade(player.toJSON(), trade_obj)
+      this.#io_manager.requestPlayerTrade(pid, trade_obj)
       return
     }
     // Trade with the Board
@@ -325,7 +326,7 @@ export default class Game {
     if (this.state !== ST.PLAYER_ACTIONS) return
     if (this.ongoing_trades.length <= id) return
     const { pid: trading_pid, giving, asking } = this.ongoing_trades[id]
-    if (pid !== this.active_player && trading_pid !== this.active_player ) return
+    if (pid !== this.active_pid && trading_pid !== this.active_pid ) return
     if (accepted) {
       const p1 = this.getPlayer(trading_pid)
       const p2 = this.getPlayer(pid)
@@ -381,7 +382,7 @@ export default class Game {
     player?.addPiece(loc, piece)
     piece === 'S' && player?.addPort(this.board.findCorner(loc)?.trade)
     this.map_changes.push({ pid, piece, loc })
-    this.#io_manager.updateBuild(player?.toJSON(), piece, loc)
+    this.#io_manager.updateBuild(pid, piece, loc)
   }
 
   #onPlayerUpdate(pid, key, context) {
@@ -397,13 +398,13 @@ export default class Game {
     Object.entries(taking).forEach(([res, val]) => {
       if (val) { p1.giveCard(res, val); p2?.takeCard(res, val) }
     })
-    this.#io_manager.updateTradeInfo(p1.toJSON(), giving, taking, p2?.toJSON())
+    this.#io_manager.updateTradeInfo(p1.id, giving, taking, p2?.id)
     this.#updateOngoingTrades(p1)
   }
 
   #updateOngoingTrades() {
     this.ongoing_trades.forEach(obj => {
-      if (!['open', 'closed'].includes(_.status)) { return }
+      if (!['open', 'closed'].includes(obj.status)) { return }
       obj.status = this.getPlayer(obj.pid)?.hasAllResources(obj.giving) ? 'open' : 'closed'
     })
     this.#io_manager.updateOngoingTrades(this.ongoing_trades)
@@ -415,7 +416,7 @@ export default class Game {
 
   setTimer(time_in_seconds, fn) {
     this.clearTimer()
-    this.#io_manager.updateTimer(time_in_seconds, this.active_player)
+    this.#io_manager.updateTimer(time_in_seconds, this.active_pid)
     this.#timer = setTimeout(_ => {
       fn && (typeof fn === 'function') && fn()
       this.#next()
@@ -436,14 +437,14 @@ export default class Game {
   hasPlayer(id) { return id <= this.players.length }
   getPlayer(id) { return this.players[id - 1] }
   getOpponents(id) { return this.players.filter((_, i) => i !== (id - 1)) }
-  getActivePlayer() { return this.players[this.#active_player] || this.players[0] }
+  getActivePlayer() { return this.players[this.#active_pid] || this.players[0] }
 
   getPlayerSoc(id) { return this.getPlayer(id)?.socket_id }
   getOtherPlayerSocs(id) {
     return this.players.filter((_, i) => i !== (id - 1)).map(p => p.socket_id)
   }
-  getActivePlayerSoc() { return this.getPlayerSoc(this.active_player) }
-  getNonActivePlayerSocs() { return this.getOtherPlayerSocs(this.active_player) }
+  getActivePlayerSoc() { return this.getPlayerSoc(this.active_pid) }
+  getNonActivePlayerSocs() { return this.getOtherPlayerSocs(this.active_pid) }
 
   toJSON() {
     const timer_left = this.#timer && Math.ceil((this.#timer._idleStart + this.#timer._idleTimeout) / 1000 - process.uptime())
@@ -452,7 +453,7 @@ export default class Game {
       mapkey: this.mapkey,
       map_changes: this.map_changes,
       config: this.config,
-      active_player: this.active_player,
+      active_pid: this.active_pid,
       state: this.state,
       dev_cards_len: this.dev_cards.length,
       robber_loc: this.board?.robber_loc,
