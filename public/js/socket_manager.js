@@ -39,7 +39,7 @@ export default class SocketManager {
     this.#socket.on(SOC.RES_RECEIVED, res_obj => game.updateTotalResReceivedInfoSoc(res_obj))
 
     /** @event Development-Card-Taken */
-    this.#socket.on(SOC.DEV_CARD_TAKEN, (pid, count) => game.updateDevCardTakenSoc(pid, count))
+    this.#socket.on(SOC.DEV_CARD_TAKEN, (pid, count, card) => game.updateDevCardTakenSoc(pid, count, card))
 
     /** @event PRIVATE--Robber-Drop-Done */
     this.#socket.on(SOC.ROBBER_DROP, () => game.updateRobberDroppedSoc())

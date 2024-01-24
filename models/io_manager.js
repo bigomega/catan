@@ -65,12 +65,13 @@ export default class IOManager {
 
   updateBuild(pid, piece, loc) { this.emit(SOC.BUILD, pid, piece, loc) }
 
-  updatePlayerData(p_json, key) { this.emit(SOC.UPDATE_PLAYER, p_json, key) }
   updatePlayerData_Private(player_socket_id, p_json, key, data) {
     this.#io.to(player_socket_id).emit(SOC.UPDATE_PLAYER, p_json, key, data)
   }
 
-  updateDevCardTaken(pid, count) { this.emit(SOC.DEV_CARD_TAKEN, pid, count) }
+  updateDevCardTaken_Private(player_socket_id, pid, count, card) {
+    this.#io.to(player_socket_id).emit(SOC.DEV_CARD_TAKEN, pid, count, card)
+  }
 
   updateDiceValue(dice_value, pid) { this.emit(SOC.DICE_VALUE, dice_value, pid) }
 
@@ -82,7 +83,6 @@ export default class IOManager {
 
   moveRobber(active_pid, id) { this.emit(SOC.ROBBER_MOVE, active_pid, id) }
 
-  updateStolen(p1_id, p2_id) { this.emit(SOC.STOLEN_INFO, p1_id, p2_id) }
   updateStolen_Private(player_socket_id, p1_id, p2_id, res) {
     this.#io.to(player_socket_id).emit(SOC.STOLEN_INFO, p1_id, p2_id, res)
   }

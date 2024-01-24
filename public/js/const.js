@@ -57,7 +57,7 @@ export const TRADE_OFFERS = {
 export const ROLL = _ => Math.ceil(Math.random() * 6)
 
 export const GAME_CONFIG = {
-  strategize: { time: 120 },
+  player_count: 2,
   initial_build: { time: 60 },
   roll: { time: 15 },
   player_turn: { time: 60 },
@@ -98,11 +98,11 @@ export const SOCKET_EVENTS = {
   STATE_CHANGE: 'state_change',
   SET_TIMER: 'set_timer',
   BUILD: 'build',
-  UPDATE_PLAYER: 'update_player_data', // Public & Private
+  UPDATE_PLAYER: 'update_player_data', // Private
   DICE_VALUE: 'value_of_rolled_dice',
   RES_RECEIVED: 'total_resources_received', // Private
-  DEV_CARD_TAKEN: 'developer_card_deck_taken',
-  STOLEN_INFO: 'notify_stolen_resource', // Public & Private
+  DEV_CARD_TAKEN: 'developer_card_deck_taken', // Private
+  STOLEN_INFO: 'notify_stolen_resource', // Private
   TRADED_INFO: 'notify_traded_info',
   ONGOING_TRADES: 'update_ongoing_trades_status',
 

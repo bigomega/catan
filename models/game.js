@@ -185,13 +185,13 @@ export default class Game {
     if (opp_c_pids.length) {
       // Steal
       if (!opp_c_pids.includes(stolen_pid)) { stolen_pid = this.#getRandom(opp_c_pids) }
-      const stolen_p = this.getPlayer(stolen_pid)
-      const [stolen_res] = stolen_p.takeRandomResource()
+      const [stolen_res] = this.getPlayer(stolen_pid).takeRandomResource()
       if (stolen_res) {
         player.giveCard(stolen_res)
-        this.#io_manager.updateStolen(pid, stolen_pid)
-        this.#io_manager.updateStolen_Private(this.getPlayerSoc(pid), player.id, stolen_pid, stolen_res)
-        this.#io_manager.updateStolen_Private(this.getPlayerSoc(stolen_pid), player.id, stolen_pid, stolen_res)
+        this.players.forEach(p => {
+          const send_res = p.id === pid || p.id === stolen_pid
+          this.#io_manager.updateStolen_Private(p.socket_id, pid, stolen_pid, send_res && stolen_res)
+        })
       }
     }
     this.#gotoNextState()
@@ -251,8 +251,11 @@ export default class Game {
     if (!this.dev_cards.length) return
     const player = this.getActivePlayer()
     if (!player.canBuy('DEV_C')) return
-    player.bought('DEV_C', this.dev_cards.pop())
-    this.#io_manager.updateDevCardTaken(pid, this.dev_cards.length)
+    const bought_card = this.dev_cards.pop()
+    player.bought('DEV_C', bought_card)
+    this.players.forEach(p => {
+      this.#io_manager.updateDevCardTaken_Private(p.socket_id, pid, this.dev_cards.length, p.id === pid && bought_card)
+    })
     this.#updateOngoingTrades(player)
   }
 
@@ -386,9 +389,10 @@ export default class Game {
   }
 
   #onPlayerUpdate(pid, key, context) {
-    const private_json = this.getPlayer(pid)?.toJSON(1)
-    this.#io_manager.updatePlayerData(this.getPlayer(pid)?.toJSON(), key)
-    this.#io_manager.updatePlayerData_Private(this.getPlayerSoc(pid), private_json, key, context)
+    this.players.forEach(p => {
+      const is_pid = pid === p.id
+      this.#io_manager.updatePlayerData_Private(p.socket_id, p.toJSON(is_pid), key, is_pid && context)
+    })
   }
 
   #tradeResources(p1, giving, taking, p2) {

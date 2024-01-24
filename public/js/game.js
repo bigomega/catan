@@ -105,7 +105,7 @@ export default class Game {
   // STATE - Initial Setup
   #onInitialSetup() {
     const time = this.config.strategize.time
-    this.#ui.alert_ui.alert(GAME_MESSAGES.STRATEGIZE.self(time))
+    this.#ui.alert_ui.alertStrategy(time)
     this.#audio_manager.play(AUDIO.START_END)
   }
   // STATE - Roll
@@ -113,16 +113,14 @@ export default class Game {
     this.#ui.toggleActions(0)
     this.#ui.hideAllShown(0)
     this.#ui.trade_ui.clearRequests()
-    const message = this.#ui.alert_ui.getMessage(this.getActivePlayer(), MSGKEY.ROLL_TURN)
     if (this.#isMyPid(this.active_pid)) {
-      this.#ui.alert_ui.alert(message)
       this.#audio_manager.play(AUDIO.PLAYER_TURN)
       this.#ui.player_ui.toggleDice(1)
       this.#ui.player_ui.toggleShow(1)
     } else {
-      this.#ui.alert_ui.setStatus(message)
       this.#ui.player_ui.toggleShow()
     }
+    this.#ui.alert_ui.alertRollTurn(this.getActivePlayer())
   }
   // STATE - Player Action
   #onPlayerAction() {
@@ -135,24 +133,21 @@ export default class Game {
   #onRobberDropCards() {
     const drop_count = this.#player.resource_count > 7 ? Math.floor(this.#player.resource_count / 2) : 0
     if (drop_count) {
-      this.#ui.alert_ui.alert(GAME_MESSAGES.ROBBER.self(drop_count))
       this.#ui.robberDrop(drop_count)
       this.#ui.player_ui.toggleShow()
-    } else {
-      this.#ui.alert_ui.appendStatus(GAME_MESSAGES.ROBBER.other())
     }
+    this.#ui.alert_ui.alertRobberDrop(drop_count)
   }
   // STATE - Robber Move
   #onRobberMove() {
     this.#ui.robber_drop_ui.hide()
     this.#ui.board_ui.toggleHide()
     if (this.#isMyPid(this.active_pid)) {
-      this.#ui.alert_ui.alert(GAME_MESSAGES.ROBBER_MOVE.self())
       this.#ui.showTiles(this.#board.getRobbableTiles())
       this.#ui.player_ui.toggleShow()
     } else {
-      this.#ui.alert_ui.setStatus(GAME_MESSAGES.ROBBER_MOVE.other(this.getActivePlayer()?.name))
     }
+    this.#ui.alert_ui.alertRobberMove(this.getActivePlayer())
   }
   //#endregion
 
@@ -160,15 +155,11 @@ export default class Game {
   requestInitialSetupSoc(active_pid, turn) {
     this.#ui.hideAllShown()
     this.active_pid = active_pid
-    const msg_key = turn < 2 ? MSGKEY.INITIAL_BUILD : MSGKEY.INITIAL_BUILD_2
-    const message = this.#ui.alert_ui.getMessage(this.getActivePlayer(), msg_key)
     if (this.#isMyPid(active_pid)) {
       this.#temp = {}
       this.#ui.showCorners(this.#board.getSettlementLocations(-1).map(s => s.id))
-      this.#ui.alert_ui.alert(message)
-    } else {
-      this.#ui.alert_ui.setStatus(message)
     }
+    this.#ui.alert_ui.alertInitialSetup(this.getActivePlayer(), turn)
   }
 
   // SOC - Build Update
@@ -184,7 +175,7 @@ export default class Game {
     this.#board.build(pid, piece, loc)
     this.#ui.build(pid, piece, loc)
     this.#amIActing(pid) && this.#ui.toggleActions(1)
-    this.#ui.alert_ui.setStatus(this.#ui.alert_ui.getMessage(this.getPlayer(pid), MSGKEY.BUILDING, piece))
+    this.#ui.alert_ui.alertBuild(this.getPlayer(pid), piece)
   }
 
   // SOC - Player Update
@@ -203,7 +194,6 @@ export default class Game {
   // SOC - Dice Value Update
   updateDiceValueSoc([d1, d2], pid) {
     this.#ui.player_ui.toggleDice(false)
-    this.#ui.alert_ui.setStatus(this.#ui.alert_ui.getMessage(this.getPlayer(pid), MSGKEY.ROLL_VALUE, d1, d2))
     if (this.#isMyPid(pid)) {
       this.#audio_manager.play(AUDIO.DICE)
       this.#ui.showDiceValue(d1, d2)
@@ -211,24 +201,23 @@ export default class Game {
       // this.#audio_manager.play(AUDIO.DICE, 0.2)
     }
     (d1 + d2) === 7 && setTimeout(_ => this.#audio_manager.play(AUDIO.ROBBER), 1000)
+    this.#ui.alert_ui.alertDiceValue(this.getPlayer(pid), d1, d2)
   }
 
   // SOC_Private - Total Res received
-  updateTotalResReceivedInfoSoc(res_obj) {
-    this.#ui.alert_ui.appendStatus(GAME_MESSAGES.RES_TO_EMOJI.self(res_obj))
-  }
+  updateTotalResReceivedInfoSoc(res_obj) { this.#ui.alert_ui.alertResTaken(res_obj) }
 
   // SOC - Dev Card taken
-  updateDevCardTakenSoc(pid, count) {
+  updateDevCardTakenSoc(pid, count, card) {
     this.#ui.player_ui.setDevCardCount(count)
-    this.#ui.alert_ui.setStatus(this.#ui.alert_ui.getMessage(this.getPlayer(pid), MSGKEY.DEVELOPMENT_CARD_BUY))
+    this.#ui.alert_ui.alertDevCardTaken(this.getPlayer(pid), card)
   }
 
   // SOC_Private - Update done: robber dropping cards
   updateRobberDroppedSoc() {
     this.#ui.robber_drop_ui.hide()
     this.#ui.board_ui.toggleHide()
-    this.#ui.alert_ui.setStatus(GAME_MESSAGES.ROBBER.other())
+    this.#ui.alert_ui.alertRobberDropDone()
   }
 
   // SOC - Robber Movement update
@@ -237,30 +226,15 @@ export default class Game {
     this.#ui.moveRobber(id)
     const tile = this.#board.findTile(id).type
     const num = this.#board.findTile(id).num || ''
-    this.#ui.alert_ui.setStatus(this.#ui.alert_ui.getMessage(this.getPlayer(pid), MSGKEY.ROBBER_MOVED_TILE, tile, num))
+    this.#ui.alert_ui.alertRobberMoveDone(this.getPlayer(pid), tile, num)
   }
 
-  // SOC - Stolen info Notification
-  updateStoleInfoSoc(p1_id, p2_id, res) {
-    if (this.#isMyPid(p1_id)) {
-      res && this.#ui.alert_ui.appendStatus(GAME_MESSAGES.PLAYER_STOLE_RES.self({ p2: this.getPlayer(p2_id) }, res))
-    } else if (this.#isMyPid(p2_id)) {
-      res && this.#ui.alert_ui.appendStatus(GAME_MESSAGES.PLAYER_STOLE_RES.self({ p1: getPlayer(p1_id) }, res))
-    } else {
-      this.#ui.alert_ui.appendStatus(GAME_MESSAGES.PLAYER_STOLE_RES.other({ p1: this.getPlayer(p1_id), p2: this.getPlayer(p2_id) }))
-    }
-  }
+  // SOC_Private - Stolen info Notification
+  updateStoleInfoSoc(p1_id, p2_id, res) { this.#ui.alert_ui.alertStolenInfo(this.getPlayer(p2_id), res) }
 
   // SOC - Trade Success data
   updateTradedInfoSoc(p1_id, given, taken, p2_id) {
-    const p1 = this.getPlayer(p1_id); const p2 = p2_id && this.getPlayer(p2_id)
-    let msg = GAME_MESSAGES.PLAYER_TRADE_INFO.self({ p1, p2, board: !p2 }, given, taken)
-    if (this.#isMyPid(p1_id)) {
-      msg = GAME_MESSAGES.PLAYER_TRADE_INFO.self({ p2, board: !p2 }, given, taken)
-    } else if (this.#isMyPid(p2_id)) {
-      msg = GAME_MESSAGES.PLAYER_TRADE_INFO.self({ p1, board: !p2 }, given, taken)
-    }
-    this.#ui.alert_ui.setStatus(msg)
+    this.#ui.alert_ui.alertTradedInfo(this.getPlayer(p1_id), p2_id && this.getPlayer(p2_id), given, taken)
   }
 
   // SOC - Update Ongoing Trades

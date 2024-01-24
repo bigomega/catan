@@ -88,7 +88,8 @@ export default class TradeUI {
         this.$card_selection
           .querySelector(`.${is_giving ? 'giving' : 'taking'}-card[data-type="${res}"]`)
           ?.classList.add('disabled')
-        this.renderGivingTakingText()
+        this.$giving_text.innerHTML = resToText(this.#giving_res)
+        this.$taking_text.innerHTML = resToText(this.#taking_res)
         // this.#toggleHandRes(res, !is_giving, res_change_count)
         this.validateAndUpdateTrade()
       })
@@ -146,14 +147,6 @@ export default class TradeUI {
     this.$giving_text.innerHTML = ''
     this.$taking_text.innerHTML = ''
     this.$submit.classList.remove('active')
-  }
-
-  renderGivingTakingText() {
-    const getText = obj => Object.entries(obj).filter(([k,v]) => v)
-      .map(([res, v]) => v ? `${v}<div class="res-icon ${res}"></div>` : '')
-      .join(' ')
-    this.$giving_text.innerHTML = getText(this.#giving_res)
-    this.$taking_text.innerHTML = getText(this.#taking_res)
   }
 
   validateAndUpdateTrade() {
@@ -225,12 +218,13 @@ export default class TradeUI {
     }
     this.$requests.insertAdjacentHTML('beforeend', `
       <div class="request p${player.id}" data-id="${id}">
+        <span class="info">Trade Offer:</span>
         <div class="text">
           ${player.name} is<span class="giving">giving ${resToText(giving)}</span>
-          &<span class="asking disabled">asking ${resToText(asking)}</span> from you
+          &<span class="asking disabled">asking ${resToText(asking)}</span>
         </div>
         <div class="actions">
-          <div class="confirm" data-id="${id}">Trade</div>
+          <div class="confirm" data-id="${id}">Accept</div>
           <div class="counter" data-id="${id}">Counter</div>
           <div class="ignore" data-id="${id}">Ignore</div>
         </div>
@@ -269,7 +263,7 @@ export default class TradeUI {
     } else {
       this.$requests.insertAdjacentHTML('afterbegin', `
         <div class="ongoing" data-id="-1">
-          <span class="text">Max Requests - ${this.#game_config.trade.max_requests}: </span>${$og_req}
+          <span class="text">Max ${this.#game_config.trade.max_requests} Requests: </span>${$og_req}
         </div>
       `)
     }
@@ -278,10 +272,7 @@ export default class TradeUI {
     })
   }
 
-  /**
-   *
-   * @param {{status:('open'|'closed'|'success'|'failed'|'deleted')}}
-   */
+  /** @param {{status:('open'|'closed'|'success'|'failed'|'deleted')}} */
   updateOngoing({ id, status, rejected, asking }) {
     const $ongoing = this.$requests.querySelector(`.ongoing[data-id="-1"] .og-request[data-id="${id}"]`)
     if ($ongoing) { $ongoing.className = 'og-request ' + status }

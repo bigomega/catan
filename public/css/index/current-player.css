@@ -318,6 +318,13 @@
 
     b { color: #77450b; }
     small { opacity: 0.7; }
+    .p-name {
+      border-left: 5px solid; padding-left: 3px;
+      &.p1 { border-color: var(--player-1-color); }
+      &.p2 { border-color: var(--player-2-color); }
+      &.p3 { border-color: var(--player-3-color); }
+      &.p4 { border-color: var(--player-4-color); }
+    }
   }
 
   &.show .hand,
