@@ -145,12 +145,13 @@ export default class BoardUI {
       const $corner = this.#$getCorner(location)
       if (!$corner) return
       $corner.classList.remove('shown')
-      $corner.dataset.taken = piece
       piece === 'S' && $corner.classList.add('taken', `p${pid}`)
+      setTimeout(_ => { $corner.dataset.taken = piece }, 200) // For animation
     } else if (piece === 'R') {
       const $edge = this.#$getEdge(location)
       $edge?.classList.remove('shown')
-      $edge?.classList.add('taken', 'p' + pid)
+      $edge?.classList.add('taken')
+      setTimeout(_ => $edge?.classList.add('p' + pid), 200) // For animation
     }
   }
 

@@ -176,6 +176,10 @@
 */
 @keyframes piece-space-blink { 50% { background: #b9b8b8aa; } }
 @keyframes piece-settlement-blink { 50% { transform: scale(1.3); } }
+@keyframes city-show {
+  0% { transform: scale(3); }
+  100% { transform: scale(1); }
+}
 .board .tile {
   .corners {
     position: absolute;
@@ -190,19 +194,20 @@
     z-index: 3;
     visibility: hidden;
 
-    &:not(.taken) {
-      box-shadow: 0 0 3px 1px #000a;
+    &.shown {
+      visibility: visible;  cursor: pointer;
+      &:not(.taken) {
+        box-shadow: 0 0 3px 1px #000a;
 
-      &:hover {
-        background: #fff;
-        box-shadow: 0 0 0 2px #000;
-      }
-      &:not(:hover) {
-        animation: piece-space-blink 1s infinite;
+        &:hover {
+          background: #fff;
+          box-shadow: 0 0 0 2px #000;
+        }
+        &:not(:hover) {
+          animation: piece-space-blink 1s infinite;
+        }
       }
     }
-
-    &.shown { visibility: visible; cursor: pointer; }
 
     &.taken {
       visibility: visible;
@@ -214,6 +219,9 @@
       /* filter: drop-shadow(-3px 3px 3px #000); */
       /* filter: drop-shadow(-3px 3px 2px #000) drop-shadow(-3px 3px 4px var(--sand-color)) drop-shadow(-3px 3px 5px var(--sand-color)); */
       filter: drop-shadow(-3px 3px 2px #000) drop-shadow(1px -1px 3px var(--sand-color)) drop-shadow(3px -3px 5px var(--sand-color)) drop-shadow(-3px 3px 5px var(--sand-color)) drop-shadow(-3px 3px 4px var(--sand-color));
+      transform: scale(4);
+      &[data-taken=S] { transition: transform .5s cubic-bezier(0.55, 0.06, 0.68, 0.19); transform: scale(1); }
+      &[data-taken=C] { animation: city-show .5s cubic-bezier(0.55, 0.06, 0.68, 0.19); transform: scale(1); }
 
       &.shown {
         animation: piece-settlement-blink 1s infinite;
@@ -286,19 +294,20 @@
     cursor: pointer;
     visibility: hidden;
 
-    &:not(.taken) {
-      box-shadow: 0 0 3px 1px #000a;
+    &.shown {
+      visibility: visible; width: 10px;
+      &:not(.taken) {
+        box-shadow: 0 0 3px 1px #000a;
 
-      &:hover {
-        background: #fff;
-        box-shadow: 1px 1px 0px 1px #000;
-      }
-      &:not(:hover) {
-        animation: piece-space-blink 1s infinite;
+        &:hover {
+          background: #fff;
+          box-shadow: 1px 1px 0px 1px #000;
+        }
+        &:not(:hover) {
+          animation: piece-space-blink 1s infinite;
+        }
       }
     }
-
-    &.shown { visibility: visible; width: 10px; }
 
     &.taken {
       opacity: 1;
@@ -307,6 +316,11 @@
       visibility: visible;
       cursor: default;
       border: 1px solid;
+      width: 21px; height: 150px; z-index: 5;
+      &.p1, &.p2, &.p3, &.p4 {
+        transition: z-index 0s .25s linear, width 0.25s ease-in, height 0.25s ease-in;
+        width: 7px; height: 50px; z-index: 1;
+      }
 
       &.p1 { background: var(--player-1-color); box-shadow: 1px 1px 0px 1px color-mix(in srgb, var(--player-1-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
       &.p2 { background: var(--player-2-color); box-shadow: 1px 1px 0px 1px color-mix(in srgb, var(--player-2-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
