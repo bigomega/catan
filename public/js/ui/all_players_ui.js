@@ -48,9 +48,8 @@ export default class AllPlayersUI {
     if (!$el) return
     switch (key) {
       case 'public_vps': $vps.innerHTML = player[key]; break
-      case 'closed_cards.res': break
-      case 'closed_cards.dc': break
       case 'closed_cards': break
+      case 'closed_cards.taken': break
       case 'pieces': break
       case 'trade_offers': break
       case 'dc_update': break

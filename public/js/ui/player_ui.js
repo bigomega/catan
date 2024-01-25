@@ -311,7 +311,7 @@ export default class PlayerUI {
     return Object.fromEntries(Object.entries(cards_obj).filter(([_, v]) => v))
   }
 
-  updateHand(player, { type, count, taken }) {
+  updateHand(player, cards) {
     this.hand = this.#cleanHandData(player.closed_cards)
     this.renderHand()
   }

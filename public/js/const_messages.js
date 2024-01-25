@@ -57,7 +57,7 @@ const GAME_MESSAGES = {
     other: p => `${getName(p)} is Robbed.`,
   },
   ROBBER: {//----
-    self: drop_count => ` You have been GREEEEDY.<br><b>Give ${drop_count} resources</b> to the activated Robber 🥷.`,
+    self: drop_count => ` You have been GREEEEDY!<br><b>Give ${drop_count} resources</b> to the activated Robber 🥷.`,
     other: _ => ` 🥷 Robber is actived. Opponents are dropping resources.`,
   },
   ROBBER_MOVE: {//----

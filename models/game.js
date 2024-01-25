@@ -141,8 +141,6 @@ export default class Game {
         this.players.forEach(p => p.resetDevCard(p.id === this.active_pid))
         this.#gotoNextState()
       } else { this.active_pid-- }
-      if (this.active_pid == 1) { this.turn++, this.#gotoNextState() }
-      else { this.active_pid-- }
     }
   }
 
@@ -163,12 +161,14 @@ export default class Game {
   /** Robber Drop Resource */
   #expectedRobberDrop(pid, { drop_count = 0, resources } = {}) {
     const player = this.getPlayer(pid)
-    if (player.resource_count > 7) {
-      resources && Object.entries(resources).forEach(([key, value]) => {
-        try { player.takeCard(key, value); drop_count -= value
-        } catch (error) { /* Couldn't take the resource */ }
-      })
-      drop_count > 0 && player.takeRandomResource(drop_count)
+    if (drop_count || player.resource_count > 7) {
+      const taking_count = Math.max(drop_count, Math.floor(player.resource_count / 2))
+      let taken_count = 0
+      if (resources) {
+        player.takeCards(resources)
+        taken_count = Object.values(resources).reduce((mem, v) => mem + v, 0)
+      }
+      taken_count < taking_count && player.takeRandomResources(taking_count - taken_count)
     }
     const rob_pl_index = this.robbing_players.indexOf(pid)
     rob_pl_index >= 0 && this.robbing_players.splice(rob_pl_index, 1)
@@ -189,9 +189,9 @@ export default class Game {
     if (opp_c_pids.length) {
       // Steal
       if (!opp_c_pids.includes(stolen_pid)) { stolen_pid = this.#getRandom(opp_c_pids) }
-      const [stolen_res] = this.getPlayer(stolen_pid).takeRandomResource()
+      const [[stolen_res] = []] = this.getPlayer(stolen_pid).takeRandomResources()
       if (stolen_res) {
-        player.giveCard(stolen_res)
+        player.giveCards({ [stolen_res]: 1})
         this.players.forEach(p => {
           const send_res = p.id === pid || p.id === stolen_pid
           this.#io_manager.updateStolen_Private(p.socket_id, pid, stolen_pid, send_res && stolen_res)
@@ -373,23 +373,26 @@ export default class Game {
     const corner = this.board.findCorner(id)
     if (!corner || !corner.player_id) return
     const player = this.getPlayer(corner.player_id)
+    const res = {}
     corner.tiles.forEach(tile => {
-      CONST.TILE_RES[tile.type] && player.giveCard(CONST.TILE_RES[tile.type], 1)
+      const _res_type = CONST.TILE_RES[tile.type]
+      if (_res_type) { res[_res_type] = (res[_res_type] || 0) + 1 }
     })
+    player.giveCards(res)
   }
 
   #distributeTileResources(num) {
     const resource_by_pid = [...Array(this.player_count)].map(_ => ({}))
     this.board.distribute(num).forEach(({ pid, res, count }) => {
-      const player = this.getPlayer(pid)
       if (res && count) {
-        player.giveCard(res, count)
-        if (resource_by_pid[pid - 1][res]) resource_by_pid[pid - 1][res] += count
-        else resource_by_pid[pid - 1][res] = count
+        resource_by_pid[pid - 1][res] = (resource_by_pid[pid - 1][res] || 0) + count
       }
     })
+    console.log(resource_by_pid);
     resource_by_pid.forEach((res, index) => {
-      this.#io_manager.updateResourceReceived_Private(this.getPlayerSoc(index + 1), res)
+      const player = this.getPlayer(index + 1)
+      player.giveCards(res)
+      this.#io_manager.updateResourceReceived_Private(this.getPlayerSoc(player.id), res)
     })
   }
 
@@ -410,12 +413,8 @@ export default class Game {
   }
 
   #tradeResources(p1, giving, taking, p2) {
-    Object.entries(giving).forEach(([res, val]) => {
-      if (val) { p1.takeCard(res, val); p2?.giveCard(res, val) }
-    })
-    Object.entries(taking).forEach(([res, val]) => {
-      if (val) { p1.giveCard(res, val); p2?.takeCard(res, val) }
-    })
+    p1.takeCards(giving); p1.giveCards(taking)
+    if (p2) { p2.giveCards(giving); p2.takeCards(taking) }
     this.#io_manager.updateTradeInfo(p1.id, giving, taking, p2?.id)
     this.#updateOngoingTrades(p1)
   }

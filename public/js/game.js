@@ -167,15 +167,15 @@ export default class Game {
 
   // SOC - Player Update
   updatePlayerSoc(update_player, key, context) {
-    // this.#ui.all_players_ui.updatePlayer(update_player, key)
     if (key.includes('closed_cards') && context && this.#isMyPid(update_player.id)) {
       this.#ui.player_ui.updateHand(update_player, context)
-      if (!context.taken) {
-        ;[...Array(context.count)].forEach(_ => this.#audio_manager.play(AUDIO.CARD))
+      if (key === 'closed_cards') {
+        const count = Object.values(context).reduce((mem, v) => mem + v, 0)
+        ;[...Array(count)].forEach(_ => this.#audio_manager.play(AUDIO.CARD))
       }
     }
     if (this.#isMyPid(update_player.id)) { this.#player.update(update_player) }
-    else { /* Update Opponents */ }
+    /* this.#ui.all_players_ui.updatePlayer(update_player, key) */
     this.#amIActing(update_player.id) && this.#ui.toggleActions(1)
   }
 

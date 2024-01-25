@@ -16,6 +16,7 @@ export default class Player {
   trade_offers = Helper.newObject(CONST.TRADE_OFFERS, false)
   can_play_dc = false
   turn_bought_dc = {}
+  played_dev_cards = []
 
   constructor(name, id, onChange) {
     this.id = id
@@ -29,32 +30,40 @@ export default class Player {
   setSocket(sid) { this.socket_id = sid }
   deleteSocket(sid) { if (sid == this.socket_id) { delete this.socket_id } }
 
-  giveCard(type, count = 1) {
-    this.closed_cards[type] += count
-    const change_type = (type in CONST.RESOURCES) ? 'res' : 'dc'
-    if (change_type === 'res') { this.resource_count += count }
-    else { this.dev_card_count += count }
-
-    this.onChange(this.id, `closed_cards.${change_type}`, { type, count })
+  giveCards(cards = {}) {
+    const _give = (type, count) => {
+      if (!count) return
+      this.closed_cards[type] += count
+      const change_type = (type in CONST.RESOURCES) ? 'res' : 'dc'
+      if (change_type === 'res') { this.resource_count += count }
+      else { this.dev_card_count += count }
+    }
+    Object.entries(cards).forEach(([k, v]) => _give(k, v))
+    this.onChange(this.id, `closed_cards`, cards)
   }
 
-  takeCard(type, count = 1) {
-    if (this.closed_cards[type] - count < 0) { throw "Cannot take more" }
-    this.closed_cards[type] -= count
-    if (type in CONST.RESOURCES) { this.resource_count -= count }
-    else { this.dev_card_count -= count }
-
-    this.onChange(this.id, 'closed_cards', { type, count, taken: true })
+  takeCards(cards = {}) {
+    const _take = (type, count) => {
+      if (!count) return
+      if (this.closed_cards[type] - count < 0) {
+        console.warn("Cannot take more", JSON.stringify(cards))
+        return
+      }
+      this.closed_cards[type] -= count
+      if (type in CONST.RESOURCES) { this.resource_count -= count }
+      else { this.dev_card_count -= count }
+    }
+    Object.entries(cards).forEach(([k, v]) => _take(k, v))
+    this.onChange(this.id, 'closed_cards.taken', cards)
   }
 
   bought(type, dev_c_key) {
-    if (!this.canBuy(type)) throw `Cannot buy: ${type}`
-    for (const res_key in CONST.COST[type]) {
-      this.takeCard(res_key, CONST.COST[type][res_key])
-    }
+    if (!this.canBuy(type)) { console.warn(`Cannot buy: ${type}`); return }
+    if (!CONST.COST[type]) return
+    this.takeCards(CONST.COST[type])
     if (type === 'DEV_C') {
       this.turn_bought_dc[dev_c_key] = (this.turn_bought_dc[dev_c_key] || 0) + 1
-      this.giveCard(dev_c_key, 1)
+      this.giveCards({ [dev_c_key]: 1 })
     }
   }
 
@@ -63,7 +72,7 @@ export default class Player {
     if (piece === 'C') {
       const i = this.pieces.S.indexOf(location)
       if (i >= 0) { this.pieces.S.splice(i, 1) }
-      else { throw `Cannot build city without settlement. pid:${this.id}, loc: ${location}`  }
+      else { console.warn(`Cannot build city without settlement. pid:${this.id}, loc: ${location}`); return  }
     }
     this.pieces[piece].push(location)
     this.onChange(this.id, 'pieces', { piece, location })
@@ -79,10 +88,10 @@ export default class Player {
     this.onChange(this.id, 'trade_offers', { [type]: true })
   }
 
-  resetDevCard(active) {
-    this.can_play_dc = !!active
-    if (active) { this.turn_bought_dc = {} }
-    this.onChange(this.id, 'dc_update', { can_play_dc: !!active, turn_bought_dc: {} })
+  resetDevCard(allowed) {
+    this.can_play_dc = !!allowed
+    if (allowed) { this.turn_bought_dc = {} }
+    this.onChange(this.id, 'dc_update', { can_play_dc: this.can_play_dc, turn_bought_dc: {} })
   }
 
   canPlayDevCard(type) {
@@ -91,20 +100,25 @@ export default class Player {
   }
 
   playedDevCard(type) {
+    if (!this.canPlayDevCard(type)) return
     this.can_play_dc = false
-    this.takeCard(type)
+    this.played_dev_cards.push(type)
+    this.takeCards({ [type]: 1 })
   }
 
-  takeRandomResource(count = 1) {
-    const all_picked_res = []
+  /** @returns {[res, val][]} */
+  takeRandomResources(count = 1) {
+    const all_picked_res = Helper.newObject(CONST.RESOURCES, 0)
     for (let i = 0; i < count; i++) {
-      const avail_res = Object.keys(CONST.RESOURCES).filter(k => this.closed_cards[k] > 0)
+      const avail_res = Object.keys(CONST.RESOURCES).filter(k => {
+        return this.closed_cards[k] > all_picked_res[k]
+      })
       if (!avail_res.length) { break }
       const picked_res = avail_res[Math.floor(Math.random() * avail_res.length)]
-      all_picked_res.push(picked_res)
-      this.takeCard(picked_res, 1)
+      all_picked_res[picked_res] += 1
     }
-    return all_picked_res
+    this.takeCards(all_picked_res)
+    return Object.entries(all_picked_res).filter(([k, v]) => v)
   }
 
   canBuy(type) {
@@ -134,6 +148,7 @@ export default class Player {
       trade_offers: this.trade_offers,
       last_status: this.last_status,
       can_play_dc: this.can_play_dc,
+      played_dev_cards: this.played_dev_cards,
       ...(get_private ? {
         turn_bought_dc: this.turn_bought_dc,
         private_vps: 0,
