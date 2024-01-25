@@ -276,7 +276,7 @@ export default class PlayerUI {
         if (!CONST.DEVELOPMENT_CARDS[e.target.dataset.type]) { return }
         this.#onDevCardActivate(e.target.dataset.type)
       }
-      if (e.target.classList.contains('card')) { return }
+      if (['card', 'card-front', 'card-back'].includes(e.target.className)) { return }
       this.closeCardPreview()
     })
     document.addEventListener('keydown', e => {

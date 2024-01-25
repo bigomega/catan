@@ -352,6 +352,7 @@
   background: color-mix(in srgb, #3a3527 80%, transparent);
   display: flex; flex-direction: column; justify-content: flex-start; align-items: center;
   transition: opacity .15s linear, z-index 0s linear;
+
   &.hide {
     opacity: 0;
     z-index: -100;
@@ -369,50 +370,85 @@
     &:hover { background-color: var(--sand-color); color: var(--sand-color-dark);}
   }
 
+  .card-container {
+    width: 196px; height: 302px; margin-top: 60px;
+    perspective: 300px;
+  }
+
   .card {
-    width: 196px; height: 302px; overflow: hidden;
-    margin-top: 100px; position: relative;
-    background-color: #ebd290;
-    border: 1px solid #5a460e; border-radius: 15px;
-    box-shadow: 0 0 15px 0 #000c;
-    transition: all .15s linear;
+    width: 100%; height: 100%;
+    position: relative; border-radius: 15px; box-shadow: 0 0 15px 0 #000c;
+    transition: all .25s linear; border: 1px solid #5a460e;
+    transform-style: preserve-3d;
 
-    &::before {
-      content: ''; position: absolute; left: 0; top: 0;
-      width: 100%; height: 100%;
-      background-image: url(/images/cards_sprite.png);
-      transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
-
+    .card-front, .card-back {
+      position: absolute; border-radius: 15px;
+      width: 100%; height: 100%; backface-visibility: hidden;
     }
-    &[data-type="S"]::before { background-size: 1570px; background-position: -253px -18px; }
-    &[data-type="L"]::before { background-size: 1570px; background-position: -907px -12px; }
-    &[data-type="O"]::before { background-size: 1550px; background-position: -474px -10px; }
-    &[data-type="B"]::before { background-size: 1550px; background-position: -19px -21px; }
-    &[data-type="W"]::before { background-size: 1570px; background-position: -695px -13px; }
-    &[data-type="dK"]::before { background-size: 1640px; background-position: -1409px -29px; transform: rotateZ(-1deg); }
-    &[data-type="dR"]::before { background-size: 1570px; transform: rotateX(-5deg) rotateY(-15deg) rotateZ(-1deg); background-position: -29px -359px; }
-    &[data-type="dY"]::before { background-size: 1550px; background-position: -478px -346px; transform: rotateZ(-1deg); }
-    &[data-type="dM"]::before { background-size: 1550px; background-position: -257px -344px; transform: rotateX(-5deg) rotateY(-10deg) rotateZ(0deg); }
-    &[data-type="dVp"]::before { background-size: 1520px; background-position: -461px -668px; transform: rotateX(-12deg) rotateY(-4deg) rotateZ(1deg); }
+    .card-front { background-color: #ebd290; overflow: hidden; }
+    .card-front::before {
+      content: ''; width: 100%; height: 100%; position: absolute;
+      background-image: url(/images/cards_sprite.png);
+    }
+    &[data-type="S"] .card-front::before { background-size: 1570px; background-position: -253px -18px; }
+    &[data-type="L"] .card-front::before { background-size: 1570px; background-position: -907px -12px; }
+    &[data-type="O"] .card-front::before { background-size: 1550px; background-position: -474px -10px; }
+    &[data-type="B"] .card-front::before { background-size: 1550px; background-position: -19px -21px; }
+    &[data-type="W"] .card-front::before { background-size: 1570px; background-position: -695px -13px; }
+    &[data-type="dK"] .card-front::before { background-size: 1640px; background-position: -1409px -29px; transform: rotateZ(-1deg); }
+    &[data-type="dR"] .card-front::before { background-size: 1570px; transform: rotateX(-5deg) rotateY(-15deg) rotateZ(-1deg); background-position: -29px -359px; }
+    &[data-type="dY"] .card-front::before { background-size: 1550px; background-position: -478px -346px; transform: rotateZ(-1deg); }
+    &[data-type="dM"] .card-front::before { background-size: 1550px; background-position: -257px -344px; transform: rotateX(-5deg) rotateY(-10deg) rotateZ(0deg); }
+    &[data-type="dVp"] .card-front::before { background-size: 1520px; background-position: -461px -668px; transform: rotateX(-12deg) rotateY(-4deg) rotateZ(1deg); }
     /* &[data-type="dY"], &[data-type="dK"] { background-color: #eecf85; } */
-    &[data-type="dR"] { background-color: #dbbe6a; }
-    &[data-type="dVp"] { background-color: #cfaf5d; }
+    &[data-type="dR"] .card-front { background-color: #dbbe6a; }
+    &[data-type="dVp"] .card-front { background-color: #cfaf5d; }
 
-    &:has(+ .activate:hover) {
-      box-shadow: 1px 2px 0 #5a460e, 15px 30px 30px 0px #000;
-      transform: rotateX(30deg) rotateY(-10deg) rotateZ(-3deg);
+    .card-back {
+      background-color: #fff; transform: rotateY(180deg);
+    }
+    &[data-type="S"], &[data-type="L"], &[data-type="O"], &[data-type="B"], &[data-type="W"] {
+      .card-back { background-image: url(/images/resources-back.png); background-size: 209px; background-position: -6px -3px;  }
+    }
+    &[data-type="dK"], &[data-type="dR"], &[data-type="dY"], &[data-type="dM"], &[data-type="dVp"] {
+      .card-back { background-image: url(/images/dc-back.png); background-size: 206px; background-position: -3px -1px;  }
     }
   }
 
+  .card-container {
+    &:has(+ .activate:hover) .card {
+      box-shadow: 0px 5px 0 -2px #5a460e, 0px 65px 20px -30px #000;
+      transform: rotateX(50deg);
+    }
+    &:hover:has(+ .activate:not(:hover)) {
+      perspective: 600px;
+      .card { animation: card-rotate 3s infinite reverse linear; }
+    }
+  }
+
+
   .activate {
-    margin-top: 50px; padding: 10px 20px;
+    margin-top: 60px; padding: 13px 35px;
     border: 2px solid; border-radius: 50px;
     color: var(--sand-color); background: #333;
     font-family: sans-serif; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;
-    cursor: pointer;
+    cursor: pointer; z-index: 1; position: relative;
+    &::after {
+      content: 'You can only activate one Development card per turn!';
+      display: block;
+      position: absolute; top: 50px; left: calc(-50vw + 80px);
+      width: 100vw; opacity: 0.5;
+      font-weight: 200; text-align: center; letter-spacing: 0px; text-transform: none;
+      text-shadow: 0 0 3px #000;
+    }
     &:hover {
-      box-shadow: 0 0 10px 0px var(--sand-color), 0 0 20px 0px var(--sand-color);
+      box-shadow: 0 0 10px 0px var(--sand-color), 0 0 30px 0px var(--sand-color);
     }
     &.hide { display: none; }
   }
+}
+@keyframes card-rotate {
+  0% { transform: rotateY(0deg); }
+  /* 50% { transform: rotateY(360deg); } */
+  100% { transform: rotateY(360deg); }
 }
