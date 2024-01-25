@@ -1,9 +1,7 @@
 #game > .all-players {
-  display: flex;
-  justify-content: center;
+  display: flex; justify-content: center; flex-direction: row; flex-wrap: wrap;
   font-family: sans-serif;
-  flex-direction: row;
-  flex-wrap: wrap;
+  &.blur:not(:hover) { filter: blur(2px); }
 
   .player {
     background: var(--sand-color);

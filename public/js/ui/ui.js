@@ -34,7 +34,9 @@ export default class UI {
       onExitTrade: _ => this.trade_ui.clearSelections(),
       onEndTurnClick: _ => game.onEndTurn(),
       onCardClick: type => game.onCardClick(type),
+      onDevCardActivate: type => game.onDevCardActivate(type),
       getPossibleLocations: p => game.getPossibleLocations(p),
+      toggleBoardBlur: hide => { this.board_ui.toggleBlur(hide); this.all_players_ui.toggleBlur(hide) },
     })
 
     this.robber_drop_ui = new RobberDropUI({
@@ -46,7 +48,7 @@ export default class UI {
     this.trade_ui = new TradeUI(player, game.config, {
       toggleHandRes: type => this.player_ui.toggleHandResource(type),
       resetHand: _ => this.player_ui.renderHand(),
-      toggleBoardHide: hide => this.board_ui.toggleHide(hide),
+      toggleBoardBlur: hide => { this.board_ui.toggleBlur(hide); this.all_players_ui.toggleBlur(hide) },
       onTradeProposal: (...params) => game.onTradeProposal(...params),
       onTradeResponse: (id, resp) => game.onTradeResponse(id, resp),
     })
@@ -66,7 +68,7 @@ export default class UI {
   }
 
   robberDrop(count) {
-    this.board_ui.toggleHide(true)
+    this.board_ui.toggleBlur(true)
     this.robber_drop_ui.render(count, this.#player.closed_cards)
     this.player_ui.activateResourceCards()
   }

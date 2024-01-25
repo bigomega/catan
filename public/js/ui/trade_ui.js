@@ -4,7 +4,7 @@ import { newObject } from "../utils.js";
 
 export default class TradeUI {
   #giving_res; #taking_res; #trade_type; #counter_id; #game_config
-  #player; #onTradeProposal; #onTradeResponse; #toggleHandRes; #resetHand; #toggleBoardHide
+  #player; #onTradeProposal; #onTradeResponse; #toggleHandRes; #resetHand; #toggleBoardBlur
   $submit; $giving_text; $taking_text;
   $el = document.querySelector('#game > .trade-zone')
   $requests = this.$el.querySelector('.trade-requests')
@@ -12,14 +12,14 @@ export default class TradeUI {
   $card_selection = this.$el.querySelector('.trade-card-selection')
 
   constructor(player, game_config, { onTradeProposal, onTradeResponse,
-    toggleHandRes, resetHand, toggleBoardHide }) {
+    toggleHandRes, resetHand, toggleBoardBlur }) {
     this.#player = player
     this.#game_config = game_config
     this.#onTradeProposal = onTradeProposal
     this.#onTradeResponse = onTradeResponse
     this.#toggleHandRes = toggleHandRes
     this.#resetHand = resetHand
-    this.#toggleBoardHide = toggleBoardHide
+    this.#toggleBoardBlur = toggleBoardBlur
   }
 
   render() {
@@ -142,7 +142,7 @@ export default class TradeUI {
     this.#taking_res = newObject(CONST.RESOURCES, 0)
     this.#trade_type = trade_type
     this.validateAndUpdateTrade()
-    this.#toggleBoardHide(true)
+    this.#toggleBoardBlur(true)
     this.$card_selection.classList.remove('hide')
     this.$card_selection.dataset.trade_type = trade_type
     this.$giving_text.innerHTML = ''
@@ -207,7 +207,7 @@ export default class TradeUI {
   clearSelections() {
     this.$type_selection.classList.add('hide')
     this.$card_selection.classList.add('hide')
-    this.#toggleBoardHide()
+    this.#toggleBoardBlur()
     // this.#resetHand()
   }
 

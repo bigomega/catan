@@ -136,8 +136,6 @@ export default class Game {
       this.#distributeCornerResources(s_id)
       if (this.active_pid == 1) { this.turn++, this.#gotoNextState() }
       else { this.active_pid-- }
-      if (this.active_player == 1) { this.turn++, this.#gotoNextState() }
-      else { this.active_player-- }
     }
   }
 

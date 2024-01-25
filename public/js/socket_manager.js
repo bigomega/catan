@@ -22,25 +22,25 @@ export default class SocketManager {
     /** @event Build */
     socket.on(SOC.BUILD, (pid, piece, loc) => game.updateBuildSoc(pid, piece, loc))
 
-    /** @event PRIVATE?--Update-Player-Info */
+    /** @event PRIVATE__Update-Player-Info */
     socket.on(SOC.UPDATE_PLAYER, (update_player, key, context) => { game.updatePlayerSoc(update_player, key, context) })
 
     /** @event Show-Dice-Value */
     socket.on(SOC.DICE_VALUE, (dice_val, pid) => game.updateDiceValueSoc(dice_val, pid))
 
-    /** @event PRIVATE--Total-Resources-Received */
+    /** @event PRIVATE__Total-Resources-Received */
     socket.on(SOC.RES_RECEIVED, res_obj => game.updateTotalResReceivedInfoSoc(res_obj))
 
-    /** @event Development-Card-Taken */
+    /** @event PRIVATE__Development-Card-Taken */
     socket.on(SOC.DEV_CARD_TAKEN, (pid, count, card) => game.updateDevCardTakenSoc(pid, count, card))
 
-    /** @event PRIVATE--Robber-Drop-Done */
+    /** @event PRIVATE__Robber-Drop-Done */
     socket.on(SOC.ROBBER_DROP, () => game.updateRobberDroppedSoc())
 
     /** @event Robber-Moved */
     socket.on(SOC.ROBBER_MOVE, (active_pid, id) => game.updateRobberMovementSoc(active_pid, id))
 
-    /** @event Notify-Stolen-Info */
+    /** @event PRIAVTE__Notify-Stolen-Info */
     socket.on(SOC.STOLEN_INFO, (p1_id, p2_id, res) => game.updateStoleInfoSoc(p1_id, p2_id, res))
 
     /** @event Notify-Traded-Info */

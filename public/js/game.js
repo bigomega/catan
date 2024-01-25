@@ -12,7 +12,8 @@ const MSGKEY = Object.keys(GAME_MESSAGES).reduce((m, k) => (m[k] = k, m), {})
 
 export default class Game {
   id; config; active_pid; state; opponents
-  #board; #player; #ui; #socket_manager; #audio_manager
+  /** @type {UI} */ #ui;
+  #board; #player; #socket_manager; #audio_manager
   #temp = {}
   possible_locations = { R: [], S: [], C: [] }
 
@@ -50,7 +51,7 @@ export default class Game {
     // Active Player State updates
     if (this.#player.id === this.active_pid) {
       switch (this.state) {
-        case ST.INITIAL_SETUP: this.#ui.showInitialBuild(); break
+        case ST.INITIAL_SETUP: this.requestInitialSetupSoc(this.active_pid, 1); break
         case ST.PLAYER_ROLL: this.#ui.player_ui.toggleDice(true); this.#ui.player_ui.toggleShow(1); break
         case ST.PLAYER_ACTIONS: this.#ui.toggleActions(true); this.#ui.player_ui.toggleShow(1); break
         case ST.ROBBER_DROP: break
@@ -129,7 +130,7 @@ export default class Game {
   // STATE - Robber Move
   #onRobberMove() {
     this.#ui.robber_drop_ui.hide()
-    this.#ui.board_ui.toggleHide()
+    this.#ui.board_ui.toggleBlur()
     if (this.#isMyPid(this.active_pid)) {
       this.#ui.showTiles(this.#board.getRobbableTiles())
       this.#ui.player_ui.toggleShow()
@@ -169,7 +170,8 @@ export default class Game {
         ;[...Array(context.count)].forEach(_ => this.#audio_manager.play(AUDIO.CARD))
       }
     }
-    this.#isMyPid(update_player.id) && this.#player.update(update_player)
+    if (this.#isMyPid(update_player.id)) { this.#player.update(update_player) }
+    else { /* Update Opponents */ }
     this.#amIActing(update_player.id) && this.#ui.toggleActions(1)
   }
 
@@ -197,7 +199,7 @@ export default class Game {
   // SOC_Private - Update done: robber dropping cards
   updateRobberDroppedSoc() {
     this.#ui.robber_drop_ui.hide()
-    this.#ui.board_ui.toggleHide()
+    this.#ui.board_ui.toggleBlur()
     this.#ui.alert_ui.alertRobberDropDone()
   }
 
@@ -281,7 +283,7 @@ export default class Game {
     piece === 'R' ? this.#ui.showEdges(locs) : this.#ui.showCorners(locs)
   }
 
-  // Development Card use + during Robber & Trade
+  // During Robber & ?Trade
   onCardClick(type) {
     if (this.state === ST.ROBBER_DROP) {
       if (this.#ui.robber_drop_ui.hasReachedGoal()) return
@@ -294,6 +296,10 @@ export default class Game {
   // Trade Proposal
   onTradeProposal(type, giving, taking, counter_id) {
     this.#socket_manager.sendTradeRequest(type, giving, taking, counter_id)
+  }
+
+  onDevCardActivate(type) {
+    //
   }
 
   onTradeResponse(id, accepted) { this.#socket_manager.sendTradeResponse(id, accepted) }

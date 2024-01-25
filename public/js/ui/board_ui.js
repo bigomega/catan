@@ -13,7 +13,7 @@ export default class BoardUI {
     this.#onClick = onClick
   }
 
-  toggleHide(bool) { this.$el.classList[bool ? 'add' : 'remove']('hide') }
+  toggleBlur(bool) { this.$el.classList[bool ? 'add' : 'remove']('blur') }
 
   render() {
     let startDiff = 0

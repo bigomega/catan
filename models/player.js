@@ -27,22 +27,22 @@ export default class Player {
   setSocket(sid) { this.socket_id = sid }
   deleteSocket(sid) { if (sid == this.socket_id) { delete this.socket_id } }
 
-  giveCard(card_type, count = 1) {
-    this.closed_cards[card_type] += count
-    const change_type = (card_type in CONST.RESOURCES) ? 'res' : 'dc'
+  giveCard(type, count = 1) {
+    this.closed_cards[type] += count
+    const change_type = (type in CONST.RESOURCES) ? 'res' : 'dc'
     if (change_type === 'res') { this.resource_count += count }
     else { this.dev_card_count += count }
 
-    this.onChange(this.id, `closed_cards.${change_type}`, { card_type, count })
+    this.onChange(this.id, `closed_cards.${change_type}`, { type, count })
   }
 
-  takeCard(card_type, count = 1) {
-    if (this.closed_cards[card_type] - count < 0) { throw "Cannot take more" }
-    this.closed_cards[card_type] -= count
-    if (card_type in CONST.RESOURCES) { this.resource_count -= count }
+  takeCard(type, count = 1) {
+    if (this.closed_cards[type] - count < 0) { throw "Cannot take more" }
+    this.closed_cards[type] -= count
+    if (type in CONST.RESOURCES) { this.resource_count -= count }
     else { this.dev_card_count -= count }
 
-    this.onChange(this.id, 'closed_cards', { card_type, count, taken: true })
+    this.onChange(this.id, 'closed_cards', { type, count, taken: true })
   }
 
   bought(type, dev_c_key) {

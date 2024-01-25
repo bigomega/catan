@@ -11,6 +11,8 @@ export default class AllPlayersUI {
     this.opponents = opponents
   }
 
+  toggleBlur(bool) { this.$el.classList[bool ? 'add' : 'remove']('blur') }
+
   render() {
     this.$el.innerHTML = [this.player, ...this.opponents].map(player => `
       <div class="player id-${player.id}" data-id="${player.id}">
