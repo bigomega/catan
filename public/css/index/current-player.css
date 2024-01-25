@@ -433,17 +433,17 @@
     color: var(--sand-color); background: #333;
     font-family: sans-serif; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;
     cursor: pointer; z-index: 1; position: relative;
-    &::after {
-      content: 'You can only activate one Development card per turn!';
-      display: block;
-      position: absolute; top: 50px; left: calc(-50vw + 80px);
-      width: 100vw; opacity: 0.5;
-      font-weight: 200; text-align: center; letter-spacing: 0px; text-transform: none;
-      text-shadow: 0 0 3px #000;
-    }
     &:hover {
       box-shadow: 0 0 10px 0px var(--sand-color), 0 0 30px 0px var(--sand-color);
     }
+    &.hide { display: none; }
+  }
+
+  .info {
+    font-family: sans-serif; font-weight: 200; color: var(--sand-color);
+    opacity: 0.5;
+    text-shadow: 0 0 3px #000;
+    margin-top: 20px;
     &.hide { display: none; }
   }
 }

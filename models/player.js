@@ -14,6 +14,8 @@ export default class Player {
   }
   open_dev_cards = {}
   trade_offers = Helper.newObject(CONST.TRADE_OFFERS, false)
+  can_play_dc = false
+  turn_bought_dc = {}
 
   constructor(name, id, onChange) {
     this.id = id
@@ -50,7 +52,10 @@ export default class Player {
     for (const res_key in CONST.COST[type]) {
       this.takeCard(res_key, CONST.COST[type][res_key])
     }
-    type === 'DEV_C' && this.giveCard(dev_c_key, 1)
+    if (type === 'DEV_C') {
+      this.turn_bought_dc[dev_c_key] = (this.turn_bought_dc[dev_c_key] || 0) + 1
+      this.giveCard(dev_c_key, 1)
+    }
   }
 
   addPiece(location, piece) {
@@ -74,8 +79,20 @@ export default class Player {
     this.onChange(this.id, 'trade_offers', { [type]: true })
   }
 
-  openDevelopmentCard(card_type) {
-    //
+  resetDevCard(active) {
+    this.can_play_dc = !!active
+    if (active) { this.turn_bought_dc = {} }
+    this.onChange(this.id, 'dc_update', { can_play_dc: !!active, turn_bought_dc: {} })
+  }
+
+  canPlayDevCard(type) {
+    return this.can_play_dc && this.closed_cards[type]
+      && this.closed_cards[type] > (this.turn_bought_dc[type] || 0)
+  }
+
+  playedDevCard(type) {
+    this.can_play_dc = false
+    this.takeCard(type)
   }
 
   takeRandomResource(count = 1) {
@@ -116,7 +133,9 @@ export default class Player {
       open_dev_cards: this.open_dev_cards,
       trade_offers: this.trade_offers,
       last_status: this.last_status,
+      can_play_dc: this.can_play_dc,
       ...(get_private ? {
+        turn_bought_dc: this.turn_bought_dc,
         private_vps: 0,
         closed_cards: this.closed_cards,
       } : {})

@@ -93,6 +93,7 @@ export const SOCKET_EVENTS = {
   ROBBER_MOVE: 'robber_is_moved',
   TRADE_REQ: 'request_trade',
   TRADE_RESP: 'response_to_trade',
+  KNIGHT_MOVE: 'knight_moves_robber',
   // Server Sends…
   JOINED_WAITING_ROOM: 'joined_waiting_room',
   STATE_CHANGE: 'state_change',
@@ -117,7 +118,7 @@ export const SOCKET_EVENTS = {
 }
 
 export const AUDIO_FILES = {
-  START_END: 'start-end.mp3',
+  START: 'intro.mp3',
   BUILD_ROAD: 'build-road.mp3',
   BUILD_SETTLEMENT: 'build-settlement.mp3',
   BUILD_CITY: 'build-city.mp3',

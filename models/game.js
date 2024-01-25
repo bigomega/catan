@@ -87,7 +87,9 @@ export default class Game {
 
       case ST.PLAYER_ACTIONS:
         this.expected_actions.add({ callback: _ => {
-          this.active_pid++; this.#gotoNextState(); this.ongoing_trades = []
+          this.active_pid++
+          this.players.forEach(p => p.resetDevCard(p.id === this.active_pid))
+          this.#gotoNextState(); this.ongoing_trades = []
         }})
         this.setTimer(this.config.player_turn.time)
         break
@@ -134,6 +136,11 @@ export default class Game {
       this.active_pid < this.player_count ? this.active_pid++ : this.turn++
     } else {
       this.#distributeCornerResources(s_id)
+      if (this.active_pid == 1) {
+        this.turn++
+        this.players.forEach(p => p.resetDevCard(p.id === this.active_pid))
+        this.#gotoNextState()
+      } else { this.active_pid-- }
       if (this.active_pid == 1) { this.turn++, this.#gotoNextState() }
       else { this.active_pid-- }
     }
@@ -142,7 +149,6 @@ export default class Game {
   /** Roll Dice */
   #expectedRoll(pid) {
     this.dice_value = [CONST.ROLL(), CONST.ROLL()]
-    this.#io_manager.updateDiceValue(this.dice_value, this.getActivePlayer())
     this.#io_manager.updateDiceValue(this.dice_value, this.active_pid)
     const dice_total = this.dice_value[0] + this.dice_value[1]
     if (dice_total === 7) {
@@ -170,7 +176,7 @@ export default class Game {
   }
 
   /** Robber Movement */
-  #expectedRobberMove(pid, { tile_id, stolen_pid } = {}) {
+  #expectedRobberMove(pid, { tile_id, stolen_pid, knight } = {}) {
     const valid_locs = this.board.getRobbableTiles()
     if (!valid_locs.includes(tile_id)) { tile_id = this.#getRandom(valid_locs) }
     const player = this.getPlayer(pid)
@@ -192,7 +198,7 @@ export default class Game {
         })
       }
     }
-    this.#gotoNextState()
+    !knight && this.#gotoNextState()
   }
   //#endregion
 
@@ -342,6 +348,16 @@ export default class Game {
       }
       this.#io_manager.updateOngoingTrades(this.ongoing_trades)
     }
+  }
+
+  knightMoveIO(pid, tile_id, stolen_pid) {
+    if (pid !== this.active_pid) return
+    if (this.state !== ST.PLAYER_ACTIONS && this.state !== ST.PLAYER_ROLL) return
+    const player = this.getPlayer(pid)
+    if (!player.canPlayDevCard('dK')) { return }
+    player.playedDevCard('dK')
+    this.#expectedRobberMove(pid, { tile_id, stolen_pid, knight: true })
+    this.#io_manager.updateKnightMoved(pid)
   }
 
   playerRollIO() { this.#next() }

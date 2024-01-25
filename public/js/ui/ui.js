@@ -34,6 +34,7 @@ export default class UI {
       onExitTrade: _ => this.trade_ui.clearSelections(),
       onEndTurnClick: _ => game.onEndTurn(),
       onCardClick: type => game.onCardClick(type),
+      canPlayDevCard: type => game.canPlayDevCard(type),
       onDevCardActivate: type => game.onDevCardActivate(type),
       getPossibleLocations: p => game.getPossibleLocations(p),
       toggleBoardBlur: hide => { this.board_ui.toggleBlur(hide); this.all_players_ui.toggleBlur(hide) },
@@ -96,5 +97,6 @@ export default class UI {
     this.player_ui.toggleHandBlur()
     this.board_ui.hideAllShown()
     this.trade_ui.clearSelections()
+    this.player_ui.closeCardPreview()
   }
 }

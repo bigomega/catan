@@ -72,6 +72,7 @@ const GAME_MESSAGES = {
   },
   PLAYER_STOLE_RES: { all: (p2, res) => ` Stole ${res ? `1<div class="res-icon ${res}"></div>` : 'a resource '}from ${getName(p2)}.` },//---
   PLAYER_TRADE_INFO: { all: ({ p1, p2, board }, given, taken) => `<b>Trade:</b> ${getName(p1)} gave ${resToText(given)} to ${board ? 'the board' : getName(p2)} and took ${resToText(taken)}.` }, //----
+  KNIGHT_USED_APPEND: { all: _ => ' - Using ⚔️ Knight Card.' },
 }
 
 export default GAME_MESSAGES

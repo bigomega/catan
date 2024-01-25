@@ -95,7 +95,7 @@ export default class Game {
   #onInitialSetup() {
     const time = this.config.strategize.time
     this.#ui.alert_ui.alertStrategy(time)
-    this.#audio_manager.play(AUDIO.START_END)
+    this.#audio_manager.play(AUDIO.START)
   }
   // STATE - Roll
   #onPlayerRoll() {
@@ -114,12 +114,14 @@ export default class Game {
   // STATE - Player Action
   #onPlayerAction() {
     if (this.#isMyPid(this.active_pid)) {
+      this.#clearDevCardUsage()
       this.#ui.player_ui.toggleShow(1)
       this.#ui.toggleActions(1)
     }
   }
   // STATE - Drop for Robber
   #onRobberDropCards() {
+    this.#isMyPid(this.active_pid) && this.#clearDevCardUsage()
     const drop_count = this.#player.resource_count > 7 ? Math.floor(this.#player.resource_count / 2) : 0
     if (drop_count) {
       this.#ui.robberDrop(drop_count)
@@ -132,9 +134,11 @@ export default class Game {
     this.#ui.robber_drop_ui.hide()
     this.#ui.board_ui.toggleBlur()
     if (this.#isMyPid(this.active_pid)) {
+      if (this.state === ST.ROBBER_MOVE) {
+        this.#clearDevCardUsage()
+        this.#ui.player_ui.toggleShow()
+      }
       this.#ui.showTiles(this.#board.getRobbableTiles())
-      this.#ui.player_ui.toggleShow()
-    } else {
     }
     this.#ui.alert_ui.alertRobberMove(this.getActivePlayer())
   }
@@ -233,6 +237,12 @@ export default class Game {
     this.#audio_manager.play(AUDIO.TRADE_REQUEST)
   }
 
+  // Knight moved using Dev Card
+  updateKnightMovedSoc(pid) {
+    this.#audio_manager.play(AUDIO.KNIGHT)
+    this.#ui.alert_ui.alertKnightUsed()
+  }
+
   setTimerSoc(t, pid) { this.#ui.player_ui.resetTimer(t, this.#isMyPid(pid)) }
   //#endregion
 
@@ -254,7 +264,9 @@ export default class Game {
       }
       return
     }
-    if (this.state === ST.ROBBER_MOVE) {
+    const is_robber_move = this.state === ST.ROBBER_MOVE
+    const is_knight = this.#player._is_playing_dc === 'dK'
+    if (is_robber_move || is_knight) {
       if (location_type === 'T') {
         const opp_taken_corners = this.#board.findTile(id)?.getAllCorners()
           .filter(c => c.piece && !this.#isMyPid(c.player_id))
@@ -263,11 +275,19 @@ export default class Game {
           this.#temp = { _robber_tile: id }
           this.#ui.showCorners(opp_taken_corners.map(_ => _.id))
         } else {
-          this.#socket_manager.sendRobberMove(id)
+          if (is_robber_move) { this.#socket_manager.sendRobberMove(id) }
+          else if (is_knight) {
+            this.#socket_manager.sendKnightMove(id)
+            this.#player._is_playing_dc = false
+          }
         }
       } else if (location_type === 'C') {
         const stolen_pid = this.#board.findCorner(id).player_id
-        this.#socket_manager.sendRobberMove(this.#temp._robber_tile, stolen_pid)
+        if (is_robber_move) { this.#socket_manager.sendRobberMove(this.#temp._robber_tile, stolen_pid) }
+        else if (is_knight) {
+          this.#socket_manager.sendKnightMove(this.#temp._robber_tile, stolen_pid)
+          this.#player._is_playing_dc = false
+        }
       }
       return
     }
@@ -298,8 +318,14 @@ export default class Game {
     this.#socket_manager.sendTradeRequest(type, giving, taking, counter_id)
   }
 
+  // Development Card Use
   onDevCardActivate(type) {
-    //
+    if (!this.canPlayDevCard(type)) return
+    this.#player._is_playing_dc = type
+    if (type === 'dK') {
+      this.#onRobberMove()
+      return
+    }
   }
 
   onTradeResponse(id, accepted) { this.#socket_manager.sendTradeResponse(id, accepted) }
@@ -309,8 +335,20 @@ export default class Game {
   onEndTurn() { this.#socket_manager.endTurn() }
   //#endregion
 
+  #clearDevCardUsage() {
+    this.#ui.hideAllShown(0)
+    this.#player._is_playing_dc = false
+  }
+  canPlayDevCard(type) {
+    return this.#player.can_play_dc
+      && this.#player.closed_cards[type]
+      && this.#player.closed_cards[type] > (this.#player.turn_bought_dc[type] || 0)
+      && this.active_pid === this.#player.id
+      && (this.state === ST.PLAYER_ACTIONS || this.state === ST.PLAYER_ROLL)
+      && !this.#player._is_playing_dc
+  }
   playRobberAudio() { this.#audio_manager.play(AUDIO.ROBBER) }
-  #amIActing(pid) {
+  #amIActing(pid = this.#player.id) {
     return this.#isMyPid(pid)
       && pid === this.active_pid
       && this.state === ST.PLAYER_ACTIONS

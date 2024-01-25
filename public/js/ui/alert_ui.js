@@ -47,8 +47,11 @@ export default class AlertUI {
     else this.setStatus(msg.other(p))
   }
   alertRollTurn(p) {
-    if (this.#isMe(p)) this.alert(MSG.ROLL_TURN.self())
-    else this.alert(MSG.ROLL_TURN.other(p))
+    if (this.#isMe(p)) {
+      if (this._has_shown_roll_alert) { this.setStatus(MSG.ROLL_TURN.self()) }
+      else { this._has_shown_roll_alert = true; this.alert(MSG.ROLL_TURN.self()) }
+    }
+    else { this.setStatus(MSG.ROLL_TURN.other(p)) }
   }
   alertDiceValue(p, d1, d2, rob_res) { this.setStatus(MSG.DICE_VALUE.all(d1, d2, this.#isNotMe(p), rob_res)) }
   alertBuild(p, piece) { this.setStatus(MSG.BUILDING.all(piece, this.#isNotMe(p))) }
@@ -70,6 +73,7 @@ export default class AlertUI {
       p1: this.#isNotMe(p1), p2: this.#isNotMe(p2), board: !p2
     }, given, taken))
   }
+  alertKnightUsed() { this.appendStatus(MSG.KNIGHT_USED_APPEND.all()) }
 
   // getMessage(alert_player, msg_key, ...data) {
   //   if (alert_player.id === this.#player.id)

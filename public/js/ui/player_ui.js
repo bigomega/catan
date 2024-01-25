@@ -5,6 +5,7 @@ const oKeys = Object.keys
 export default class PlayerUI {
   #ui; #onDiceClick; #onPieceClick; #onBuyDevCardClick; #onTradeClick; #onExitTrade;
   #onEndTurnClick; #onCardClick; #getPossibleLocations; #toggleBoardBlur; #onDevCardActivate
+  #canPlayDevCard
   player; timer; hand
 
   $timer; $dice; $build_road; $build_settlement; $build_city; $buy_dev_card; $trade_btn; $end_turn
@@ -15,7 +16,7 @@ export default class PlayerUI {
 
   constructor(player, { onDiceClick, onPieceClick, onBuyDevCardClick, onTradeClick,
     onExitTrade, onEndTurnClick, onCardClick, getPossibleLocations, toggleBoardBlur,
-    onDevCardActivate }) {
+    onDevCardActivate, canPlayDevCard }) {
     this.player = player
     this.#onDiceClick = onDiceClick
     this.#onPieceClick = onPieceClick
@@ -25,6 +26,7 @@ export default class PlayerUI {
     this.#onEndTurnClick = onEndTurnClick
     this.#onCardClick = onCardClick
     this.#onDevCardActivate = onDevCardActivate
+    this.#canPlayDevCard = canPlayDevCard
     this.#getPossibleLocations = getPossibleLocations
     this.#toggleBoardBlur = toggleBoardBlur
     this.hand = this.#cleanHandData(this.player.closed_cards)
@@ -32,11 +34,11 @@ export default class PlayerUI {
 
   render() {
     this.renderActionBar()
-    // // this.hand.S = 3
-    // // this.hand.L = 7
-    // // this.hand.B = 2
+    // this.hand.S = 3
+    // this.hand.L = 7
+    // this.hand.B = 2
     // this.hand.dK = 3
-    // // this.hand.O = 3
+    // this.hand.O = 3
     // this.hand.dM = 1
     // this.hand.dR = 1
     // this.hand.dY = 1
@@ -238,6 +240,7 @@ export default class PlayerUI {
       return `
         <div
           class="card-group ${type}" data-type="${type}" data-count="${count}"
+          ${type === 'dK' ? ' title="Knight (k)" ' : ''}
           style="margin-right:${group_margin}px;
             transform:rotate(${group_rotation}deg) translateY(${group_translate}px);"
         >
@@ -261,10 +264,13 @@ export default class PlayerUI {
     this.$hand.querySelectorAll('.card, .card-count').forEach($el => {
       $el.addEventListener('click', e => {
         const $card_group = e.target.parentElement
+        const type = $card_group.dataset.type
         const is_active = $card_group.classList.contains('active')
-        const is_dc = CONST.DEVELOPMENT_CARDS[$card_group.dataset.type]
-        if (is_dc || !is_active) { this.showCardPreview($card_group.dataset.type, is_dc && is_active) }
-        else { this.#onCardClick($card_group.dataset.type) }
+        const is_dc = CONST.DEVELOPMENT_CARDS[type] && type !== 'dVp'
+        if (is_dc || !is_active) {
+          this.showCardPreview(type, is_dc, is_dc && this.#canPlayDevCard(type))
+        }
+        else { this.#onCardClick(type) }
       })
     })
   }
@@ -273,28 +279,32 @@ export default class PlayerUI {
     this.$card_preview.addEventListener('click', e => {
       if (e.target.classList.contains('activate')) {
         if (e.target.classList.contains('hide')) { return }
-        if (!CONST.DEVELOPMENT_CARDS[e.target.dataset.type]) { return }
-        this.#onDevCardActivate(e.target.dataset.type)
+        const type = this.$card_preview.querySelector('.card').dataset.type
+        if (!CONST.DEVELOPMENT_CARDS[type] || type === 'dVp') { return }
+        this.#onDevCardActivate(type)
       }
       if (['card', 'card-front', 'card-back'].includes(e.target.className)) { return }
       this.closeCardPreview()
     })
     document.addEventListener('keydown', e => {
       e.code === 'Escape' && this.closeCardPreview()
+      e.code === 'KeyK' && this.$hand.querySelector('.card.dK')?.click()
     })
   }
 
-  showCardPreview(type, show_activate) {
+  showCardPreview(type, show_info, show_activate) {
     this.#toggleBoardBlur(true); this.togglePlayerBlur(true)
     this.$card_preview.classList.remove('hide')
-    this.$card_preview.querySelector('.activate').classList[show_activate ? 'remove' : 'add']('hide')
     this.$card_preview.querySelector('.card').dataset.type = type
+    show_activate && this.$card_preview.querySelector('.activate').classList.remove('hide')
+    show_info && this.$card_preview.querySelector('.info').classList.remove('hide')
   }
 
   closeCardPreview() {
     this.#toggleBoardBlur(false); this.togglePlayerBlur(false)
     this.$card_preview.classList.add('hide')
     this.$card_preview.querySelector('.activate').classList.add('hide')
+    this.$card_preview.querySelector('.info').classList.add('hide')
   }
 
   #cleanHandData(cards_obj) {
@@ -311,11 +321,6 @@ export default class PlayerUI {
     this.renderHand()
     const res_selector = oKeys(CONST.RESOURCES).map(k => `.card-group[data-type="${k}"]`).join(',')
     this.$hand.querySelectorAll(res_selector).forEach($el => $el.classList.add('active'))
-  }
-
-  toggleDevelopmentCards(active) {
-    const selector = oKeys(CONST.DEVELOPMENT_CARDS).map(k => `.card-group[data-type="${k}"]`).join(',')
-    this.$hand.querySelectorAll(selector).forEach($el => $el.classList[active ? 'add' : 'remove']('active'))
   }
 
   /** During Robber Drop */
