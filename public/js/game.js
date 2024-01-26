@@ -239,6 +239,11 @@ export default class Game {
     this.#ui.alert_ui.alertKnightUsed()
   }
 
+  updateRoadBuildingUsedSoc(pid) {
+    this.#audio_manager.playRoadBuilding()
+    this.#ui.alert_ui.alertRoadBuildingUsed(this.getPlayer(pid))
+  }
+
   setTimerSoc(t, pid) { this.#ui.player_ui.resetTimer(t, this.#isMyPid(pid)) }
   //#endregion
 
@@ -249,6 +254,7 @@ export default class Game {
 
   onBoardClick(location_type, id) {
     this.#ui.hideAllShown()
+    // Initial Setup
     if (this.state === ST.INITIAL_SETUP) {
       if (location_type === 'C') {
         this.#ui.showCorners([id])
@@ -260,6 +266,7 @@ export default class Game {
       }
       return
     }
+    // Robber & Knight
     const is_robber_move = this.state === ST.ROBBER_MOVE
     const is_knight = this.#player._is_playing_dc === 'dK'
     if (is_robber_move || is_knight) {
@@ -287,6 +294,18 @@ export default class Game {
       }
       return
     }
+    // Road Building DC
+    if (location_type === 'E' && this.#player._is_playing_dc === 'dR') {
+      if (this.#temp.r1) {
+        this.#clearDevCardUsage()
+        this.#temp.r1 !== id && this.#socket_manager.sendRoadBuildingLocs(this.#temp.r1, id)
+      } else {
+        this.#temp.r1 = id
+        this.#board.findEdge(id)?.buildRoad(20) // Temp pid-20 build
+        this.#ui.showEdges([id, ...this.#board.getRoadLocationsFromRoads([id , ...this.#player.pieces.R])])
+      }
+      return
+    }
     // Normal Actions
     this.#socket_manager.sendLocationClick(location_type, id)
   }
@@ -299,7 +318,7 @@ export default class Game {
     piece === 'R' ? this.#ui.showEdges(locs) : this.#ui.showCorners(locs)
   }
 
-  // During Robber & ?Trade
+  // During Robber & ??? Trade
   onCardClick(type) {
     if (this.state === ST.ROBBER_DROP) {
       if (this.#ui.robber_drop_ui.hasReachedGoal()) return
@@ -322,6 +341,11 @@ export default class Game {
       this.#onRobberMove()
       return
     }
+    if (type === 'dR') {
+      this.#temp = {}
+      this.#ui.showEdges(this.#board.getRoadLocationsFromRoads(this.#player.pieces.R))
+      return
+    }
   }
 
   onTradeResponse(id, accepted) { this.#socket_manager.sendTradeResponse(id, accepted) }
@@ -333,6 +357,9 @@ export default class Game {
 
   #clearDevCardUsage() {
     this.#ui.hideAllShown(0)
+    if (this.#player._is_playing_dc === 'dR' && this.#temp.r1) {
+      this.#board.findEdge(this.#temp.r1)?.buildRoad(null)
+    }
     this.#player._is_playing_dc = false
   }
   canPlayDevCard(type) {

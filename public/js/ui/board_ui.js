@@ -151,7 +151,7 @@ export default class BoardUI {
       const $edge = this.#$getEdge(location)
       $edge?.classList.remove('shown')
       $edge?.classList.add('taken')
-      setTimeout(_ => $edge?.classList.add('p' + pid), 200) // For animation
+      setTimeout(_ => $edge?.classList.add('p' + pid), 100) // For animation
     }
   }
 

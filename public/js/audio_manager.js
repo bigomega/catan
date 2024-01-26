@@ -32,4 +32,5 @@ export default class AudioManager {
   playRobber() { this.play(AUDIO.ROBBER) }
   playTradeRequest() { this.play(AUDIO.TRADE_REQUEST) }
   playKnight() { this.play(AUDIO.KNIGHT) }
+  playRoadBuilding() { this.play(AUDIO.ROAD_BUILDING) }
 }

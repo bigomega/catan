@@ -89,11 +89,12 @@ export const SOCKET_EVENTS = {
   END_TURN: 'end_turn',
   // Both
   INITIAL_SETUP: 'ask/return_initial_setup',
-  ROBBER_DROP: 'resources_dropped_to_robber/server_update', // Private
+  ROBBER_DROP: 'resources_dropped_to_robber/ack', // Private
   ROBBER_MOVE: 'robber_is_moved',
   TRADE_REQ: 'request_trade',
   TRADE_RESP: 'response_to_trade',
-  KNIGHT_MOVE: 'knight_moves_robber',
+  KNIGHT_MOVE: 'knight_moves_robber/ack',
+  ROAD_BUILDING: 'road_building_locations/ack',
   // Server Sends…
   JOINED_WAITING_ROOM: 'joined_waiting_room',
   STATE_CHANGE: 'state_change',
@@ -128,4 +129,5 @@ export const AUDIO_FILES = {
   ROBBER: 'robber.mp3',
   KNIGHT: 'knight.mp3',
   TRADE_REQUEST: 'bop.mp3',
+  ROAD_BUILDING: 'road-running.mp3',
 }

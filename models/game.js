@@ -350,6 +350,7 @@ export default class Game {
     }
   }
 
+  /** Knight Dev_C used */
   knightMoveIO(pid, tile_id, stolen_pid) {
     if (pid !== this.active_pid) return
     if (this.state !== ST.PLAYER_ACTIONS && this.state !== ST.PLAYER_ROLL) return
@@ -358,6 +359,23 @@ export default class Game {
     player.playedDevCard('dK')
     this.#expectedRobberMove(pid, { tile_id, stolen_pid, knight: true })
     this.#io_manager.updateKnightMoved(pid)
+  }
+
+
+  /** Road Building Dev_C used */
+  roadBuildingIO(pid, r1, r2) {
+    if (pid !== this.active_pid) return
+    if (this.state !== ST.PLAYER_ACTIONS && this.state !== ST.PLAYER_ROLL) return
+    const player = this.getPlayer(pid)
+    if (!player.canPlayDevCard('dR')) { return }
+    player.playedDevCard('dR')
+    let valid_edges = this.board.getRoadLocationsFromRoads(player.pieces.R)
+    if (!valid_edges.includes(r1)) { r1 = this.#getRandom(valid_edges) }
+    this.build(pid, 'R', r1)
+    valid_edges = this.board.getRoadLocationsFromRoads(player.pieces.R)
+    if (!valid_edges.includes(r2)) { r2 = this.#getRandom(valid_edges) }
+    this.build(pid, 'R', r2)
+    this.#io_manager.updateRoadBuildingUsed(pid)
   }
 
   playerRollIO() { this.#next() }
@@ -388,7 +406,6 @@ export default class Game {
         resource_by_pid[pid - 1][res] = (resource_by_pid[pid - 1][res] || 0) + count
       }
     })
-    console.log(resource_by_pid);
     resource_by_pid.forEach((res, index) => {
       const player = this.getPlayer(index + 1)
       player.giveCards(res)

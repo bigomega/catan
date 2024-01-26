@@ -1,5 +1,3 @@
-import * as CONST from "../const.js"
-
 export default class Corner {
   id; trade; piece; player_id;
   tiles = []

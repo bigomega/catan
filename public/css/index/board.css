@@ -322,7 +322,7 @@
       /* border-radius: 3px; */
       &.p1, &.p2, &.p3, &.p4 {
         transition: z-index 0s .25s linear, width 0.25s ease-in, height 0.25s ease-in;
-        width: 7px; height: 50px; z-index: 1;
+        width: 7px; height: 50px; z-index: 2;
       }
 
       &.p1 { background: var(--player-1-color); box-shadow: 1px 1px 0px 1px color-mix(in srgb, var(--player-1-color-dark) 50%, #000), 4px 4px 6px 0px #000; }

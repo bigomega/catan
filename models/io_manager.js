@@ -56,6 +56,9 @@ export default class IOManager {
 
     /** @event Knight-Robber-Move */
     socket.on(SOC.KNIGHT_MOVE, (t_id, s_pid) => game.knightMoveIO(pid, t_id, s_pid))
+
+    /** @event Knight-Robber-Move */
+    socket.on(SOC.ROAD_BUILDING, (r1, r2) => game.roadBuildingIO(pid, r1, r2))
   }
 
   updateWaitingRoom(player) { this.emit(SOC.JOINED_WAITING_ROOM, player) }
@@ -97,6 +100,8 @@ export default class IOManager {
   updateOngoingTrades(ongoing_trades) { this.emit(SOC.ONGOING_TRADES, ongoing_trades) }
 
   updateKnightMoved(pid) { this.emit(SOC.KNIGHT_MOVE, pid) }
+
+  updateRoadBuildingUsed(pid) { this.emit(SOC.ROAD_BUILDING, pid) }
 
   emit(type, ...data) { this.#io.to(this.#game.id).emit(type, ...data) }
 }

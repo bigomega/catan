@@ -74,6 +74,7 @@ export default class AlertUI {
     }, given, taken))
   }
   alertKnightUsed() { this.appendStatus(MSG.KNIGHT_USED_APPEND.all()) }
+  alertRoadBuildingUsed(p) { this.setStatus(MSG.ROAD_BUILDING_USED.all(p)) }
 
   // getMessage(alert_player, msg_key, ...data) {
   //   if (alert_player.id === this.#player.id)

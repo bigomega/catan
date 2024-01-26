@@ -50,10 +50,13 @@ export default class SocketManager {
     socket.on(SOC.TRADE_REQ, (pid, trade_obj) => game.requestTradeSoc(pid, trade_obj))
 
     /** @event Update-Ongoing-Trades */
-    socket.on(SOC.ONGOING_TRADES, (ongoing_trades) => game.updateOngoingTradesSoc(ongoing_trades))
+    socket.on(SOC.ONGOING_TRADES, ongoing_trades => game.updateOngoingTradesSoc(ongoing_trades))
 
     /** @event Knight-Moved-Robber */
-    socket.on(SOC.KNIGHT_MOVE, (pid) => game.updateKnightMovedSoc(pid))
+    socket.on(SOC.KNIGHT_MOVE, pid => game.updateKnightMovedSoc(pid))
+
+    /** @event Road-Building-Used */
+    socket.on(SOC.ROAD_BUILDING, pid => game.updateRoadBuildingUsedSoc(pid))
   }
 
   sendInitialSetup({ settlement_loc, road_loc }) { this.#socket.emit(SOC.INITIAL_SETUP, settlement_loc, road_loc) }
@@ -75,6 +78,8 @@ export default class SocketManager {
   sendTradeResponse(id, accepted) { this.#socket.emit(SOC.TRADE_RESP, id, accepted) }
 
   sendKnightMove(id, stolen_pid) { this.#socket.emit(SOC.KNIGHT_MOVE, id, stolen_pid) }
+
+  sendRoadBuildingLocs(r1, r2) { this.#socket.emit(SOC.ROAD_BUILDING, r1, r2) }
 
   saveStatus(message) { this.#socket.emit(SOC.SAVE_STATUS, message) }
 }
