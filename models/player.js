@@ -12,11 +12,10 @@ export default class Player {
     ...Helper.newObject(CONST.RESOURCES, 0),
     ...Helper.newObject(CONST.DEVELOPMENT_CARDS, 0),
   }
-  open_dev_cards = {}
+  open_dev_cards = Helper.newObject(CONST.DEVELOPMENT_CARDS, 0)
   trade_offers = Helper.newObject(CONST.TRADE_OFFERS, false)
   can_play_dc = false
   turn_bought_dc = {}
-  played_dev_cards = []
 
   constructor(name, id, onChange) {
     this.id = id
@@ -102,7 +101,7 @@ export default class Player {
   playedDevCard(type) {
     if (!this.canPlayDevCard(type)) return
     this.can_play_dc = false
-    this.played_dev_cards.push(type)
+    this.open_dev_cards[type] += 1
     this.takeCards({ [type]: 1 })
   }
 
@@ -148,7 +147,6 @@ export default class Player {
       trade_offers: this.trade_offers,
       last_status: this.last_status,
       can_play_dc: this.can_play_dc,
-      played_dev_cards: this.played_dev_cards,
       ...(get_private ? {
         turn_bought_dc: this.turn_bought_dc,
         private_vps: 0,

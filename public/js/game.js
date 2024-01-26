@@ -5,10 +5,7 @@ import Player from "./player/player.js"
 import UI from "./ui/ui.js"
 import SocketManager from "./socket_manager.js"
 import AudioManager from "./audio_manager.js"
-import GAME_MESSAGES from "./const_messages.js"
 const ST = CONST.GAME_STATES
-const AUDIO = CONST.AUDIO_FILES
-const MSGKEY = Object.keys(GAME_MESSAGES).reduce((m, k) => (m[k] = k, m), {})
 
 export default class Game {
   id; config; active_pid; state; opponents
@@ -95,7 +92,7 @@ export default class Game {
   #onInitialSetup() {
     const time = this.config.strategize.time
     this.#ui.alert_ui.alertStrategy(time)
-    this.#audio_manager.play(AUDIO.START)
+    this.#audio_manager.playStart()
   }
   // STATE - Roll
   #onPlayerRoll() {
@@ -103,7 +100,7 @@ export default class Game {
     this.#ui.hideAllShown(0)
     this.#ui.trade_ui.clearRequests()
     if (this.#isMyPid(this.active_pid)) {
-      this.#audio_manager.play(AUDIO.PLAYER_TURN)
+      this.#audio_manager.playTurnNotification()
       this.#ui.player_ui.toggleDice(1)
       this.#ui.player_ui.toggleShow(1)
     } else {
@@ -157,8 +154,7 @@ export default class Game {
 
   // SOC - Build Update
   updateBuildSoc(pid, piece, loc) {
-    const aud_file = ({ S: AUDIO.BUILD_SETTLEMENT, C: AUDIO.BUILD_CITY, R: AUDIO.BUILD_ROAD })[piece]
-    aud_file && this.#audio_manager.play(aud_file, this.#isMyPid(pid) ? 1 : .5)
+    this.#audio_manager.playBuild(piece, this.#isMyPid(pid))
     this.#board.build(pid, piece, loc)
     this.#ui.build(pid, piece, loc)
     this.#amIActing(pid) && this.#ui.toggleActions(1)
@@ -171,7 +167,7 @@ export default class Game {
       this.#ui.player_ui.updateHand(update_player, context)
       if (key === 'closed_cards') {
         const count = Object.values(context).reduce((mem, v) => mem + v, 0)
-        ;[...Array(count)].forEach(_ => this.#audio_manager.play(AUDIO.CARD))
+        this.#audio_manager.playCardTake(count)
       }
     }
     if (this.#isMyPid(update_player.id)) { this.#player.update(update_player) }
@@ -183,9 +179,9 @@ export default class Game {
   updateDiceValueSoc([d1, d2], pid) {
     this.#ui.player_ui.toggleDice(false)
     this.#isMyPid(pid) && this.#ui.showDiceValue(d1, d2)
-    this.#audio_manager.play(AUDIO.DICE, this.#isMyPid(pid) ? 1 : 0.1)
+    this.#audio_manager.playDice(this.#isMyPid(pid))
     const total = d1 + d2
-    total === 7 && setTimeout(_ => this.#audio_manager.play(AUDIO.ROBBER), 1000)
+    total === 7 && setTimeout(_ => this.#audio_manager.playRobber(), 1000)
     const robbed_tile = this.#board.getRobbedTile()
     const rob_tile_type = robbed_tile?.num === total && robbed_tile.type
     this.#ui.alert_ui.alertDiceValue(this.getPlayer(pid), d1, d2, CONST.TILE_RES[rob_tile_type])
@@ -234,12 +230,12 @@ export default class Game {
   // Trade Request
   requestTradeSoc(pid, trade_obj) {
     this.#ui.trade_ui.renderNewRequest(this.getPlayer(pid), trade_obj)
-    this.#audio_manager.play(AUDIO.TRADE_REQUEST)
+    this.#audio_manager.playTradeRequest()
   }
 
   // Knight moved using Dev Card
   updateKnightMovedSoc(pid) {
-    this.#audio_manager.play(AUDIO.KNIGHT)
+    this.#audio_manager.playKnight()
     this.#ui.alert_ui.alertKnightUsed()
   }
 
@@ -347,7 +343,7 @@ export default class Game {
       && (this.state === ST.PLAYER_ACTIONS || this.state === ST.PLAYER_ROLL)
       && !this.#player._is_playing_dc
   }
-  playRobberAudio() { this.#audio_manager.play(AUDIO.ROBBER) }
+  playRobberAudio() { this.#audio_manager.playRobber() }
   #amIActing(pid = this.#player.id) {
     return this.#isMyPid(pid)
       && pid === this.active_pid
