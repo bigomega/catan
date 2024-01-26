@@ -337,15 +337,21 @@ export default class Game {
   onDevCardActivate(type) {
     if (!this.canPlayDevCard(type)) return
     this.#player._is_playing_dc = type
-    if (type === 'dK') {
-      this.#onRobberMove()
-      return
+    switch (type) {
+      case 'dK': this.#onRobberMove(); break
+      case 'dR':
+        this.#temp = {}
+        this.#ui.showEdges(this.#board.getRoadLocationsFromRoads(this.#player.pieces.R))
+        break
+      case 'dM':
+      case 'dY':
+        this.#ui.res_selection_ui.show(type)
     }
-    if (type === 'dR') {
-      this.#temp = {}
-      this.#ui.showEdges(this.#board.getRoadLocationsFromRoads(this.#player.pieces.R))
-      return
-    }
+  }
+
+  // Monopoly & Year of Plenty Resource Selection
+  onDevCardResSelection(type, res1, res2) {
+    this.#player._is_playing_dc = false
   }
 
   onTradeResponse(id, accepted) { this.#socket_manager.sendTradeResponse(id, accepted) }

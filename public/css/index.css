@@ -5,6 +5,7 @@
 @import './index/current-player.css';
 @import './index/robber-drop.css';
 @import './index/trade.css';
+@import './index/res-selection.css';
 
 body {
   margin: 0;

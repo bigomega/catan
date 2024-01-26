@@ -7,6 +7,7 @@ import AlertUI from "./alert_ui.js"
 import RobberDropUI from "./robber_drop_ui.js"
 import AllPlayersUI from "./all_players_ui.js"
 import TradeUI from "./trade_ui.js"
+import ResSelectionUI from "./res_selection_ui.js"
 const $ = document.querySelector.bind(document)
 
 export default class UI {
@@ -53,6 +54,11 @@ export default class UI {
       onTradeProposal: (...params) => game.onTradeProposal(...params),
       onTradeResponse: (id, resp) => game.onTradeResponse(id, resp),
     })
+
+    this.res_selection_ui = new ResSelectionUI({
+      onSubmit: (res1, res2) => game.onDevCardResSelection(res1, res2),
+      onDevCardClick: type => this.player_ui.clickCard(type),
+    })
   }
 
   render() {
@@ -61,6 +67,7 @@ export default class UI {
     this.all_players_ui.render()
     this.alert_ui.render()
     this.trade_ui.render()
+    this.res_selection_ui.render()
     this.$splash.classList.add('hide')
   }
 
@@ -98,5 +105,6 @@ export default class UI {
     this.board_ui.hideAllShown()
     this.trade_ui.clearSelections()
     this.player_ui.closeCardPreview()
+    this.res_selection_ui.hide()
   }
 }

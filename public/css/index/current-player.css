@@ -378,7 +378,7 @@
   .card {
     width: 100%; height: 100%;
     position: relative; border-radius: 15px; box-shadow: 0 0 15px 0 #000c;
-    transition: all .25s linear; border: 1px solid #5a460e;
+    transition: all .15s linear; border: 1px solid #5a460e;
     transform-style: preserve-3d;
 
     .card-front, .card-back {

@@ -261,19 +261,19 @@ export default class PlayerUI {
     this.#setupHandEvents()
   }
   #setupHandEvents() {
-    this.$hand.querySelectorAll('.card, .card-count').forEach($el => {
-      $el.addEventListener('click', e => {
-        const $card_group = e.target.parentElement
-        const type = $card_group.dataset.type
-        const is_active = $card_group.classList.contains('active')
-        const is_dc = CONST.DEVELOPMENT_CARDS[type] && type !== 'dVp'
-        if (is_dc || !is_active) {
-          this.showCardPreview(type, is_dc, is_dc && this.#canPlayDevCard(type))
-        }
-        else { this.#onCardClick(type) }
-      })
-    })
+    this.$hand.querySelectorAll('.card, .card-count').forEach($el => $el.addEventListener('click', e => {
+      const $card_group = e.target.parentElement
+      const type = $card_group.dataset.type
+      const is_active = $card_group.classList.contains('active')
+      const is_dc = CONST.DEVELOPMENT_CARDS[type] && type !== 'dVp'
+      if (is_dc || !is_active) {
+        this.showCardPreview(type, is_dc, is_dc && this.#canPlayDevCard(type))
+      }
+      else { this.#onCardClick(type) }
+    }))
   }
+
+  clickCard(type) { this.$hand.querySelector('.card.' + type)?.click() }
 
   #setupCardPreviewEvents() {
     this.$card_preview.addEventListener('click', e => {
