@@ -57,6 +57,12 @@ export default class SocketManager {
 
     /** @event Road-Building-Used */
     socket.on(SOC.ROAD_BUILDING, pid => game.updateRoadBuildingUsedSoc(pid))
+
+    /** @event Monopoly-Used */
+    socket.on(SOC.MONOPOLY, (pid, res, total, self_count) => game.updateMonopolyUsedSoc(pid, res, total, self_count))
+
+    /** @event Year-of-Plenty-Used */
+    socket.on(SOC.YEAR_OF_PLENTY, (pid, res_obj) => game.updateYearOfPlentyUsedSoc(pid, res_obj))
   }
 
   sendInitialSetup({ settlement_loc, road_loc }) { this.#socket.emit(SOC.INITIAL_SETUP, settlement_loc, road_loc) }
@@ -80,6 +86,10 @@ export default class SocketManager {
   sendKnightMove(id, stolen_pid) { this.#socket.emit(SOC.KNIGHT_MOVE, id, stolen_pid) }
 
   sendRoadBuildingLocs(r1, r2) { this.#socket.emit(SOC.ROAD_BUILDING, r1, r2) }
+
+  sendMonopolyResource(res) { this.#socket.emit(SOC.MONOPOLY, res) }
+
+  sendYearOfPlentyResource(res1, res2) { this.#socket.emit(SOC.YEAR_OF_PLENTY, res1, res2) }
 
   saveStatus(message) { this.#socket.emit(SOC.SAVE_STATUS, message) }
 }

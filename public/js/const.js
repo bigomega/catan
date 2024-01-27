@@ -87,7 +87,7 @@ export const SOCKET_EVENTS = {
   CLICK_LOC: 'clicked_location',
   BUY_DEV: 'buy_development_card',
   END_TURN: 'end_turn',
-  // Both
+  // Both Sends…
   INITIAL_SETUP: 'ask/return_initial_setup',
   ROBBER_DROP: 'resources_dropped_to_robber/ack', // Private
   ROBBER_MOVE: 'robber_is_moved',
@@ -95,6 +95,8 @@ export const SOCKET_EVENTS = {
   TRADE_RESP: 'response_to_trade',
   KNIGHT_MOVE: 'knight_moves_robber/ack',
   ROAD_BUILDING: 'road_building_locations/ack',
+  MONOPOLY: 'monopoly_resource/ack', // Private
+  YEAR_OF_PLENTY: 'year_of_plenty_resource/ack', // Private
   // Server Sends…
   JOINED_WAITING_ROOM: 'joined_waiting_room',
   STATE_CHANGE: 'state_change',
@@ -107,15 +109,6 @@ export const SOCKET_EVENTS = {
   STOLEN_INFO: 'notify_stolen_resource', // Private
   TRADED_INFO: 'notify_traded_info',
   ONGOING_TRADES: 'update_ongoing_trades_status',
-
-
-
-  ALERT_ALL: 'alert_all',
-  ALERT_PLAYER: 'alert_player',
-  STATUS_ONLY: 'update_status_only',
-  APPEND_STATUS: 'append_to_status',
-  SHOW_LOCS: 'show_actionable_locations', // sent privately
-  HIDE_LOCS: 'hide_all_shown_locations',
 }
 
 export const AUDIO_FILES = {
@@ -127,7 +120,10 @@ export const AUDIO_FILES = {
   DICE: 'dice.mp3',
   PLAYER_TURN: 'player-turn.mp3',
   ROBBER: 'robber.mp3',
-  KNIGHT: 'knight.mp3',
   TRADE_REQUEST: 'bop.mp3',
+  KNIGHT: 'knight.mp3',
   ROAD_BUILDING: 'road-running.mp3',
+  MONOPOLY: 'coin-fall.mp3',
+  YEAR_OF_PLENTY: 'flute.mp3',
+  FAIL: 'fail.mp3',
 }

@@ -56,7 +56,7 @@ export default class UI {
     })
 
     this.res_selection_ui = new ResSelectionUI({
-      onSubmit: (res1, res2) => game.onDevCardResSelection(res1, res2),
+      onSubmit: (type, res1, res2) => game.onMonopolyYearOfPlentyResSelection(type, res1, res2),
       onDevCardClick: type => this.player_ui.clickCard(type),
     })
   }
@@ -69,6 +69,13 @@ export default class UI {
     this.trade_ui.render()
     this.res_selection_ui.render()
     this.$splash.classList.add('hide')
+    this.#setUpEvents()
+  }
+
+  #setUpEvents() {
+    document.addEventListener('keydown', e => {
+      e.code === 'Escape' && this.#game.clearDevCardUsage()
+    })
   }
 
   showDiceValue() {

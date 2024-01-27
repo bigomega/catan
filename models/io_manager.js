@@ -59,6 +59,12 @@ export default class IOManager {
 
     /** @event Knight-Robber-Move */
     socket.on(SOC.ROAD_BUILDING, (r1, r2) => game.roadBuildingIO(pid, r1, r2))
+
+    /** @event Monopoly-Resource */
+    socket.on(SOC.MONOPOLY, res => game.monopolyIO(pid, res))
+
+    /** @event Year-of-Plenty-Resource */
+    socket.on(SOC.YEAR_OF_PLENTY, (res1, res2) => game.yearOfPlentyIO(pid, res1, res2))
   }
 
   updateWaitingRoom(player) { this.emit(SOC.JOINED_WAITING_ROOM, player) }
@@ -102,6 +108,14 @@ export default class IOManager {
   updateKnightMoved(pid) { this.emit(SOC.KNIGHT_MOVE, pid) }
 
   updateRoadBuildingUsed(pid) { this.emit(SOC.ROAD_BUILDING, pid) }
+
+  updateMonopolyUsed_Private(player_socket_id, pid, res, total_count, self_count) {
+    this.#io.to(player_socket_id).emit(SOC.MONOPOLY, pid, res, total_count, self_count)
+  }
+
+  updateYearOfPlentyUsed_Private(player_socket_id, pid, res_obj) {
+    this.#io.to(player_socket_id).emit(SOC.YEAR_OF_PLENTY, pid, res_obj)
+  }
 
   emit(type, ...data) { this.#io.to(this.#game.id).emit(type, ...data) }
 }

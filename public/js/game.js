@@ -111,14 +111,14 @@ export default class Game {
   // STATE - Player Action
   #onPlayerAction() {
     if (this.#isMyPid(this.active_pid)) {
-      this.#clearDevCardUsage()
+      this.clearDevCardUsage()
       this.#ui.player_ui.toggleShow(1)
       this.#ui.toggleActions(1)
     }
   }
   // STATE - Drop for Robber
   #onRobberDropCards() {
-    this.#isMyPid(this.active_pid) && this.#clearDevCardUsage()
+    this.#isMyPid(this.active_pid) && this.clearDevCardUsage()
     const drop_count = this.#player.resource_count > 7 ? Math.floor(this.#player.resource_count / 2) : 0
     if (drop_count) {
       this.#ui.robberDrop(drop_count)
@@ -132,7 +132,7 @@ export default class Game {
     this.#ui.board_ui.toggleBlur()
     if (this.#isMyPid(this.active_pid)) {
       if (this.state === ST.ROBBER_MOVE) {
-        this.#clearDevCardUsage()
+        this.clearDevCardUsage()
         this.#ui.player_ui.toggleShow()
       }
       this.#ui.showTiles(this.#board.getRobbableTiles())
@@ -187,7 +187,7 @@ export default class Game {
     this.#ui.alert_ui.alertDiceValue(this.getPlayer(pid), d1, d2, CONST.TILE_RES[rob_tile_type])
   }
 
-  // SOC_Private - Total Res received
+  // SOC_P - Total Res received
   updateTotalResReceivedInfoSoc(res_obj) { this.#ui.alert_ui.alertResTaken(res_obj) }
 
   // SOC - Dev Card taken
@@ -196,7 +196,7 @@ export default class Game {
     this.#ui.alert_ui.alertDevCardTaken(this.getPlayer(pid), card)
   }
 
-  // SOC_Private - Update done: robber dropping cards
+  // SOC_P - Update done: robber dropping cards
   updateRobberDroppedSoc() {
     this.#ui.robber_drop_ui.hide()
     this.#ui.board_ui.toggleBlur()
@@ -212,7 +212,7 @@ export default class Game {
     this.#ui.alert_ui.alertRobberMoveDone(this.getPlayer(pid), tile, num)
   }
 
-  // SOC_Private - Stolen info Notification
+  // SOC_P - Stolen info Notification
   updateStoleInfoSoc(p1_id, p2_id, res) { this.#ui.alert_ui.alertStolenInfo(this.getPlayer(p2_id), res) }
 
   // SOC - Trade Success data
@@ -227,21 +227,34 @@ export default class Game {
     })
   }
 
-  // Trade Request
+  // SOC - Trade Request
   requestTradeSoc(pid, trade_obj) {
     this.#ui.trade_ui.renderNewRequest(this.getPlayer(pid), trade_obj)
     this.#audio_manager.playTradeRequest()
   }
 
-  // Knight moved using Dev Card
+  // SOC - DEV_C - Knight moved using Dev Card
   updateKnightMovedSoc(pid) {
     this.#audio_manager.playKnight()
     this.#ui.alert_ui.alertKnightUsed()
   }
 
+  // SOC - DEV_C - Road Building Used
   updateRoadBuildingUsedSoc(pid) {
     this.#audio_manager.playRoadBuilding()
     this.#ui.alert_ui.alertRoadBuildingUsed(this.getPlayer(pid))
+  }
+
+  // SOC_P - DEV_C - Monopoly Used
+  updateMonopolyUsedSoc(pid, res, total, self_count) {
+    total ? this.#audio_manager.playMonopoly() : this.#audio_manager.playFail()
+    this.#ui.alert_ui.alertMonopolyUsed(this.getPlayer(pid), res, total, self_count)
+  }
+
+  // SOC_P - DEV_C - Year of Plenty Used
+  updateYearOfPlentyUsedSoc(pid, res_obj) {
+    this.#audio_manager.playYearOfPlenty()
+    this.#ui.alert_ui.alertYearOfPlentyUsed(this.getPlayer(pid), res_obj)
   }
 
   setTimerSoc(t, pid) { this.#ui.player_ui.resetTimer(t, this.#isMyPid(pid)) }
@@ -297,7 +310,7 @@ export default class Game {
     // Road Building DC
     if (location_type === 'E' && this.#player._is_playing_dc === 'dR') {
       if (this.#temp.r1) {
-        this.#clearDevCardUsage()
+        this.clearDevCardUsage()
         this.#temp.r1 !== id && this.#socket_manager.sendRoadBuildingLocs(this.#temp.r1, id)
       } else {
         this.#temp.r1 = id
@@ -350,8 +363,13 @@ export default class Game {
   }
 
   // Monopoly & Year of Plenty Resource Selection
-  onDevCardResSelection(type, res1, res2) {
+  onMonopolyYearOfPlentyResSelection(type, res1, res2) {
     this.#player._is_playing_dc = false
+    if (type === 'dY' && res2) {
+      this.#socket_manager.sendYearOfPlentyResource(res1, res2)
+    } else if (type === 'dM') {
+      this.#socket_manager.sendMonopolyResource(res1)
+    }
   }
 
   onTradeResponse(id, accepted) { this.#socket_manager.sendTradeResponse(id, accepted) }
@@ -361,7 +379,8 @@ export default class Game {
   onEndTurn() { this.#socket_manager.endTurn() }
   //#endregion
 
-  #clearDevCardUsage() {
+  clearDevCardUsage() {
+    if (!this.#player._is_playing_dc) return
     this.#ui.hideAllShown(0)
     if (this.#player._is_playing_dc === 'dR' && this.#temp.r1) {
       this.#board.findEdge(this.#temp.r1)?.buildRoad(null)

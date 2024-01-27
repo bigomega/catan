@@ -74,13 +74,9 @@ export default class AlertUI {
     }, given, taken))
   }
   alertKnightUsed() { this.appendStatus(MSG.KNIGHT_USED_APPEND.all()) }
-  alertRoadBuildingUsed(p) { this.setStatus(MSG.ROAD_BUILDING_USED.all(p)) }
-
-  // getMessage(alert_player, msg_key, ...data) {
-  //   if (alert_player.id === this.#player.id)
-  //     return GAME_MESSAGES[msg_key]?.self(...data)
-  //   return GAME_MESSAGES[msg_key]?.other(...data, alert_player)
-  // }
+  alertRoadBuildingUsed(p) { this.setStatus(MSG.ROAD_BUILDING_USED.all(this.#isNotMe(p))) }
+  alertMonopolyUsed(p, res, total, self) { this.setStatus(MSG.MONOPOLY_USED.all(this.#isNotMe(p), res, total, self)) }
+  alertYearOfPlentyUsed(p, res_obj) { this.setStatus(MSG.YEAR_OF_PLENTY_USED.all(this.#isNotMe(p), res_obj)) }
 
   #isMe(p) { return p?.id === this.#player.id }
   #isNotMe(p) { return p?.id !== this.#player.id && p }

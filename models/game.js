@@ -88,7 +88,7 @@ export default class Game {
       case ST.PLAYER_ACTIONS:
         this.expected_actions.add({ callback: _ => {
           this.active_pid++
-          this.players.forEach(p => p.resetDevCard(p.id === this.active_pid))
+          this.players.forEach(p => p.resetDevCard(this.#isActive(p.id)))
           this.#gotoNextState(); this.ongoing_trades = []
         }})
         this.setTimer(this.config.player_turn.time)
@@ -138,7 +138,7 @@ export default class Game {
       this.#distributeCornerResources(s_id)
       if (this.active_pid == 1) {
         this.turn++
-        this.players.forEach(p => p.resetDevCard(p.id === this.active_pid))
+        this.players.forEach(p => p.resetDevCard(this.#isActive(p.id)))
         this.#gotoNextState()
       } else { this.active_pid-- }
     }
@@ -218,8 +218,7 @@ export default class Game {
 
   /** Building - Edge & Corner click (other than initial-build) */
   clickedLocationIO(pid, loc_type, id) {
-    if (pid !== this.active_pid) return
-    if (this.state !== ST.PLAYER_ACTIONS) return
+    if (!this.#canAct(pid)) return
     const player = this.getActivePlayer()
     // Validate & Build
     if (loc_type === CONST.LOCS.EDGE) {
@@ -250,8 +249,7 @@ export default class Game {
 
   /** Development Card buying click */
   buyDevCardIO(pid) {
-    if (pid !== this.active_pid) return
-    if (this.state !== ST.PLAYER_ACTIONS) return
+    if (!this.#canAct(pid)) return
     if (!this.dev_cards.length) return
     const player = this.getActivePlayer()
     if (!player.canBuy('DEV_C')) return
@@ -284,7 +282,7 @@ export default class Game {
 
   /** Robber movement location and stolen player */
   robberMoveIO(pid, tile_id, stolen_pid) {
-    if (pid !== this.active_pid) return
+    if (!this.#isActive(pid)) return
     if (this.state !== ST.ROBBER_MOVE) return
     const expected_index = this.expected_actions.findIndex(_ => _.type === ST.ROBBER_MOVE)
     const { callback } = this.expected_actions[expected_index]
@@ -295,8 +293,7 @@ export default class Game {
 
   /** Request a Trade */
   tradeRequestIO(pid, type, giving, taking, counter_id) {
-    if (pid !== this.active_pid) return
-    if (this.state !== ST.PLAYER_ACTIONS) return
+    if (!this.#canAct(pid)) return
     // Reject trading the same resources
     if (Object.entries(giving).filter(([k, v]) => v && taking[k]).length) return
     const player = this.getPlayer(pid)
@@ -333,7 +330,7 @@ export default class Game {
     if (this.state !== ST.PLAYER_ACTIONS) return
     if (this.ongoing_trades.length <= id) return
     const { pid: trading_pid, giving, asking } = this.ongoing_trades[id]
-    if (pid !== this.active_pid && trading_pid !== this.active_pid ) return
+    if (!this.#isActive(pid) && !this.#isActive(trading_pid) ) return
     if (accepted) {
       const p1 = this.getPlayer(trading_pid)
       const p2 = this.getPlayer(pid)
@@ -352,8 +349,7 @@ export default class Game {
 
   /** Knight Dev_C used */
   knightMoveIO(pid, tile_id, stolen_pid) {
-    if (pid !== this.active_pid) return
-    if (this.state !== ST.PLAYER_ACTIONS && this.state !== ST.PLAYER_ROLL) return
+    if (!this.#canPlayDC(pid)) return
     const player = this.getPlayer(pid)
     if (!player.canPlayDevCard('dK')) { return }
     player.playedDevCard('dK')
@@ -364,8 +360,7 @@ export default class Game {
 
   /** Road Building Dev_C used */
   roadBuildingIO(pid, r1, r2) {
-    if (pid !== this.active_pid) return
-    if (this.state !== ST.PLAYER_ACTIONS && this.state !== ST.PLAYER_ROLL) return
+    if (!this.#canPlayDC(pid)) return
     const player = this.getPlayer(pid)
     if (!player.canPlayDevCard('dR')) { return }
     player.playedDevCard('dR')
@@ -376,6 +371,39 @@ export default class Game {
     if (!valid_edges.includes(r2)) { r2 = this.#getRandom(valid_edges) }
     this.build(pid, 'R', r2)
     this.#io_manager.updateRoadBuildingUsed(pid)
+  }
+
+  monopolyIO(pid, res) {
+    if (!CONST.RESOURCES[res]) return
+    if (!this.#canPlayDC(pid)) return
+    const player = this.getPlayer(pid)
+    if (!player.canPlayDevCard('dM')) { return }
+    player.playedDevCard('dM')
+    const res_from_player = {}
+    this.players.forEach(p => {
+      if (p.id === pid) return
+      const avail_res = p.closed_cards[res]
+      avail_res && p.takeCards({ [res]: avail_res })
+      res_from_player[p.id] = avail_res
+    })
+    const total_count = Object.values(res_from_player).reduce((mem, v) => mem + v, 0)
+    player.giveCards({ [res]: total_count })
+    this.players.forEach(p => {
+      this.#io_manager.updateMonopolyUsed_Private(this.getPlayerSoc(p.id), pid, res, total_count, res_from_player[p.id])
+    })
+  }
+
+  yearOfPlentyIO(pid, res1, res2) {
+    if (!CONST.RESOURCES[res1] || !CONST.RESOURCES[res2]) return
+    if (!this.#canPlayDC(pid)) return
+    const player = this.getPlayer(pid)
+    if (!player.canPlayDevCard('dY')) { return }
+    player.playedDevCard('dY')
+    const res_obj = res1 === res2 ? { [res1]: 2 } : { [res1]: 1, [res2]: 1 }
+    player.giveCards(res_obj)
+    this.players.forEach(p => {
+      this.#io_manager.updateYearOfPlentyUsed_Private(this.getPlayerSoc(p.id), pid, pid === p.id && res_obj)
+    })
   }
 
   playerRollIO() { this.#next() }
@@ -457,6 +485,13 @@ export default class Game {
     }, time_in_seconds * 1000)
   }
   clearTimer() { clearTimeout(this.#timer) }
+
+  #canPlayDC(pid) {
+    return this.#isActive(pid)
+      && (this.state === ST.PLAYER_ACTIONS || this.state === ST.PLAYER_ROLL)
+  }
+  #canAct(pid) { return this.#isActive(pid) && this.state === ST.PLAYER_ACTIONS }
+  #isActive(pid) { return pid === this.active_pid }
 
   #getRandom(list) { return list[Math.floor(Math.random() * list.length)] }
   #gotoNextState() { this.state = NEXT_STATE[this.state] }

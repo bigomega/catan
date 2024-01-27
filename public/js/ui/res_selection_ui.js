@@ -64,6 +64,7 @@ export default class ResSelectionUI {
     this.$el.querySelector('.dev-card').dataset.type = type
     this.$el.querySelector('.submit').innerText = submit_text
     this.$el.querySelector('.submit').classList.remove('active')
+    this.$el.querySelector('.card-area').classList.remove('inactive')
     this.$el.querySelectorAll('.card').forEach($el => $el.dataset.count = 0)
     this.$el.classList.remove('hide')
   }
