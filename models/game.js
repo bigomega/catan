@@ -363,6 +363,7 @@ export default class Game {
     if (!this.#canPlayDC(pid)) return
     const player = this.getPlayer(pid)
     if (!player.canPlayDevCard('dR')) { return }
+    if (CONST.PIECES_COUNT.R - player.pieces.R.length < 2) return
     player.playedDevCard('dR')
     let valid_edges = this.board.getRoadLocationsFromRoads(player.pieces.R)
     if (!valid_edges.includes(r1)) { r1 = this.#getRandom(valid_edges) }

@@ -35,6 +35,7 @@ export const DC_VICTORY_POINT_CARD_VARIETIES = ['dL', 'dMr', 'dG', 'dC', 'dU']
 export const LOCS = { CORNER: 'C', EDGE: 'E', TILE: 'T' }
 
 export const PIECES = { S: 'Settlement', C: 'City', R: 'Road' }
+export const PIECES_COUNT = { S: 5, C: 4, R: 15 }
 
 export const COST = {
   R: { L: 1, B: 1 },

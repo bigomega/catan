@@ -155,10 +155,13 @@
     /* BUILD ROAD */
     .build-road {
       position: relative;
-      width: 40px;
+      width: 6px;
+      height: 40px;
+      border: 2px solid #fff;
+      background: var(--sand-color-dark);
       cursor: pointer;
 
-      &::before {
+      &::after {
         content: '';
         display: block;
         width: 40px;
@@ -167,32 +170,23 @@
         background: #fff;
         opacity: 0.3;
         position: absolute;
-        left: 0px;
-        top: 2px;
+        left: -17px;
+        top: 0px;
         z-index: -1;
-      }
-
-      &::after {
-        content: '';
-        display: flex;
-        width: 6px;
-        margin-left: 15px;
-        height: 40px;
-        border: 2px solid #fff;
-        background: var(--sand-color-dark);
       }
 
       &:hover, &.active {
         filter: brightness(0.7);
-        &::after { border-color: transparent; }
+        border-color: transparent;
       }
 
-      &.disabled {
+      &.disabled, &[data-count="0"] {
         cursor: not-allowed;
         filter: grayscale(1) brightness(2);
         opacity: 0.7;
-        &::after { border-color: #0003; }
-        &::before { opacity: .1; }
+        border-color: #333;
+        &::after { visibility: hidden; }
+        &::before { color: #333; }
       }
     }
 
@@ -207,10 +201,11 @@
       filter: drop-shadow(1px 1px 0px #fff) drop-shadow(-1px -1px 0px #fff) drop-shadow(1px -1px 0px #fff) drop-shadow(-1px 1px 0px #fff);
       &:hover, &.active { filter: brightness(0.7); }
 
-      &.disabled {
+      &.disabled, &[data-count="0"] {
         cursor: not-allowed;
         filter: grayscale(1) brightness(2);
         opacity: 0.5;
+        &::before { color: #333; }
       }
     }
     .build-settlement { width: 30px; background-size: 30px; }
@@ -222,12 +217,14 @@
       position: relative;
       & img { width: 30px; }
       &:hover { filter: brightness(0.7); }
-      &.disabled {
+      &.disabled, &[data-count="0"] {
         cursor: not-allowed;
         filter: grayscale(1);
         opacity: .5;
       }
+    }
 
+    .build-road, .build-settlement, .build-city, .dev-card {
       &::before {
         content: attr(data-count);
         position: absolute;
@@ -240,13 +237,16 @@
         color: #999;
         background: #fff;
         border-radius: 3px;
-        border: 1px solid #999;
+        border: 1px solid;
         display: flex;
         justify-content: center;
         align-items: center;
         /* opacity: 0.7; */
       }
     }
+    .build-road::before { top: 32px; left: 3px; }
+    .build-settlement::before { top: 20px; }
+    .build-city::before { left: 31px; top: 28px; }
 
     /* TRADE */
     .trade {
@@ -285,10 +285,10 @@
   &.id-3 .actions { background: var(--player-3-color); border-color: var(--player-3-color-dark); }
   &.id-4 .actions { background: var(--player-4-color); border-color: var(--player-4-color-dark); }
 
-  &.id-1 .actions .build-road::after { background: var(--player-1-color-dark); }
-  &.id-2 .actions .build-road::after { background: var(--player-2-color-dark); }
-  &.id-3 .actions .build-road::after { background: var(--player-3-color-dark); }
-  &.id-4 .actions .build-road::after { background: var(--player-4-color-dark); }
+  &.id-1 .actions .build-road { background: var(--player-1-color-dark); }
+  &.id-2 .actions .build-road { background: var(--player-2-color-dark); }
+  &.id-3 .actions .build-road { background: var(--player-3-color-dark); }
+  &.id-4 .actions .build-road { background: var(--player-4-color-dark); }
 
   &.id-1 .actions .build-settlement { background-image: url(/images/pieces/settlement-1.png); }
   &.id-2 .actions .build-settlement { background-image: url(/images/pieces/settlement-2.png); }

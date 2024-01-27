@@ -122,6 +122,7 @@ export default class Player {
 
   canBuy(type) {
     if (!(type in CONST.COST)) return
+    if (CONST.PIECES[type] && CONST.PIECES_COUNT[type] <= this.pieces[type].length) return
     return Object.keys(CONST.COST[type]).reduce((mem, res_key) => {
       return mem && (this.closed_cards[res_key] >= CONST.COST[type][res_key])
     }, true)

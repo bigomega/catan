@@ -62,9 +62,9 @@ export default class PlayerUI {
     this.$action_bar.innerHTML = `
       <div class="timer disabled">0:00</div>
       <div class="roll-dice disabled" title="Roll Dice (SPACE)">🎲🎲</div>
-      <div class="build-road disabled" title="Build Road (r)"></div>
-      <div class="build-settlement disabled" title="Build Settlement (s)"></div>
-      <div class="build-city disabled" title="Build City (c)"></div>
+      <div class="build-road disabled" title="Build Road (r)" data-count="${CONST.PIECES_COUNT.R}"></div>
+      <div class="build-settlement disabled" title="Build Settlement (s)" data-count="${CONST.PIECES_COUNT.S}"></div>
+      <div class="build-city disabled" title="Build City (c)" data-count="${CONST.PIECES_COUNT.C}"></div>
       <div class="dev-card disabled" title="Buy Development Card (d)" data-count="-">
         <img src="/images/dc-back.png"/>
       </div>
@@ -104,6 +104,7 @@ export default class PlayerUI {
     const getEventCb = piece => e => {
       const classList = this.#$keyToEl(piece).classList
       if (classList.contains('disabled')) return
+      if (this.#$keyToEl(piece).dataset.count === '0') return
       this.#onPieceClick(piece, classList.contains('active'))
       classList.toggle('active')
     }
@@ -113,6 +114,7 @@ export default class PlayerUI {
     // Buy Development Card
     this.$buy_dev_card.addEventListener('click', e => {
       if (e.target.classList.contains('disabled')) return
+      if (e.target.dataset.count === '0') return
       this.#onBuyDevCardClick()
     })
     // Trade
@@ -212,6 +214,12 @@ export default class PlayerUI {
   toggleDice(active) { this.toggleAction(this.$dice, active) }
   toggleAction($el, toggle) {
     $el?.classList[toggle ? 'remove' : 'add']('disabled')
+  }
+
+  updatePiecesCount() {
+    this.$build_road.dataset.count = CONST.PIECES_COUNT.R - this.player.pieces.R.length
+    this.$build_settlement.dataset.count = CONST.PIECES_COUNT.S - this.player.pieces.S.length
+    this.$build_city.dataset.count = CONST.PIECES_COUNT.C - this.player.pieces.C.length
   }
 
   setDevCardCount(n) { this.$buy_dev_card.dataset.count = n }

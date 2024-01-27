@@ -35,6 +35,7 @@ export default class Game {
       this.#ui.build(pid, piece, loc)
     })
     this.#ui.player_ui.setDevCardCount(game_obj.dev_cards_len)
+    this.#ui.player_ui.updatePiecesCount()
     game_obj.timer && this.setTimerSoc(game_obj.timer, this.active_pid)
     if (game_obj.robber_loc) {
       this.#board.moveRobber(game_obj.robber_loc)
@@ -157,20 +158,23 @@ export default class Game {
     this.#audio_manager.playBuild(piece, this.#isMyPid(pid))
     this.#board.build(pid, piece, loc)
     this.#ui.build(pid, piece, loc)
+    this.#isMyPid(pid) && this.#ui.player_ui.updatePiecesCount()
     this.#amIActing(pid) && this.#ui.toggleActions(1)
     this.#ui.alert_ui.alertBuild(this.getPlayer(pid), piece)
   }
 
   // SOC - Player Update
   updatePlayerSoc(update_player, key, context) {
-    if (key.includes('closed_cards') && context && this.#isMyPid(update_player.id)) {
-      this.#ui.player_ui.updateHand(update_player, context)
-      if (key === 'closed_cards') {
-        const count = Object.values(context).reduce((mem, v) => mem + v, 0)
-        this.#audio_manager.playCardTake(count)
+    if (this.#isMyPid(update_player.id)) {
+      this.#player.update(update_player)
+      if (key.includes('closed_cards') && context) {
+        this.#ui.player_ui.updateHand(update_player, context)
+        if (key === 'closed_cards') {
+          const count = Object.values(context).reduce((mem, v) => mem + v, 0)
+          this.#audio_manager.playCardTake(count)
+        }
       }
     }
-    if (this.#isMyPid(update_player.id)) { this.#player.update(update_player) }
     /* this.#ui.all_players_ui.updatePlayer(update_player, key) */
     this.#amIActing(update_player.id) && this.#ui.toggleActions(1)
   }
@@ -394,6 +398,7 @@ export default class Game {
       && this.active_pid === this.#player.id
       && (this.state === ST.PLAYER_ACTIONS || this.state === ST.PLAYER_ROLL)
       && !this.#player._is_playing_dc
+      && (type !== 'dR' || ((CONST.PIECES_COUNT.R - this.#player.pieces.R.length) >= 2))
   }
   playRobberAudio() { this.#audio_manager.playRobber() }
   #amIActing(pid = this.#player.id) {

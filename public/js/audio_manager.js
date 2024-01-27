@@ -34,6 +34,6 @@ export default class AudioManager {
   playKnight() { this.play(AUDIO.KNIGHT) }
   playRoadBuilding() { this.play(AUDIO.ROAD_BUILDING) }
   playMonopoly() { this.play(AUDIO.MONOPOLY) }
-  playYearOfPlenty() { this.play(AUDIO.YEAR_OF_PLENTY) }
+  playYearOfPlenty() { this.play(AUDIO.YEAR_OF_PLENTY, .3) }
   playFail() { this.play(AUDIO.FAIL) }
 }
