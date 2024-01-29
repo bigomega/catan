@@ -31,4 +31,31 @@ export default class AnimationUI {
     setTimeout(_ => this.$el.classList.add('start'), 200)
     setTimeout(_ => this.$el.classList.add('finish'), 950)
   }
+
+  animateLongestRoad(pid, p, locs) {
+    if (!locs?.length) return
+
+    const $board = document.querySelector('#game > .board')
+    $board.classList.add('darken')
+    const ids = locs.slice()
+    const timer = setInterval(_ => {
+      if (!ids.length) { return clearInterval(timer) }
+      const { id, type } = ids.pop()
+      $board.querySelector(`.${type == 'e' ? 'edge' : 'corner'}[data-id="${id}"]`)?.classList.add('longest')
+    }, 2000 / locs.length)
+    setTimeout(_ => {
+      this.$el.className = `animation-zone ready longest-road-animation`
+      this.$el.innerHTML = `
+        <div class="title p${pid}">${GAME_MESSAGES.LONGEST_ROAD.all(p, locs.filter(_ => _.type == 'e').length)}</div>
+        <div class="container">
+        <div class="longest-road-card"></div>
+        </div>
+      `
+    }, 4000)
+    setTimeout(_ => {
+      this.$el.classList.add('start')
+      $board.classList.remove('darken')
+      $board.querySelectorAll('.longest').forEach(_ => _.classList.remove('longest'))
+    }, 6000)
+  }
 }

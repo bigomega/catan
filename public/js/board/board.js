@@ -176,6 +176,64 @@ export default class Board {
     }, [])
   }
 
+  findLongestPathFromRoads(pid, locs) {
+    if (!pid || !locs?.length) return []
+
+    return locs.reduce((mem1, loc) => {
+      const starting_edge = this.findEdge(loc)
+      if (!starting_edge || starting_edge.road !== pid) return mem1
+
+      const explored = []
+      const recursiveFn = (edge, from_cid) => {
+        if (explored.includes(edge.id)) return []
+        explored.push(edge.id)
+        const c1_possible = from_cid !== edge.corner1.id
+          && (!edge.corner1.player_id || edge.corner1.player_id === pid)
+        const c2_possible = from_cid !== edge.corner2.id
+          && (!edge.corner2.player_id || edge.corner2.player_id === pid)
+        const c1_longest = c1_possible
+          ? edge.corner1.getEdges(pid)
+            .filter(_ => _.id !== edge.id)
+            .reduce((mem, e) => {
+              const path = recursiveFn(e, edge.corner1.id)
+              return path.length > mem.length ? path : mem
+            }, [])
+          : []
+        const c2_longest = c2_possible
+          ? edge.corner2.getEdges(pid)
+            .filter(_ => _.id !== edge.id)
+            .reduce((mem, e) => {
+              const path = recursiveFn(e, edge.corner2.id)
+              return path.length > mem.length ? path : mem
+            }, [])
+          : []
+        return [edge.id, ...c1_longest.length > c2_longest.length ? c1_longest : c2_longest]
+      }
+
+      const longest = recursiveFn(starting_edge)
+      return longest.length > mem1.length ? longest : mem1
+    }, [])
+  }
+
+  addTakenCornersAlongEdgePath(locs) {
+    if (!locs?.length || locs.length < 2) return []
+    const findCommonCorner = (e1, e2) => {
+      if (e1.corner1 === e2.corner1) return e1.corner1
+      if (e1.corner1 === e2.corner2) return e1.corner1
+      return e1.corner2
+    }
+    const new_list = [{id: locs[0], type: 'e'}]
+    locs.reduce((old_edge, eid) => {
+      const edge = this.findEdge(eid)
+      if (!old_edge) return edge
+      const c = findCommonCorner(old_edge, edge)
+      c.player_id && new_list.push({id: c.id, type: 'c'})
+      new_list.push({id: eid, type: 'e'})
+      return edge
+    }, null)
+    return new_list
+  }
+
   getRobbedTile() { return this.findTile(this.robber_loc) }
   findCorner(id) { return this.#corner_refs[id] }
   findEdge(id) { return this.#edge_refs[id] }

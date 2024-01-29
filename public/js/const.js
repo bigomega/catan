@@ -66,6 +66,8 @@ export const GAME_CONFIG = {
   trade: { max_requests: 3 },
   win_points: 10,
   alert: { time: 3 },
+  largest_army_start: 3,
+  longest_road_start: 5,
 }
 
 export const GAME_STATES = {
@@ -130,4 +132,5 @@ export const AUDIO_FILES = {
   YEAR_OF_PLENTY: 'flute.mp3',
   FAIL: 'fail.mp3',
   LARGEST_ARMY: 'horse-army.mp3',
+  LONGEST_ROAD: 'horse-cart.mp3',
 }

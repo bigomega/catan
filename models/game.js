@@ -26,8 +26,8 @@ export default class Game {
   turn = 1; dice_value = 2
   mapkey = `S(br-S2).S.S(bl-B2).S\n-S.M5.J10.J8.S(bl-*3)\n-S(r-O2).J2.C9.G11.C4.S\n-S.G6.J4.D.F3.F11.S(l-W2)\n+S(r-L2).F3.G5.C6.M12.S\n+S.F8.G10.M9.S(tl-*3)\n+S(tr-*3).S.S(tl-*3).S`
   dev_cards = Helper.shuffle(CONST.DEVELOPMENT_CARDS_DECK.slice())
-  largest_army = { pid: 0, knight_count: 2 }
-  longest_road = { pid: 0, roads: [-1, -1, -1, -1] }
+  largest_army_pid = -1
+  longest_road_pid = -1
 
   get state() { return this.#state }
   set state(s) {
@@ -356,17 +356,19 @@ export default class Game {
     if (!player.canPlayDevCard('dK')) { return }
     player.playedDevCard('dK')
     this.#expectedRobberMove(pid, { tile_id, stolen_pid, knight: true })
-    if (player.open_dev_cards.dK > this.largest_army.knight_count) {
-      this.largest_army.knight_count = player.open_dev_cards.dK
-      const army_pid = this.largest_army.pid
-      if (!army_pid || army_pid !== player.id) {
-        player.toggleLargestArmy(true)
-        this.getPlayer(army_pid)?.toggleLargestArmy(false)
-        this.largest_army.pid = player.id
-        this.#io_manager.updateLargestArmy(pid, this.largest_army.knight_count)
-      }
-    }
     this.#io_manager.updateKnightMoved(pid)
+    // Largest Army
+    const army_player = this.getPlayer(this.largest_army_pid)
+    if (this.largest_army_pid !== pid
+      && (army_player
+        ? player.open_dev_cards.dK > army_player.open_dev_cards.dK
+        : player.open_dev_cards.dK >= this.config.largest_army_start)
+    ) {
+      army_player && army_player.toggleLargestArmy(false)
+      player.toggleLargestArmy(true)
+      this.largest_army_pid = pid
+      this.#io_manager.updateLargestArmy(pid, player.open_dev_cards.dK)
+    }
   }
 
 
@@ -457,10 +459,58 @@ export default class Game {
   build(pid, piece, loc) {
     const player = this.getPlayer(pid)
     this.board.build(pid, piece, loc)
-    piece === 'S' && player.addPort(this.board.findCorner(loc)?.trade)
+    if (piece === 'S') {
+      player.addPort(this.board.findCorner(loc)?.trade)
+      // is this breaking enemy roads?
+      const [e1, e2] = (this.board.findCorner(loc)?.getEdges(null) || []).filter(_ => _.road !== pid)
+      if (e1 && e2 && e1.road && e1.road === e2.road) { // yes
+        const longest_player = this.getPlayer(this.longest_road_pid)
+        if (longest_player && this.longest_road_pid === e1.road
+          && longest_player.longest_road_list.includes(e1.id)
+          && longest_player.longest_road_list.includes(e2.id))
+        {
+          this.#checkLongestRoad({ broken_pid: e2.road })
+        }
+      }
+    }
     player.addPiece(loc, piece)
+    piece === 'R' && this.#checkLongestRoad({ pid })
     this.map_changes.push({ pid, piece, loc })
     this.#io_manager.updateBuild(pid, piece, loc)
+  }
+
+  #checkLongestRoad({ pid, broken_pid }) {
+    let player, longest_path
+    if (pid) {
+      player = this.getPlayer(pid)
+      longest_path = this.board.findLongestPathFromRoads(pid, player.pieces.R)
+      if (longest_path.length > player.longest_road_list.length) {
+        player.setLongestRoadPath(longest_path)
+      }
+    } else {
+      if (broken_pid) {
+        const broken_player = this.getPlayer(broken_pid)
+        const new_long_path = this.board.findLongestPathFromRoads(broken_pid, broken_player?.pieces.R)
+        if (new_long_path.length < broken_player.longest_road_list.length) {
+          this.longest_road_pid = -1
+          broken_player?.setLongestRoadPath(new_long_path)
+        }
+      }
+      player = this.players.slice().sort((a, b) => a.longest_road_list.length - b.longest_road_list.length).pop()
+      longest_path = player.longest_road_list
+    }
+
+    const curr_long_player = this.getPlayer(this.longest_road_pid)
+    if (this.longest_road_pid !== player.id
+      && (curr_long_player
+        ? longest_path.length > curr_long_player.longest_road_list.length
+        : longest_path.length >= this.config.longest_road_start)
+    ) {
+      curr_long_player?.toggleLongestRoad(false)
+      player.toggleLongestRoad(true)
+      this.longest_road_pid = player.id
+      this.#io_manager.updateLongestRoad(player.id, longest_path)
+    }
   }
 
   #onPlayerUpdate(pid, key, context) {

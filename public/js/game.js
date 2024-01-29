@@ -275,6 +275,17 @@ export default class Game {
     }, 2000) // Wait for the Knight DC animation & sound
   }
 
+  // SOC - Longest Road
+  updateLongestRoadSoc(pid, locs = []) {
+    setTimeout(_ => {
+      this.#audio_manager.playLongestRoad()
+      const player = this.getPlayer(pid)
+      this.#ui.alert_ui.alertLongestRoad(player, locs.length)
+      const new_locs = this.#board.addTakenCornersAlongEdgePath(locs)
+      this.#ui.animation_ui.animateLongestRoad(pid, !this.#isMyPid(pid) && this.getPlayer(pid), new_locs)
+    }, 500) // Wait for the road animation
+  }
+
   setTimerSoc(t, pid) { this.#ui.player_ui.resetTimer(t, this.#isMyPid(pid)) }
   //#endregion
 

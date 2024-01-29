@@ -37,4 +37,5 @@ export default class AudioManager {
   playYearOfPlenty() { this.play(AUDIO.YEAR_OF_PLENTY, .3) }
   playFail() { this.play(AUDIO.FAIL) }
   playLargestArmy() { this.play(AUDIO.LARGEST_ARMY) }
+  playLongestRoad() { this.play(AUDIO.LONGEST_ROAD) }
 }

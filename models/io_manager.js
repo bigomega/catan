@@ -119,5 +119,7 @@ export default class IOManager {
 
   updateLargestArmy(pid, count) { this.emit(SOC.LARGEST_ARMY, pid, count) }
 
+  updateLongestRoad(pid, locs) { this.emit(SOC.LONGEST_ROAD, pid, locs) }
+
   emit(type, ...data) { this.#io.to(this.#game.id).emit(type, ...data) }
 }

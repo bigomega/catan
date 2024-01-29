@@ -18,6 +18,7 @@ export default class Player {
   turn_bought_dc = {}
   largest_army = false
   longest_road = false
+  longest_road_list = []
 
   constructor(name, id, onChange) {
     this.id = id
@@ -158,6 +159,11 @@ export default class Player {
     }
   }
 
+  setLongestRoadPath(locs) {
+    this.longest_road_list = locs
+    this.onChange(this.id, 'longest_road_list', { longest_road_list: locs })
+  }
+
   setLastStatus(message) { this.last_status = message }
 
   toJSON(get_private) {
@@ -174,6 +180,7 @@ export default class Player {
       can_play_dc: this.can_play_dc,
       largest_army: this.largest_army,
       longest_road: this.longest_road,
+      longest_road_list: this.longest_road_list,
       ...(get_private ? {
         turn_bought_dc: this.turn_bought_dc,
         private_vps: 0,

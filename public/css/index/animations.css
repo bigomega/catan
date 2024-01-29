@@ -141,3 +141,39 @@
     transition: opacity .15s linear 5s, z-index 0s 5.15s linear;
   }
 }
+
+/* Longest Road */
+.animation-zone.longest-road-animation {
+  background: color-mix(in srgb, #3a3527 80%, transparent);
+  display: flex; flex-direction: column; justify-content: flex-start; align-items: center;
+  transition: opacity .5s ease-out, z-index 0s linear;
+
+  .title {
+    color: #fff; background: var(--sand-color-dark);
+    font-family: sans-serif; font-size: 1.5em; font-weight: 200;
+    width: 100%; padding: 10px;
+    text-align: center; border-bottom: 2px solid;
+
+    &.p1 { background-color: var(--player-1-color); }
+    &.p2 { background-color: var(--player-2-color); }
+    &.p3 { background-color: var(--player-3-color); }
+    &.p4 { background-color: var(--player-4-color); }
+  }
+
+  .container {
+    margin-top: 50px; position: relative;
+
+    .longest-road-card {
+      height: 402px;
+      width: 327px; position: relative;
+      border: 1px solid; border-radius: 10px;
+      background: #c8b66d url(/images/extra-vps-sprite.png) -353px -152px/700px no-repeat;
+      box-shadow: 5px 5px 15px 0px #000;
+    }
+  }
+
+  &.start {
+    opacity: 0; z-index: -1;
+    transition: opacity .15s linear 0s, z-index 0s 0.15s linear;
+  }
+}

@@ -169,6 +169,17 @@
   &.S[data-trade-dir="right"]::after { transform: translate(53px, 37px); }
   &.S[data-trade-dir="left"]::after { transform: translate(35px, 41px); }
 }
+.board.darken .tile .background
+, .board.darken .tile.robbed .background
+, .board.darken .tile .number
+, .board.darken .tile .beaches
+, .board.darken .tile .trade-post
+, .board.darken .tile.robbed::before
+/* , .board.darken .tile .corner.taken */
+{
+  filter: brightness(.5);
+  transition: filter .25s ease;
+}
 
 /* --------------------------------------
 * CORNERS (& Trade Docs)
@@ -210,18 +221,20 @@
     }
 
     &.taken {
-      visibility: visible;
-      border-radius: 0;
-      background-color: transparent;
-      background-size: contain;
-      background-repeat: no-repeat;
+      visibility: visible; border-radius: 0;
+      background-color: transparent; background-size: contain; background-repeat: no-repeat;
       /* filter: drop-shadow(1px -1px 0px #000) drop-shadow(-1px 1px 0px #000) drop-shadow(1px 1px 0px #000) drop-shadow(-1px -1px 0px #000); */
       /* filter: drop-shadow(-3px 3px 3px #000); */
       /* filter: drop-shadow(-3px 3px 2px #000) drop-shadow(-3px 3px 4px var(--sand-color)) drop-shadow(-3px 3px 5px var(--sand-color)); */
       filter: drop-shadow(-3px 3px 2px #000) drop-shadow(1px -1px 3px var(--sand-color)) drop-shadow(3px -3px 5px var(--sand-color)) drop-shadow(-3px 3px 5px var(--sand-color)) drop-shadow(-3px 3px 4px var(--sand-color));
       transform: scale(4);
+      transition: all .25s ease-in;
       &[data-taken=S] { transition: transform .5s cubic-bezier(0.55, 0.06, 0.68, 0.19); transform: scale(1); }
       &[data-taken=C] { animation: city-show .5s cubic-bezier(0.55, 0.06, 0.68, 0.19); transform: scale(1); }
+
+      &.longest {
+        filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff);
+      }
 
       &.shown {
         animation: piece-settlement-blink 1s infinite;
@@ -275,6 +288,9 @@
     &.p-bottom_right { top: 115px; left: 135px; transform: rotate(120deg) translate(-5px, 13px); }
   }
 }
+.board.darken .tile .corner.taken:not(.longest) {
+  filter: brightness(1);
+}
 
 /* --------------------------------------
  * EDGES
@@ -317,9 +333,7 @@
       cursor: default;
       border: 1px solid;
       width: 21px; height: 150px; z-index: 5;
-      /* Longest Road Style */
-      /* box-shadow: 0px 0px 0 5px #fff, 0px -20px 0 5px #fff, 0px 20px 0 5px #fff; */
-      /* border-radius: 3px; */
+
       &.p1, &.p2, &.p3, &.p4 {
         transition: z-index 0s .25s linear, width 0.25s ease-in, height 0.25s ease-in;
         width: 7px; height: 50px; z-index: 2;
@@ -329,6 +343,12 @@
       &.p2 { background: var(--player-2-color); box-shadow: 1px 1px 0px 1px color-mix(in srgb, var(--player-2-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
       &.p3 { background: var(--player-3-color); box-shadow: 1px 1px 0px 1px color-mix(in srgb, var(--player-3-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
       &.p4 { background: var(--player-4-color); box-shadow: 1px 1px 0px 1px color-mix(in srgb, var(--player-4-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
+
+
+      &.longest {
+        box-shadow: 0px 0px 0 5px #fff, 0px -20px 0 5px #fff, 0px 20px 0 5px #fff;
+        border-radius: 3px; transition: all .25s ease-in;
+      }
     }
 
     &[data-dir="right"] { transform: rotate(0deg) translate(146px, 61px); }

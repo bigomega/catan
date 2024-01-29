@@ -52,6 +52,7 @@ export default class AllPlayersUI {
       case 'pieces': break
       case 'largest_army': break
       case 'longest_road': break
+      case 'longest_road_list': break
       case 'dc_update': break
     }
   }
