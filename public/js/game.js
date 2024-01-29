@@ -241,24 +241,28 @@ export default class Game {
   updateKnightMovedSoc(pid) {
     this.#audio_manager.playKnight()
     this.#ui.alert_ui.alertKnightUsed()
+    this.#isMyPid(pid) || this.#ui.animation_ui.animateDevelopmentCard('dK')
   }
 
   // SOC - DEV_C - Road Building Used
   updateRoadBuildingUsedSoc(pid) {
     this.#audio_manager.playRoadBuilding()
     this.#ui.alert_ui.alertRoadBuildingUsed(this.getPlayer(pid))
+    this.#isMyPid(pid) || this.#ui.animation_ui.animateDevelopmentCard('dR')
   }
 
   // SOC_P - DEV_C - Monopoly Used
   updateMonopolyUsedSoc(pid, res, total, self_count) {
     total ? this.#audio_manager.playMonopoly() : this.#audio_manager.playFail()
     this.#ui.alert_ui.alertMonopolyUsed(this.getPlayer(pid), res, total, self_count)
+    this.#isMyPid(pid) || this.#ui.animation_ui.animateDevelopmentCard('dM')
   }
 
   // SOC_P - DEV_C - Year of Plenty Used
   updateYearOfPlentyUsedSoc(pid, res_obj) {
     this.#audio_manager.playYearOfPlenty()
     this.#ui.alert_ui.alertYearOfPlentyUsed(this.getPlayer(pid), res_obj)
+    this.#isMyPid(pid) || this.#ui.animation_ui.animateDevelopmentCard('dY')
   }
 
   setTimerSoc(t, pid) { this.#ui.player_ui.resetTimer(t, this.#isMyPid(pid)) }

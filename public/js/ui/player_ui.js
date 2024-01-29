@@ -292,7 +292,7 @@ export default class PlayerUI {
         this.#onDevCardActivate(type)
       }
       if (['card', 'card-front', 'card-back'].includes(e.target.className)) { return }
-      this.closeCardPreview()
+      this.closeCardPreview(true)
     })
     document.addEventListener('keydown', e => {
       e.code === 'Escape' && this.closeCardPreview()
@@ -302,14 +302,15 @@ export default class PlayerUI {
 
   showCardPreview(type, show_info, show_activate) {
     this.#toggleBoardBlur(true); this.togglePlayerBlur(true)
-    this.$card_preview.classList.remove('hide')
+    this.$card_preview.classList.remove('hide', 'activated')
     this.$card_preview.querySelector('.card').dataset.type = type
     show_activate && this.$card_preview.querySelector('.activate').classList.remove('hide')
     show_info && this.$card_preview.querySelector('.info').classList.remove('hide')
   }
 
-  closeCardPreview() {
+  closeCardPreview(activated) {
     this.#toggleBoardBlur(false); this.togglePlayerBlur(false)
+    activated && this.$card_preview.classList.add('activated')
     this.$card_preview.classList.add('hide')
     this.$card_preview.querySelector('.activate').classList.add('hide')
     this.$card_preview.querySelector('.info').classList.add('hide')

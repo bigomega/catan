@@ -427,6 +427,15 @@
   }
 
 
+  &.activated.hide {
+    transition: opacity 0s linear, z-index 0s linear;
+    .card {
+      box-shadow: 0px 5px 0 -2px #5a460e, 0px 65px 20px -30px #000;
+      transform: rotateX(50deg);
+    }
+  }
+
+
   .activate {
     margin-top: 60px; padding: 13px 35px;
     border: 2px solid; border-radius: 50px;

@@ -8,6 +8,7 @@ import RobberDropUI from "./robber_drop_ui.js"
 import AllPlayersUI from "./all_players_ui.js"
 import TradeUI from "./trade_ui.js"
 import ResSelectionUI from "./res_selection_ui.js"
+import AnimationUI from "./animations_ui.js"
 const $ = document.querySelector.bind(document)
 
 export default class UI {
@@ -26,6 +27,7 @@ export default class UI {
     this.alert_ui = new AlertUI(player, st => game.saveStatus(st), game.config.alert.time)
     this.board_ui = new BoardUI(board, (loc, id) => game.onBoardClick(loc, id))
     this.all_players_ui = new AllPlayersUI(player, opponents)
+    this.animation_ui = new AnimationUI()
 
     this.player_ui = new PlayerUI(player, {
       onDiceClick: _ => game.onDiceClick(),
@@ -36,7 +38,10 @@ export default class UI {
       onEndTurnClick: _ => game.onEndTurn(),
       onCardClick: type => game.onCardClick(type),
       canPlayDevCard: type => game.canPlayDevCard(type),
-      onDevCardActivate: type => game.onDevCardActivate(type),
+      onDevCardActivate: type => {
+        this.animation_ui.animateDevelopmentCard(type, true)
+        game.onDevCardActivate(type)
+      },
       getPossibleLocations: p => game.getPossibleLocations(p),
       toggleBoardBlur: hide => { this.board_ui.toggleBlur(hide); this.all_players_ui.toggleBlur(hide) },
     })

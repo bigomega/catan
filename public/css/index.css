@@ -6,6 +6,7 @@
 @import './index/robber-drop.css';
 @import './index/trade.css';
 @import './index/res-selection.css';
+@import './index/animations.css';
 
 body {
   margin: 0;
