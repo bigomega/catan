@@ -1,4 +1,5 @@
 import * as CONST from "../const.js"
+import { resToText } from "../const_messages.js"
 const $ = document.querySelector.bind(document)
 const oKeys = Object.keys
 
@@ -62,10 +63,17 @@ export default class PlayerUI {
     this.$action_bar.innerHTML = `
       <div class="timer disabled">0:00</div>
       <div class="roll-dice disabled" title="Roll Dice (SPACE)">🎲🎲</div>
-      <div class="build-road disabled" title="Build Road (r)" data-count="${CONST.PIECES_COUNT.R}"></div>
-      <div class="build-settlement disabled" title="Build Settlement (s)" data-count="${CONST.PIECES_COUNT.S}"></div>
-      <div class="build-city disabled" title="Build City (c)" data-count="${CONST.PIECES_COUNT.C}"></div>
+      <div class="build-road disabled" title="Build Road (r)" data-count="${CONST.PIECES_COUNT.R}">
+        <div class="cost-tooltip">${resToText(CONST.COST.R)}</div>
+      </div>
+      <div class="build-settlement disabled" title="Build Settlement (s)" data-count="${CONST.PIECES_COUNT.S}">
+        <div class="cost-tooltip">${resToText(CONST.COST.S)}</div>
+      </div>
+      <div class="build-city disabled" title="Build City (c)" data-count="${CONST.PIECES_COUNT.C}">
+        <div class="cost-tooltip">${resToText(CONST.COST.C)}</div>
+      </div>
       <div class="dev-card disabled" title="Buy Development Card (d)" data-count="-">
+        <div class="cost-tooltip">${resToText(CONST.COST.DEV_C)}</div>
         <img src="/images/dc-back.png"/>
       </div>
       <div class="trade disabled" title="Trade (t/Esc)">Trade</div>
@@ -163,7 +171,9 @@ export default class PlayerUI {
   canIBuy(type) {
     const costs = CONST.COST[type]
     return oKeys(costs).reduce((mem, res_key) => {
-      return mem && (this.hand[res_key] >= costs[res_key])
+      const has_resource = this.hand[res_key] >= costs[res_key]
+      this.toggleAction(this.#$keyToEl(type).querySelector('.cost-tooltip .res-icon.'+res_key), has_resource)
+      return mem && has_resource
     }, true)
   }
 
@@ -323,6 +333,7 @@ export default class PlayerUI {
   updateHand(player, cards) {
     this.hand = this.#cleanHandData(player.closed_cards)
     this.renderHand()
+    oKeys(CONST.COST).forEach(key => this.canIBuy(key))
   }
 
   activateResourceCards() {

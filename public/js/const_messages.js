@@ -3,7 +3,7 @@ import * as CONST from "./const.js"
 export const getName = player => player ? `<span class="p-name p${player.id}">${player.name}</span>` : 'You'
 
 export const resToText = obj => Object.keys(obj).filter(k => obj[k])
-  .map(k => `<span class="res-count">${obj[k]}</span><div class="res-icon ${k}"></div>`).join('')
+  .map(k => `<span class="res-count" data-count="${obj[k]}">${obj[k]}</span><div class="res-icon ${k}"></div>`).join('')
 
 const GAME_MESSAGES = {
   STRATEGIZE: { all: t => `You have <b>${t}</b> seconds to Strategize!` },//----

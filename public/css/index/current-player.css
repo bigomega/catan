@@ -175,18 +175,17 @@
         z-index: -1;
       }
 
-      &:hover, &.active {
-        filter: brightness(0.7);
+      &:hover:not(.disabled), &.active {
+        border-color: #333;
+        box-shadow: 2px 2px 0px 2px #000;
         border-color: transparent;
       }
 
       &.disabled, &[data-count="0"] {
         cursor: not-allowed;
-        filter: grayscale(1) brightness(2);
-        opacity: 0.7;
-        border-color: #333;
+        background: #919191c0;
+        border-color: #666666c0;
         &::after { visibility: hidden; }
-        &::before { color: #333; }
       }
     }
 
@@ -194,59 +193,73 @@
     .build-city,
     .build-settlement
     {
-      height: 100%;
-      background-repeat: no-repeat;
-      background-position: center;
+      height: 100%; position: relative;
       cursor: pointer;
-      filter: drop-shadow(1px 1px 0px #fff) drop-shadow(-1px -1px 0px #fff) drop-shadow(1px -1px 0px #fff) drop-shadow(-1px 1px 0px #fff);
-      &:hover, &.active { filter: brightness(0.7); }
+      &::after {
+        content: ''; position: absolute; width: 100%; height: 100%;
+        background-repeat: no-repeat; background-position: center;
+        filter: drop-shadow(1px 1px 0px #fff) drop-shadow(-1px -1px 0px #fff) drop-shadow(1px -1px 0px #fff) drop-shadow(-1px 1px 0px #fff);
+      }
+      &:hover::after, &.active::after { filter: brightness(0.7); }
 
       &.disabled, &[data-count="0"] {
         cursor: not-allowed;
-        filter: grayscale(1) brightness(2);
-        opacity: 0.5;
-        &::before { color: #333; }
+        &::after {
+          filter: grayscale(1) brightness(2); opacity: 0.8;
+        }
       }
     }
-    .build-settlement { width: 30px; background-size: 30px; }
-    .build-city { width: 40px; background-size: 40px; }
+    .build-settlement { width: 30px; &::after { background-size: 30px; } }
+    .build-city { width: 40px; &::after { background-size: 40px; } }
 
     /* DEV CARD */
     .dev-card {
       cursor: pointer;
       position: relative;
-      & img { width: 30px; }
-      &:hover { filter: brightness(0.7); }
+      img { width: 30px; }
+      &:hover img { filter: brightness(0.7); }
       &.disabled, &[data-count="0"] {
         cursor: not-allowed;
-        filter: grayscale(1);
-        opacity: .5;
+        img { filter: grayscale(1); opacity: .5; }
       }
     }
 
     .build-road, .build-settlement, .build-city, .dev-card {
       &::before {
         content: attr(data-count);
-        position: absolute;
-        top: 37px;
-        left: 22px;
-        width: 14px;
-        height: 12px;
-        font-family: monospace;
-        font-size: 10px;
-        color: #999;
-        background: #fff;
-        border-radius: 3px;
-        border: 1px solid;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        position: absolute; top: 37px; left: 22px;
+        width: 14px; height: 12px;
+        font-family: monospace; font-size: 10px;
+        color: #999; background: #fff;
+        border-radius: 3px; border: 1px solid;
+        display: flex; justify-content: center; align-items: center;
+        z-index: 1;
         /* opacity: 0.7; */
+      }
+      &.disabled::before { filter: brightness(.7); }
+
+      .cost-tooltip {
+        position: absolute; bottom: 74px;
+        display: none; transform: scale(2);
+        background: var(--sand-color); color: #0009;
+        padding: 5px 0 5px 7px;
+        border-radius: 100px; border: 1px solid #000;
+        .res-count[data-count="1"] { display: none; }
+        .res-count:has(+ .res-icon.disabled) { color: #0004; }
+        .res-icon.disabled { filter: grayscale(1) contrast(0.5) brightness(1.5) opacity(1); }
+      }
+      :is(&:hover, .active) .cost-tooltip {
+        display: block;
       }
     }
     .build-road::before { top: 32px; left: 3px; }
     .build-settlement::before { top: 20px; }
     .build-city::before { left: 31px; top: 28px; }
+
+    .build-road .cost-tooltip { width: 75px; left: -33px; }
+    .build-settlement .cost-tooltip { width: 136px; left: -60px; }
+    .build-city .cost-tooltip { width: 75px; padding-left: 10px; left: -23px; }
+    .dev-card .cost-tooltip { width: 87px; left: -30px; bottom: 78px; }
 
     /* TRADE */
     .trade {
@@ -285,20 +298,20 @@
   &.id-3 .actions { background: var(--player-3-color); border-color: var(--player-3-color-dark); }
   &.id-4 .actions { background: var(--player-4-color); border-color: var(--player-4-color-dark); }
 
-  &.id-1 .actions .build-road { background: var(--player-1-color-dark); }
-  &.id-2 .actions .build-road { background: var(--player-2-color-dark); }
-  &.id-3 .actions .build-road { background: var(--player-3-color-dark); }
-  &.id-4 .actions .build-road { background: var(--player-4-color-dark); }
+  &.id-1 .actions .build-road:not(.disabled) { background: var(--player-1-color-dark); }
+  &.id-2 .actions .build-road:not(.disabled) { background: var(--player-2-color-dark); }
+  &.id-3 .actions .build-road:not(.disabled) { background: var(--player-3-color-dark); }
+  &.id-4 .actions .build-road:not(.disabled) { background: var(--player-4-color-dark); }
 
-  &.id-1 .actions .build-settlement { background-image: url(/images/pieces/settlement-1.png); }
-  &.id-2 .actions .build-settlement { background-image: url(/images/pieces/settlement-2.png); }
-  &.id-3 .actions .build-settlement { background-image: url(/images/pieces/settlement-3.png); }
-  &.id-4 .actions .build-settlement { background-image: url(/images/pieces/settlement-4.png); }
+  &.id-1 .actions .build-settlement::after { background-image: url(/images/pieces/settlement-1.png); }
+  &.id-2 .actions .build-settlement::after { background-image: url(/images/pieces/settlement-2.png); }
+  &.id-3 .actions .build-settlement::after { background-image: url(/images/pieces/settlement-3.png); }
+  &.id-4 .actions .build-settlement::after { background-image: url(/images/pieces/settlement-4.png); }
 
-  &.id-1 .actions .build-city { background-image: url(/images/pieces/city-1.png); }
-  &.id-2 .actions .build-city { background-image: url(/images/pieces/city-2.png); }
-  &.id-3 .actions .build-city { background-image: url(/images/pieces/city-3.png); }
-  &.id-4 .actions .build-city { background-image: url(/images/pieces/city-4.png); }
+  &.id-1 .actions .build-city::after { background-image: url(/images/pieces/city-1.png); }
+  &.id-2 .actions .build-city::after { background-image: url(/images/pieces/city-2.png); }
+  &.id-3 .actions .build-city::after { background-image: url(/images/pieces/city-3.png); }
+  &.id-4 .actions .build-city::after { background-image: url(/images/pieces/city-4.png); }
 
   &.id-1 .actions .end-turn { color: var(--player-1-color); }
   &.id-2 .actions .end-turn { color: var(--player-2-color); }
