@@ -26,6 +26,8 @@ export default class Game {
   turn = 1; dice_value = 2
   mapkey = `S(br-S2).S.S(bl-B2).S\n-S.M5.J10.J8.S(bl-*3)\n-S(r-O2).J2.C9.G11.C4.S\n-S.G6.J4.D.F3.F11.S(l-W2)\n+S(r-L2).F3.G5.C6.M12.S\n+S.F8.G10.M9.S(tl-*3)\n+S(tr-*3).S.S(tl-*3).S`
   dev_cards = Helper.shuffle(CONST.DEVELOPMENT_CARDS_DECK.slice())
+  largest_army = { pid: 0, knight_count: 2 }
+  longest_road = { pid: 0, roads: [-1, -1, -1, -1] }
 
   get state() { return this.#state }
   set state(s) {
@@ -354,6 +356,16 @@ export default class Game {
     if (!player.canPlayDevCard('dK')) { return }
     player.playedDevCard('dK')
     this.#expectedRobberMove(pid, { tile_id, stolen_pid, knight: true })
+    if (player.open_dev_cards.dK > this.largest_army.knight_count) {
+      this.largest_army.knight_count = player.open_dev_cards.dK
+      const army_pid = this.largest_army.pid
+      if (!army_pid || army_pid !== player.id) {
+        player.toggleLargestArmy(true)
+        this.getPlayer(army_pid)?.toggleLargestArmy(false)
+        this.largest_army.pid = player.id
+        this.#io_manager.updateLargestArmy(pid, this.largest_army.knight_count)
+      }
+    }
     this.#io_manager.updateKnightMoved(pid)
   }
 
@@ -445,8 +457,8 @@ export default class Game {
   build(pid, piece, loc) {
     const player = this.getPlayer(pid)
     this.board.build(pid, piece, loc)
-    player?.addPiece(loc, piece)
-    piece === 'S' && player?.addPort(this.board.findCorner(loc)?.trade)
+    piece === 'S' && player.addPort(this.board.findCorner(loc)?.trade)
+    player.addPiece(loc, piece)
     this.map_changes.push({ pid, piece, loc })
     this.#io_manager.updateBuild(pid, piece, loc)
   }

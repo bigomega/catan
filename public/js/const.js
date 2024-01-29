@@ -110,6 +110,8 @@ export const SOCKET_EVENTS = {
   STOLEN_INFO: 'notify_stolen_resource', // Private
   TRADED_INFO: 'notify_traded_info',
   ONGOING_TRADES: 'update_ongoing_trades_status',
+  LARGEST_ARMY: 'largest_army',
+  LONGEST_ROAD: 'longest_road',
 }
 
 export const AUDIO_FILES = {
@@ -127,4 +129,5 @@ export const AUDIO_FILES = {
   MONOPOLY: 'coin-fall.mp3',
   YEAR_OF_PLENTY: 'flute.mp3',
   FAIL: 'fail.mp3',
+  LARGEST_ARMY: 'horse-army.mp3',
 }

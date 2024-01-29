@@ -23,14 +23,6 @@ const GAME_MESSAGES = {
   //   self: _ => `It's your turn to take actions. "End Turn" when you're done.`,
   //   other: pname => `It's ${pname}'s turn to act.`,
   // },
-  KNIGHT_ARMY: {
-    self: _ => `You now own the Knight Army ⚔️`,
-    other: p => `${getName(p)} now owns the Knight Army ⚔️`,
-  },
-  LONGEST_ROAD: {
-    self: _ => `You now own the Longest Road 👣`,
-    other: p => `${getName(p)} now owns the Longest Road 👣`,
-  },
   MONOPOLY: {
     self: n => `You took ${n} TK`,
     other: n => `You took ${n} TK`,
@@ -76,6 +68,7 @@ const GAME_MESSAGES = {
   ROAD_BUILDING_USED: { all: p => `${getName(p)} used "Road Building" and built 2 roads.` },
   MONOPOLY_USED: { all: (p, res, total, self_c) => `${getName(p)} used "Monopoly" and collected ${total ? resToText({ [res]: total }) + 'from everyone.' + (p ? ` (${self_c} from you).` : '') : 'NOTHING from anyone.'}` },
   YEAR_OF_PLENTY_USED: { all: (p, res_obj) => `${getName(p)} used "Year of Plenty" and took ${p ? '2 resources' : resToText(res_obj)}.` },
+  LARGEST_ARMY: { all: (p, c) => `⚔️ ${getName(p)} has taken over the "Largest Army" with <b>${c} Knights</b> ⚔️.` },
 }
 
 export default GAME_MESSAGES

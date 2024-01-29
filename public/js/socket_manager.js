@@ -63,6 +63,9 @@ export default class SocketManager {
 
     /** @event Year-of-Plenty-Used */
     socket.on(SOC.YEAR_OF_PLENTY, (pid, res_obj) => game.updateYearOfPlentyUsedSoc(pid, res_obj))
+
+    /** @event Larget-Army */
+    socket.on(SOC.LARGEST_ARMY, (pid, count) => game.updateLargestArmySoc(pid, count))
   }
 
   sendInitialSetup({ settlement_loc, road_loc }) { this.#socket.emit(SOC.INITIAL_SETUP, settlement_loc, road_loc) }

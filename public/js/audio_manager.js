@@ -36,4 +36,5 @@ export default class AudioManager {
   playMonopoly() { this.play(AUDIO.MONOPOLY) }
   playYearOfPlenty() { this.play(AUDIO.YEAR_OF_PLENTY, .3) }
   playFail() { this.play(AUDIO.FAIL) }
+  playLargestArmy() { this.play(AUDIO.LARGEST_ARMY) }
 }

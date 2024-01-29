@@ -1,6 +1,5 @@
-import GAME_MESSAGES from "../const_messages.js"
+import { default as MSG } from "../const_messages.js"
 const $ = document.querySelector.bind(document)
-const MSG = GAME_MESSAGES
 
 export default class AlertUI {
   #player; #onStatusUpdate; #alert_time
@@ -77,6 +76,7 @@ export default class AlertUI {
   alertRoadBuildingUsed(p) { this.setStatus(MSG.ROAD_BUILDING_USED.all(this.#isNotMe(p))) }
   alertMonopolyUsed(p, res, total, self) { this.setStatus(MSG.MONOPOLY_USED.all(this.#isNotMe(p), res, total, self)) }
   alertYearOfPlentyUsed(p, res_obj) { this.setStatus(MSG.YEAR_OF_PLENTY_USED.all(this.#isNotMe(p), res_obj)) }
+  alertLargestArmy(p, count) { this.setStatus(MSG.LARGEST_ARMY.all(this.#isNotMe(p), count)) }
 
   #isMe(p) { return p?.id === this.#player.id }
   #isNotMe(p) { return p?.id !== this.#player.id && p }

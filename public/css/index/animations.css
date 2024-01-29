@@ -8,65 +8,136 @@
     width: 100%; height: 100%;
   }
 
-  &.start { opacity: 0; z-index: -1; }
   &.end {
     opacity: 0 !important; z-index: -1 !important;
     transition: opacity .15s linear, z-index 0s .15s linear !important;
   }
+}
 
-  &.dev-c-animation {
-    background: color-mix(in srgb, #3a3527 80%, transparent);
-    display: flex; flex-direction: column; justify-content: flex-start; align-items: center;
+/* Development Card - Intro & Outro */
+.animation-zone.dev-c-animation {
+  background: color-mix(in srgb, #3a3527 80%, transparent);
+  display: flex; flex-direction: column; justify-content: flex-start; align-items: center;
+  perspective: 300px;
+
+  .card-container {
+    width: 196px; height: 302px; margin-top: 61px; margin-left: 2px;
     perspective: 300px;
+  }
 
-    .card-container {
-      width: 196px; height: 302px; margin-top: 61px; margin-left: 2px;
-      perspective: 300px;
+  .card {
+    width: 100%; height: 100%;
+    box-shadow: 0 0 15px 0 #000c;
+    background-color: #ebd290; overflow: hidden;
+    position: relative; border-radius: 15px; perspective: 10000px;
+
+    &::before {
+      content: ''; width: 100%; height: 100%; position: absolute;
+      background-image: url(/images/cards_sprite.png);
     }
 
-    .card {
-      width: 100%; height: 100%;
-      box-shadow: 0 0 15px 0 #000c;
-      background-color: #ebd290; overflow: hidden;
-      position: relative; border-radius: 15px; perspective: 10000px;
+    &.dK::before { background-size: 1640px; background-position: -1409px -29px; transform: rotateZ(-1deg); }
+    &.dR::before { background-size: 1570px; transform: rotateX(-5deg) rotateY(-15deg) rotateZ(-1deg); background-position: -29px -359px; }
+    &.dY::before { background-size: 1550px; background-position: -478px -346px; transform: rotateZ(-1deg); }
+    &.dM::before { background-size: 1550px; background-position: -257px -344px; transform: rotateX(-5deg) rotateY(-10deg) rotateZ(0deg); }
+    &.dVp::before { background-size: 1520px; background-position: -461px -668px; transform: rotateX(-12deg) rotateY(-4deg) rotateZ(1deg); }
+    &.dR { background-color: #dbbe6a; }
+    &.dVp { background-color: #cfaf5d; }
+  }
 
+  &.start { opacity: 0; z-index: -1; }
+
+  &.out {
+    transition: none;
+    .card {
+      box-shadow: 0px 5px 0 -2px #5a460e, 0px 65px 20px -30px #000;
+      transform: rotateX(50deg); /* translate3d(0px, -54px, -116px); */
+      transform-origin: center; transition: all .25s linear;
+    }
+    &.start { transition: opacity .15s .25s linear, z-index 0s .4s linear; }
+    &.start .card {
+      transform: rotateX(65deg) translate3d(0px, -1000px, -20px);
+      transform-origin: top center;
+    }
+  }
+
+  &.in {
+    .card {
+      transform: rotateX(65deg) translate3d(0px, -500px, 300px);
+      transform-origin: bottom center; transition: all .25s linear;
+    }
+    &.start { transition: opacity .15s 1.75s linear, z-index 0s 1.9s linear; }
+    &.start .card {
+      transform: rotateX(0deg) translate3d(0px, 50px, 0px);
+    }
+  }
+}
+
+/* Largest Army */
+.animation-zone.largest-army-animation {
+  background: color-mix(in srgb, #3a3527 80%, transparent);
+  display: flex; flex-direction: column; justify-content: flex-start; align-items: center;
+
+  .title {
+    color: #fff; background: var(--sand-color-dark);
+    font-family: sans-serif; font-size: 1.5em; font-weight: 200;
+    width: 100%; padding: 10px;
+    text-align: center; border-bottom: 2px solid;
+
+    &.p1 { background-color: var(--player-1-color); }
+    &.p2 { background-color: var(--player-2-color); }
+    &.p3 { background-color: var(--player-3-color); }
+    &.p4 { background-color: var(--player-4-color); }
+  }
+
+  .container {
+    margin-top: 50px; position: relative;
+
+    .largest-army-card {
+      height: 210px;
+      width: 327px; position: relative;
+      border: 1px solid; border-radius: 10px;
+      background: #c8b66d url(/images/extra-vps-sprite.png) -23px -146px/700px no-repeat;
+      box-shadow: 5px 5px 15px 0px #000; opacity: 0;
+    }
+
+    .knight {
+      width: 92px; height: 139px;
+      position: absolute;
+      background-color: #dabd63;
+      border-radius: 5px; overflow: hidden;
+      box-shadow: 0px 0px 5px 2px #000;
+      opacity: 0;
       &::before {
-        content: ''; width: 100%; height: 100%; position: absolute;
+        content: ''; width: 100%; height: 100%; display: block;
         background-image: url(/images/cards_sprite.png);
       }
 
-      &.dK::before { background-size: 1640px; background-position: -1409px -29px; transform: rotateZ(-1deg); }
-      &.dR::before { background-size: 1570px; transform: rotateX(-5deg) rotateY(-15deg) rotateZ(-1deg); background-position: -29px -359px; }
-      &.dY::before { background-size: 1550px; background-position: -478px -346px; transform: rotateZ(-1deg); }
-      &.dM::before { background-size: 1550px; background-position: -257px -344px; transform: rotateX(-5deg) rotateY(-10deg) rotateZ(0deg); }
-      &.dVp::before { background-size: 1520px; background-position: -461px -668px; transform: rotateX(-12deg) rotateY(-4deg) rotateZ(1deg); }
-      &.dR { background-color: #dbbe6a; }
-      &.dVp { background-color: #cfaf5d; }
+      &.first { top: 54px; left: 72px; transform: rotate(-15deg) scale(1.1); }
+      &.first::before {
+        background-size: 755px; background-position: -546px -177px; transform: rotateZ(-2deg) rotateY(10deg) rotateX(-5deg);
+      }
+      &.second { top: 47px; left: 148px; transform: scale(1.1); }
+      &.second::before {
+        background-size: 752px; background-position: -643px -181px; transform: rotateZ(-2deg) rotateY(0deg) rotateX(1deg);
+      }
+      &.third { top: 60px; left: 226px; transform: rotate(15deg) scale(1.1); }
+      &.third::before {
+        background-size: 752px; background-position: -338px -170px; transform: rotateZ(-1deg) rotateY(0deg) rotateX(0deg);
+      }
     }
+  }
 
-    &.out {
-      transition: none;
-      .card {
-        box-shadow: 0px 5px 0 -2px #5a460e, 0px 65px 20px -30px #000;
-        transform: rotateX(50deg); /* translate3d(0px, -54px, -116px); */
-        transform-origin: center; transition: all .25s linear;
-      }
-      &.start { transition: opacity .15s .25s linear, z-index 0s .4s linear; }
-      &.start .card {
-        transform: rotateX(65deg) translate3d(0px, -1000px, -20px);
-        transform-origin: top center;
-      }
-    }
+  &.start .knight.third { opacity: 1; transition: opacity .25s linear; }
+  &.start .knight.second { opacity: 1; transition: opacity .25s .25s linear; }
+  &.start .knight.first { opacity: 1; transition: opacity .25s .5s linear; }
 
-    &.in {
-      .card {
-        transform: rotateX(65deg) translate3d(0px, -500px, 300px);
-        transform-origin: bottom center; transition: all .25s linear;
-      }
-      &.start { transition: opacity .15s 1.75s linear, z-index 0s 1.9s linear; }
-      &.start .card {
-        transform: rotateX(0deg) translate3d(0px, 50px, 0px);
-      }
-    }
+  &.finish .largest-army-card { opacity: 1; height: 403px; transition: opacity .25s ease-in, height .25s 1s ease-in; }
+  &.finish .knight.third { opacity: 0; transition: opacity .25s .25s linear; }
+  &.finish .knight.second { opacity: 0; transition: opacity .25s .25s linear; }
+  &.finish .knight.first { opacity: 0; transition: opacity .25s .25s linear; }
+  &.finish {
+    opacity: 0; z-index: -1;
+    transition: opacity .15s linear 5s, z-index 0s 5.15s linear;
   }
 }

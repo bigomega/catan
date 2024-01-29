@@ -265,6 +265,16 @@ export default class Game {
     this.#isMyPid(pid) || this.#ui.animation_ui.animateDevelopmentCard('dY')
   }
 
+  // SOC - Largest Army
+  updateLargestArmySoc(pid, count) {
+    setTimeout(_ => {
+      this.#audio_manager.playLargestArmy()
+      const player = this.getPlayer(pid)
+      this.#ui.alert_ui.alertLargestArmy(player, count)
+      this.#ui.animation_ui.animateLargestArmy(pid, !this.#isMyPid(pid) && this.getPlayer(pid), count)
+    }, 2000) // Wait for the Knight DC animation & sound
+  }
+
   setTimerSoc(t, pid) { this.#ui.player_ui.resetTimer(t, this.#isMyPid(pid)) }
   //#endregion
 

@@ -117,5 +117,7 @@ export default class IOManager {
     this.#io.to(player_socket_id).emit(SOC.YEAR_OF_PLENTY, pid, res_obj)
   }
 
+  updateLargestArmy(pid, count) { this.emit(SOC.LARGEST_ARMY, pid, count) }
+
   emit(type, ...data) { this.#io.to(this.#game.id).emit(type, ...data) }
 }

@@ -16,6 +16,8 @@ export default class Player {
   trade_offers = Helper.newObject(CONST.TRADE_OFFERS, false)
   can_play_dc = false
   turn_bought_dc = {}
+  largest_army = false
+  longest_road = false
 
   constructor(name, id, onChange) {
     this.id = id
@@ -74,17 +76,15 @@ export default class Player {
       else { console.warn(`Cannot build city without settlement. pid:${this.id}, loc: ${location}`); return  }
     }
     this.pieces[piece].push(location)
-    this.onChange(this.id, 'pieces', { piece, location })
     if (piece !== 'R') {
       this.public_vps++
     }
-    this.onChange(this.id, 'public_vps', { public_vps: this.public_vps })
+    this.onChange(this.id, 'pieces', { piece, location })
   }
 
   addPort(type) {
     if (!CONST.TRADE_OFFERS[type]) { return }
     this.trade_offers[type] = true
-    this.onChange(this.id, 'trade_offers', { [type]: true })
   }
 
   resetDevCard(allowed) {
@@ -134,6 +134,30 @@ export default class Player {
     }, true)
   }
 
+  toggleLargestArmy(given) {
+    if (given && !this.largest_army) {
+      this.largest_army = true
+      this.public_vps += 2
+      this.onChange(this.id, 'largest_army', { largest_army: true })
+    } else if (!given && this.largest_army) {
+      this.largest_army = false
+      this.public_vps -= 2
+      this.onChange(this.id, 'largest_army', { largest_army: false })
+    }
+  }
+
+  toggleLongestRoad(given) {
+    if (given && !this.longest_road) {
+      this.longest_road = true
+      this.public_vps += 2
+      this.onChange(this.id, 'longest_road', { longest_road: true })
+    } else if (!given && this.longest_road) {
+      this.longest_road = false
+      this.public_vps -= 2
+      this.onChange(this.id, 'longest_road', { longest_road: false })
+    }
+  }
+
   setLastStatus(message) { this.last_status = message }
 
   toJSON(get_private) {
@@ -148,6 +172,8 @@ export default class Player {
       trade_offers: this.trade_offers,
       last_status: this.last_status,
       can_play_dc: this.can_play_dc,
+      largest_army: this.largest_army,
+      longest_road: this.longest_road,
       ...(get_private ? {
         turn_bought_dc: this.turn_bought_dc,
         private_vps: 0,

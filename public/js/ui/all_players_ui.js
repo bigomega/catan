@@ -47,11 +47,11 @@ export default class AllPlayersUI {
     const { $el, $vps } = this.player_refs[player.id]
     if (!$el) return
     switch (key) {
-      case 'public_vps': $vps.innerHTML = player[key]; break
       case 'closed_cards': break
       case 'closed_cards.taken': break
       case 'pieces': break
-      case 'trade_offers': break
+      case 'largest_army': break
+      case 'longest_road': break
       case 'dc_update': break
     }
   }
