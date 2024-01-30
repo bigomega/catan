@@ -3,12 +3,15 @@ const $ = document.querySelector.bind(document)
 
 export default class AllPlayersUI {
   player; opponents
+  #showLargestArmy; #showLongestRoad
   $el = $('#game > .all-players')
   player_refs = []
 
-  constructor(player, opponents) {
+  constructor(player, opponents, { showLargestArmy, showLongestRoad }) {
     this.player = player
     this.opponents = opponents
+    this.#showLargestArmy = showLargestArmy
+    this.#showLongestRoad = showLongestRoad
   }
 
   toggleBlur(bool) { this.$el.classList[bool ? 'add' : 'remove']('blur') }
@@ -26,14 +29,22 @@ export default class AllPlayersUI {
           </div>
         </div>
         <div class="advanced-info">
-          <div class="largest-army" data-count="${player.open_dev_cards.dK}"></div>
-          <div class="longest-road" data-count="${player.longest_road_list.length}"></div>
+          <div class="largest-army" data-id="${player.id}" data-count="${player.open_dev_cards.dK}"></div>
+          <div class="longest-road" data-id="${player.id}" data-count="${player.longest_road_list.length}"></div>
         </div>
       </div>
     `).join('')
-    this.$el.dataset.road = all_players.find(_ => _.longest_road)?.id || '-'
     this.$el.dataset.army = all_players.find(_ => _.largest_army)?.id || '-'
+    this.$el.dataset.road = all_players.find(_ => _.longest_road)?.id || '-'
     this.#setRefs()
+    this.$el.querySelectorAll('.largest-army').forEach($_ => $_.addEventListener('click', e => {
+      if (this.$el.dataset.army !== e.target.dataset.id) return
+      this.#showLargestArmy(+this.$el.dataset.army)
+    }))
+    this.$el.querySelectorAll('.longest-road').forEach($_ => $_.addEventListener('click', e => {
+      if (this.$el.dataset.road !== e.target.dataset.id) return
+      this.#showLongestRoad(+this.$el.dataset.road)
+    }))
   }
 
   #setRefs() {
@@ -59,8 +70,6 @@ export default class AllPlayersUI {
     $dc.dataset.count = player.dev_card_count
     $army.dataset.count = player.open_dev_cards.dK
     $road.dataset.count = player.longest_road_list.length
-
-    console.log(player.id);
     if (player.longest_road) this.$el.dataset.road = player.id
     if (player.largest_army) this.$el.dataset.army = player.id
     // switch (key) {

@@ -428,6 +428,19 @@
     }
   }
 
+  .card-container:has(.card[data-type="lArmy"], .card[data-type="lRoad"]) {
+    height: 402px; width: 327px;
+    .card {
+      transition: none;
+      .card-front::before {
+        background: #c8b66d url(/images/extra-vps-sprite.png) -23px -146px/700px no-repeat;
+      }
+    }
+  }
+  .card-container:has(.card[data-type="lRoad"]) {
+    .card .card-front::before { background-position: -353px -152px; }
+  }
+
   .card-container {
     &:has(+ .activate:hover) .card {
       box-shadow: 0px 5px 0 -2px #5a460e, 0px 65px 20px -30px #000;
@@ -435,7 +448,7 @@
     }
     &:hover:has(+ .activate:not(:hover)) {
       perspective: 600px;
-      .card { animation: card-rotate 3s infinite reverse linear; }
+      .card:not([data-type="lArmy"], [data-type="lRoad"] ) { animation: card-rotate 3s infinite reverse linear; }
     }
   }
 

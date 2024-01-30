@@ -26,7 +26,10 @@ export default class UI {
 
     this.alert_ui = new AlertUI(player, st => game.saveStatus(st), game.config.alert.time)
     this.board_ui = new BoardUI(board, (loc, id) => game.onBoardClick(loc, id))
-    this.all_players_ui = new AllPlayersUI(player, opponents)
+    this.all_players_ui = new AllPlayersUI(player, opponents, {
+      showLargestArmy: _ => this.player_ui.showCardPreview('lArmy'),
+      showLongestRoad: _ => this.player_ui.showCardPreview('lRoad'),
+    })
     this.animation_ui = new AnimationUI()
 
     this.player_ui = new PlayerUI(player, {

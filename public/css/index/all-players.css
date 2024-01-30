@@ -1,7 +1,7 @@
 .all-players {
   display: flex; justify-content: center; flex-direction: row; flex-wrap: wrap;
   font-family: sans-serif; border-top: 5px solid var(--sand-color-dark);
-  box-shadow: 0px 0px 20px -2px #000;
+  box-shadow: 0px 0px 30px 2px #000;
   &.blur:not(:hover) { filter: blur(2px); }
 
   .player {
@@ -9,7 +9,7 @@
     border: 3px solid var(--sand-color-dark);
     border-top: none;
     margin: 0 -1.5px;;
-    display: flex; z-index: -1;
+    display: flex;
 
     &.p1 { background: var(--player-1-color-light); border-color: var(--player-1-color-dark); }
     &.p2 { background: var(--player-2-color-light); border-color: var(--player-2-color-dark); }
@@ -48,7 +48,7 @@
             content: "";
             position: absolute; left: -30px;
             width: 20px; height: 20px;
-            box-shadow: rgb(0, 0, 0) 2px 2px 5px -1px;
+            box-shadow: 2px 2px 5px -1px #000, 0 0 5px 0px #000;
             background: url(/images/catan-bg.png) -27px -12px / 74px;
             border-radius: 50px;
           }
@@ -118,10 +118,10 @@
     }
   }
 
-  &[data-active="1"] { border-color: var(--player-1-color); .player.p1 { box-shadow: 0px 0px 20px 2px #000; z-index: 0; } }
-  &[data-active="2"] { border-color: var(--player-2-color); .player.p2 { box-shadow: 0px 0px 20px 2px #000; z-index: 0; } }
-  &[data-active="3"] { border-color: var(--player-3-color); .player.p3 { box-shadow: 0px 0px 20px 2px #000; z-index: 0; } }
-  &[data-active="4"] { border-color: var(--player-4-color); .player.p4 { box-shadow: 0px 0px 20px 2px #000; z-index: 0; } }
+  &[data-active="1"] { border-color: var(--player-1-color); }
+  &[data-active="2"] { border-color: var(--player-2-color); }
+  &[data-active="3"] { border-color: var(--player-3-color); }
+  &[data-active="4"] { border-color: var(--player-4-color); }
 
   &[data-active="1"] .player.p1 .basic-info .name::before { content: '👉 '; }
   &[data-active="2"] .player.p2 .basic-info .name::before { content: '👉 '; }
@@ -149,20 +149,20 @@
     .longest-road::before { background-position-x: -76px; }
   }
 
-  &[data-army="1"] .player.p1 .advanced-info .largest-army::before { filter: none; }
-  &[data-army="2"] .player.p2 .advanced-info .largest-army::before { filter: none; }
-  &[data-army="3"] .player.p3 .advanced-info .largest-army::before { filter: none; }
-  &[data-army="4"] .player.p4 .advanced-info .largest-army::before { filter: none; }
+  &[data-army="1"] .player.p1 .advanced-info .largest-army::before { filter: none; cursor: pointer; }
+  &[data-army="2"] .player.p2 .advanced-info .largest-army::before { filter: none; cursor: pointer; }
+  &[data-army="3"] .player.p3 .advanced-info .largest-army::before { filter: none; cursor: pointer; }
+  &[data-army="4"] .player.p4 .advanced-info .largest-army::before { filter: none; cursor: pointer; }
 
   &[data-army="1"] .player.p1 .advanced-info .largest-army::after { color: #fff; background: var(--player-1-color); }
   &[data-army="2"] .player.p2 .advanced-info .largest-army::after { color: #fff; background: var(--player-2-color); }
   &[data-army="3"] .player.p3 .advanced-info .largest-army::after { color: #fff; background: var(--player-3-color); }
   &[data-army="4"] .player.p4 .advanced-info .largest-army::after { color: #fff; background: var(--player-4-color); }
 
-  &[data-road="1"] .player.p1 .advanced-info .longest-road::before { filter: none; }
-  &[data-road="2"] .player.p2 .advanced-info .longest-road::before { filter: none; }
-  &[data-road="3"] .player.p3 .advanced-info .longest-road::before { filter: none; }
-  &[data-road="4"] .player.p4 .advanced-info .longest-road::before { filter: none; }
+  &[data-road="1"] .player.p1 .advanced-info .longest-road::before { filter: none; cursor: pointer; }
+  &[data-road="2"] .player.p2 .advanced-info .longest-road::before { filter: none; cursor: pointer; }
+  &[data-road="3"] .player.p3 .advanced-info .longest-road::before { filter: none; cursor: pointer; }
+  &[data-road="4"] .player.p4 .advanced-info .longest-road::before { filter: none; cursor: pointer; }
 
   &[data-road="1"] .player.p1 .advanced-info .longest-road::after { color: #fff; background: var(--player-1-color); }
   &[data-road="2"] .player.p2 .advanced-info .longest-road::after { color: #fff; background: var(--player-2-color); }
