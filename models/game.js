@@ -1,5 +1,5 @@
 import * as CONST from "../public/js/const.js"
-import * as Helper from "../shuffler/helper.js"
+import { shuffle } from "../public/js/utils.js"
 import Player from "./player.js"
 import Board from "../public/js/board/board.js"
 import IOManager from "./io_manager.js"
@@ -15,7 +15,7 @@ const NEXT_STATE = {
 
 export default class Game {
   /** @type {Board} */ board;
-  id; player_count;
+  id; player_count; mapkey;
   #state; #timer; #io_manager;
   #active_pid = 0
   config = CONST.GAME_CONFIG
@@ -24,8 +24,7 @@ export default class Game {
   /** @type {{ pid, giving, asking, id, status:('open'|'closed'|'success'|'failed'|'deleted'), rejected:number[] }[]} */
   ongoing_trades = []
   turn = 1; dice_value = 2
-  mapkey = `S(br-S2).S.S(bl-B2).S\n-S.M5.J10.J8.S(bl-*3)\n-S(r-O2).J2.C9.G11.C4.S\n-S.G6.J4.D.F3.F11.S(l-W2)\n+S(r-L2).F3.G5.C6.M12.S\n+S.F8.G10.M9.S(tl-*3)\n+S(tr-*3).S.S(tl-*3).S`
-  dev_cards = Helper.shuffle(CONST.DEVELOPMENT_CARDS_DECK.slice())
+  dev_cards = shuffle(CONST.DEVELOPMENT_CARDS_DECK)
   largest_army_pid = -1
   longest_road_pid = -1
 
@@ -46,6 +45,7 @@ export default class Game {
     this.player_count = config.player_count
     this.#io_manager = new IOManager({ game: this, io })
     this.players.push(new Player(host_name, 1, this.#onPlayerUpdate.bind(this)))
+    this.mapkey = this.config.mapkey || this.config.starting_map_key
     this.expected_actions.add = (...elems) => elems.forEach(obj => {
       this.expected_actions.push(Object.assign({ type: this.state, pid: this.active_pid }, obj))
     })

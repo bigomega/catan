@@ -11,7 +11,7 @@ export default class Board {
   /** @type {Corner[]} */ #corner_refs = []
   /** @type {Edge[]} */ #edge_refs = []
 
-  constructor(mapkey, existing_changes = []) {
+  constructor(mapkey, existing_changes = [], no_edge_corner) {
     this.mapkey = mapkey
     this.existing_changes = existing_changes
     /**
@@ -53,7 +53,7 @@ export default class Board {
         }
         const tile_params = {
           id: this.#tile_refs.length, createCorner: this.createCorner.bind(this),
-          createEdge: this.createEdge.bind(this), ...adjacent_tiles
+          createEdge: this.createEdge.bind(this), no_edge_corner, ...adjacent_tiles
         }
         if (tile_map[0] == 'S') {
           const { dir, res, num } =

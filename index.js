@@ -8,6 +8,7 @@ import http from "http"
 import Game from "./models/game.js"
 import { parse as parseCookie } from "cookie"
 import * as CONST from "./public/js/const.js"
+import BoardShuffler from "./public/js/board/board_shuffler.js"
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -41,7 +42,9 @@ app.get('/game/new', function (req, res) {
   const game = new Game({
     id: GAME_SESSIONS.next,
     playerName: req.query.name,
-    config: CONST.GAME_CONFIG,
+    config: Object.assign({}, CONST.GAME_CONFIG, {
+      mapkey: (new BoardShuffler(CONST.GAME_CONFIG.starting_map_key)).shuffle(),
+    }),
     io,
   })
   GAME_SESSIONS.next++

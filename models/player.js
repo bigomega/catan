@@ -1,5 +1,5 @@
 import * as CONST from "../public/js/const.js"
-import * as Helper from "../shuffler/helper.js"
+import { newObject } from "../public/js/utils.js"
 
 export default class Player {
   id; name; socket_id; onChange; last_status;
@@ -10,11 +10,11 @@ export default class Player {
   private_vps = 0
   pieces = { R: [], S: [], C: [] }
   closed_cards = {
-    ...Helper.newObject(CONST.RESOURCES, 0),
-    ...Helper.newObject(CONST.DEVELOPMENT_CARDS, 0),
+    ...newObject(CONST.RESOURCES, 0),
+    ...newObject(CONST.DEVELOPMENT_CARDS, 0),
   }
-  open_dev_cards = Helper.newObject(CONST.DEVELOPMENT_CARDS, 0)
-  trade_offers = Helper.newObject(CONST.TRADE_OFFERS, false)
+  open_dev_cards = newObject(CONST.DEVELOPMENT_CARDS, 0)
+  trade_offers = newObject(CONST.TRADE_OFFERS, false)
   can_play_dc = false
   turn_bought_dc = {}
   largest_army = false
@@ -110,7 +110,7 @@ export default class Player {
 
   /** @returns {[res, val][]} */
   takeRandomResources(count = 1) {
-    const all_picked_res = Helper.newObject(CONST.RESOURCES, 0)
+    const all_picked_res = newObject(CONST.RESOURCES, 0)
     for (let i = 0; i < count; i++) {
       const avail_res = Object.keys(CONST.RESOURCES).filter(k => {
         return this.closed_cards[k] > all_picked_res[k]

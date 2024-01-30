@@ -69,6 +69,7 @@ export const GAME_CONFIG = {
   alert: { time: 3 },
   largest_army_start: 3,
   longest_road_start: 5,
+  starting_map_key: `S(br-S2).S.S(bl-B2).S\n-S.M5.J10.J8.S(bl-*3)\n-S(r-O2).J2.C9.G11.C4.S\n-S.G6.J4.D.F3.F11.S(l-W2)\n+S(r-L2).F3.G5.C6.M12.S\n+S.F8.G10.M9.S(tl-*3)\n+S(tr-*3).S.S(tl-*3).S`,
 }
 
 export const GAME_STATES = {
