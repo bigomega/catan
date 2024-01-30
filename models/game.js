@@ -514,9 +514,10 @@ export default class Game {
   }
 
   #onPlayerUpdate(pid, key, context) {
+    const player = this.getPlayer(pid)
     this.players.forEach(p => {
       const is_pid = pid === p.id
-      this.#io_manager.updatePlayerData_Private(p.socket_id, p.toJSON(is_pid), key, is_pid && context)
+      this.#io_manager.updatePlayerData_Private(p.socket_id, player.toJSON(is_pid), key, is_pid && context)
     })
   }
 

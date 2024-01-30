@@ -7,6 +7,7 @@ export default class Player {
   resource_count = 0
   dev_card_count = 0
   public_vps = 0
+  private_vps = 0
   pieces = { R: [], S: [], C: [] }
   closed_cards = {
     ...Helper.newObject(CONST.RESOURCES, 0),
@@ -65,6 +66,7 @@ export default class Player {
     this.takeCards(CONST.COST[type])
     if (type === 'DEV_C') {
       this.turn_bought_dc[dev_c_key] = (this.turn_bought_dc[dev_c_key] || 0) + 1
+      if (dev_c_key === 'dVp') { this.private_vps++ }
       this.giveCards({ [dev_c_key]: 1 })
     }
   }
@@ -183,7 +185,7 @@ export default class Player {
       longest_road_list: this.longest_road_list,
       ...(get_private ? {
         turn_bought_dc: this.turn_bought_dc,
-        private_vps: 0,
+        private_vps: this.private_vps,
         closed_cards: this.closed_cards,
       } : {})
     }

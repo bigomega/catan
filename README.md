@@ -1,14 +1,22 @@
 # Catan
 Free to play multiplayer catan style board game
 
-## Architecture
-### Data Structure
-<img src="https://github.com/bigomega/catan/assets/2320747/53b0abb7-78a0-49f3-8de8-0548003b3d81" width="500px"/>
+### Install & Run
+```bash
+npm i
+npm start
+```
 
 ## Status
 ### In Progress
   ##### Jan '24
-  - [ ] Dev Card Actions
+  - [ ] Login & waiting room UI rework
+  - [ ] Shuffler
+  - [ ] End Game
+  - [x] Opponents UI
+  - [x] ~~Longest Road & Largest Army~~
+  - [ ] Animations (~~DC, Cost, Build~~, Dice, Hand)
+  - [x] Dev Card Actions
   - [x] ~~Trade~~
   - [x] ~~Keyboard Shortcuts~~
   - [x] ~~Client Refactor~~
@@ -35,11 +43,13 @@ Free to play multiplayer catan style board game
   - [x] ~~Simple Server~~
   - [x] ~~Decoding the map from key~~
 ### Next Steps
-  - End Game
-  - Opponents UI
-  - Shuffler
-  - Animations
-  - Browser Memory Optimization
+  - Optimization (memory, speed, colors)
+  - Accessibility (zoom, Fullscreen, Sound, Shortcuts)
+  - Alert history
+  - Trade negotiations
+  - Join random games
+    - Private & public game
+  - Watch games
 
 ### Known Bugs
   - Road building into the sea from beach 🤷🏻‍♂️
@@ -50,4 +60,3 @@ Free to play multiplayer catan style board game
 - Social login (w pic and/or just a name/id)
 - Discord help (for talking)
 - Seafarers expansion (fairly easy one)
-- Keyboard shortcuts

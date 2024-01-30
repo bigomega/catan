@@ -80,6 +80,7 @@ export default class Game {
   updateStateChangeSoc(state, active_pid) {
     this.state = state
     this.active_pid = active_pid
+    this.#ui.all_players_ui.updateActive(active_pid)
     switch (state) {
       case ST.INITIAL_SETUP: this.#onInitialSetup(); break
       case ST.PLAYER_ROLL: this.#onPlayerRoll(); break
@@ -146,6 +147,7 @@ export default class Game {
   requestInitialSetupSoc(active_pid, turn) {
     this.#ui.hideAllShown()
     this.active_pid = active_pid
+    this.#ui.all_players_ui.updateActive(active_pid)
     if (this.#isMyPid(active_pid)) {
       this.#temp = {}
       this.#ui.showCorners(this.#board.getSettlementLocations(-1).map(s => s.id))
@@ -174,8 +176,10 @@ export default class Game {
           this.#audio_manager.playCardTake(count)
         }
       }
+    } else {
+      Object.assign(this.getPlayer(update_player.id), update_player)
     }
-    /* this.#ui.all_players_ui.updatePlayer(update_player, key) */
+    this.#ui.all_players_ui.updatePlayer(update_player, key)
     this.#amIActing(update_player.id) && this.#ui.toggleActions(1)
   }
 

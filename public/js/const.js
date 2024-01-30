@@ -59,6 +59,7 @@ export const ROLL = _ => Math.ceil(Math.random() * 6)
 
 export const GAME_CONFIG = {
   player_count: 2,
+  strategize: { time: 120 },
   initial_build: { time: 60 },
   roll: { time: 15 },
   player_turn: { time: 60 },
