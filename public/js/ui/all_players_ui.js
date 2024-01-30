@@ -24,13 +24,16 @@ export default class AllPlayersUI {
           <div class="name">${player.name}</div>
           <div class="hand-vp">
             <div class="victory-points"><span>${player.public_vps + (player.private_vps || 0)}</span></div>
-            <div class="resources" data-count="${player.resource_count}"></div>
-            <div class="development-cards" data-count="${player.dev_card_count}"></div>
+            <div class="resources" data-count="${player.resource_count}" title="Resources in hand"
+              data-robbable="${player.resource_count > 7}"></div>
+            <div class="development-cards" title="Development Cards in hand" data-count="${player.dev_card_count}"></div>
           </div>
         </div>
         <div class="advanced-info">
-          <div class="largest-army" data-id="${player.id}" data-count="${player.open_dev_cards.dK}"></div>
-          <div class="longest-road" data-id="${player.id}" data-count="${player.longest_road_list.length}"></div>
+          <div class="largest-army" title="Largest Army" data-id="${player.id}"
+            data-count="${player.open_dev_cards.dK}"></div>
+          <div class="longest-road" title="Longest Road" data-id="${player.id}"
+            data-count="${player.longest_road_list.length}"></div>
         </div>
       </div>
     `).join('')
@@ -67,6 +70,7 @@ export default class AllPlayersUI {
     if (!$p) return
     $vps.innerHTML = player.public_vps + (player.private_vps || 0)
     $res.dataset.count = player.resource_count
+    $res.dataset.robbable = player.resource_count > 7
     $dc.dataset.count = player.dev_card_count
     $army.dataset.count = player.open_dev_cards.dK
     $road.dataset.count = player.longest_road_list.length

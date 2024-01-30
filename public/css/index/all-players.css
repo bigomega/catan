@@ -1,7 +1,7 @@
 .all-players {
   display: flex; justify-content: center; flex-direction: row; flex-wrap: wrap;
   font-family: sans-serif; border-top: 5px solid var(--sand-color-dark);
-  box-shadow: 0px 0px 30px 2px #000;
+  filter: drop-shadow(0px 0px 30px #000);
   &.blur:not(:hover) { filter: blur(2px); }
 
   .player {
@@ -36,8 +36,8 @@
       }
 
       .victory-points {
-        font-size: 2em; display: flex;
-        margin: 0 5px;
+        display: flex; justify-content: center; flex-grow: 1;
+        font-size: 2em; margin: 0 5px;
 
         & span {
           margin-right: 5px; margin-left: 30px;
@@ -64,9 +64,19 @@
 
       .resources, .development-cards {
         width: 30px; height: 44px; background-size: cover;
+        &[data-count="0"] { filter: grayscale(1) brightness(1.5) contrast(0.5); }
+        &[data-robbable="true"] {
+          box-shadow: 0px 0px 5px 2px var(--trade-negative);
+          &::after {
+            content: '🥷' attr(data-count); width: 100%;
+            text-align: center; box-sizing: border-box;
+            border-right: 0; border-radius: 0;
+            background: var(--trade-negative); color: #fff;
+          }
+        }
       }
       .resources { background-image: url(/images/resources-back.png); margin-right: 5px; }
-      .development-cards { background-image: url(/images/dc-back.png); }
+      .development-cards { background-image: url(/images/dc-back.png); background-size: 31px; background-position-y: -1px; }
     }
     &.p1 .basic-info .name { background: var(--player-1-color); }
     &.p2 .basic-info .name { background: var(--player-2-color); }
@@ -79,21 +89,21 @@
     &.p4 .hand-vp { border-color: var(--player-4-color); }
 
     .advanced-info {
-      display: flex; justify-content: space-around; flex-wrap: wrap; align-content: space-around;
-      padding: 3px; width: 30px;
+      display: flex; justify-content: space-around; flex-wrap: wrap; align-content: space-between;
+      padding: 3px 5px; width: 30px;
 
       .largest-army {
-        &::before{ background-position: -30px -33px; }
+        &::before{ background-position: -33px -33px; }
       }
       .longest-road {
-        &::before{ background-position: -111px -34px; }
+        &::before{ background-position: -117px -34px; }
       }
       .largest-army, .longest-road {
-        width: 67px; height: 43px;
+        width: 67px; height: 44px;
         &::before {
           content: ''; display: block; width: 100%; height: 100%;
           background-image: url(/images/extra-vps-sprite.png);
-          background-color: #c8b66d; background-size: 150px; background-repeat: no-repeat;
+          background-color: #c8b66d; background-size: 155px; background-repeat: no-repeat;
           filter: grayscale(1) brightness(1.5) opacity(.5);
         }
       }
@@ -106,14 +116,14 @@
       &::after {
         content: attr(data-count);
         display: inline-block;
-        position: absolute; top: 0; left: 0;
-        color: #333;
-        font-size: 0.7em;
-        background: rgb(255, 255, 255);
-        border-bottom: 1px solid #666;
+        position: absolute; bottom: 0; left: 0;
+        color: #666;
+        font-size: 0.7em; font-family: monospace;
+        background: #fff;
+        border-top: 1px solid #666;
         border-right: 1px solid #666;
-        border-bottom-right-radius: 3px;
-        padding: 1px 3px;
+        border-top-right-radius: 3px;
+        padding: 2px 4px;
       }
     }
   }
@@ -130,23 +140,23 @@
 
   :is(&[data-army="1"], &[data-road="1"]) .player.p1 .advanced-info {
     width: 67px;
-    .largest-army::before { background-position-x: -7px; }
-    .longest-road::before { background-position-x: -76px; }
+    .largest-army::before { background-position-x: -9px; }
+    .longest-road::before { background-position-x: -81px; }
   }
   :is(&[data-army="2"], &[data-road="2"]) .player.p2 .advanced-info {
     width: 67px;
-    .largest-army::before { background-position-x: -7px; }
-    .longest-road::before { background-position-x: -76px; }
+    .largest-army::before { background-position-x: -9px; }
+    .longest-road::before { background-position-x: -81px; }
   }
   :is(&[data-army="3"], &[data-road="3"]) .player.p3 .advanced-info {
     width: 67px;
-    .largest-army::before { background-position-x: -7px; }
-    .longest-road::before { background-position-x: -76px; }
+    .largest-army::before { background-position-x: -9px; }
+    .longest-road::before { background-position-x: -81px; }
   }
   :is(&[data-army="4"], &[data-road="4"]) .player.p4 .advanced-info {
     width: 67px;
-    .largest-army::before { background-position-x: -7px; }
-    .longest-road::before { background-position-x: -76px; }
+    .largest-army::before { background-position-x: -9px; }
+    .longest-road::before { background-position-x: -81px; }
   }
 
   &[data-army="1"] .player.p1 .advanced-info .largest-army::before { filter: none; cursor: pointer; }
@@ -154,18 +164,18 @@
   &[data-army="3"] .player.p3 .advanced-info .largest-army::before { filter: none; cursor: pointer; }
   &[data-army="4"] .player.p4 .advanced-info .largest-army::before { filter: none; cursor: pointer; }
 
-  &[data-army="1"] .player.p1 .advanced-info .largest-army::after { color: #fff; background: var(--player-1-color); }
-  &[data-army="2"] .player.p2 .advanced-info .largest-army::after { color: #fff; background: var(--player-2-color); }
-  &[data-army="3"] .player.p3 .advanced-info .largest-army::after { color: #fff; background: var(--player-3-color); }
-  &[data-army="4"] .player.p4 .advanced-info .largest-army::after { color: #fff; background: var(--player-4-color); }
+  &[data-army="1"] .player.p1 .advanced-info .largest-army::after { font-size: 1em; color: #fff; background: var(--player-1-color); }
+  &[data-army="2"] .player.p2 .advanced-info .largest-army::after { font-size: 1em; color: #fff; background: var(--player-2-color); }
+  &[data-army="3"] .player.p3 .advanced-info .largest-army::after { font-size: 1em; color: #fff; background: var(--player-3-color); }
+  &[data-army="4"] .player.p4 .advanced-info .largest-army::after { font-size: 1em; color: #fff; background: var(--player-4-color); }
 
   &[data-road="1"] .player.p1 .advanced-info .longest-road::before { filter: none; cursor: pointer; }
   &[data-road="2"] .player.p2 .advanced-info .longest-road::before { filter: none; cursor: pointer; }
   &[data-road="3"] .player.p3 .advanced-info .longest-road::before { filter: none; cursor: pointer; }
   &[data-road="4"] .player.p4 .advanced-info .longest-road::before { filter: none; cursor: pointer; }
 
-  &[data-road="1"] .player.p1 .advanced-info .longest-road::after { color: #fff; background: var(--player-1-color); }
-  &[data-road="2"] .player.p2 .advanced-info .longest-road::after { color: #fff; background: var(--player-2-color); }
-  &[data-road="3"] .player.p3 .advanced-info .longest-road::after { color: #fff; background: var(--player-3-color); }
-  &[data-road="4"] .player.p4 .advanced-info .longest-road::after { color: #fff; background: var(--player-4-color); }
+  &[data-road="1"] .player.p1 .advanced-info .longest-road::after { font-size: 1em; color: #fff; background: var(--player-1-color); }
+  &[data-road="2"] .player.p2 .advanced-info .longest-road::after { font-size: 1em; color: #fff; background: var(--player-2-color); }
+  &[data-road="3"] .player.p3 .advanced-info .longest-road::after { font-size: 1em; color: #fff; background: var(--player-3-color); }
+  &[data-road="4"] .player.p4 .advanced-info .longest-road::after { font-size: 1em; color: #fff; background: var(--player-4-color); }
 }
