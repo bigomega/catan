@@ -168,9 +168,15 @@ export default class BoardUI {
   showEdges(ids = []) { ids.forEach(id => this.#$getEdge(id)?.classList.add('shown')) }
   showTiles(ids = []) { ids.forEach(id => this.#$getTile(id)?.classList.add('shown')) }
 
+  showLongestEdges(ids = []) { ids.forEach(id => this.#$getEdge(id)?.classList.add('longest')) }
+
   hideAllShown() {
     this.$el.querySelectorAll('.corner.shown, .edge.shown, .tile.shown').forEach($el => {
       $el.classList.remove('shown')
     })
+    this.hideLongestRoads()
+  }
+  hideLongestRoads() {
+    this.$el.querySelectorAll('.edge.longest').forEach($el => $el.classList.remove('longest'))
   }
 }

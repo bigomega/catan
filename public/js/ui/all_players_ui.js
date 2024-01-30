@@ -3,15 +3,18 @@ const $ = document.querySelector.bind(document)
 
 export default class AllPlayersUI {
   player; opponents
-  #showLargestArmy; #showLongestRoad
+  #showLargestArmy; #showLongestRoad; #showPlayerLongestRoad; #hidePlayerLongestRoad
   $el = $('#game .all-players')
   player_refs = []
 
-  constructor(player, opponents, { showLargestArmy, showLongestRoad }) {
+  constructor(player, opponents, { showLargestArmy, showLongestRoad,
+    showPlayerLongestRoad, hidePlayerLongestRoad }) {
     this.player = player
     this.opponents = opponents
     this.#showLargestArmy = showLargestArmy
     this.#showLongestRoad = showLongestRoad
+    this.#showPlayerLongestRoad = showPlayerLongestRoad
+    this.#hidePlayerLongestRoad = hidePlayerLongestRoad
   }
 
   toggleBlur(bool) { this.$el.classList[bool ? 'add' : 'remove']('blur') }
@@ -44,6 +47,10 @@ export default class AllPlayersUI {
       if (this.$el.dataset.road !== e.target.dataset.id) return
       this.#showLongestRoad(+this.$el.dataset.road)
     }))
+    this.$el.querySelectorAll('.longest-road').forEach($_ => {
+      $_.addEventListener('mouseover', e => this.#showPlayerLongestRoad(+e.target.dataset.id))
+      $_.addEventListener('mouseout', e => this.#hidePlayerLongestRoad())
+    })
   }
 
   #setRefs() {

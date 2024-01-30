@@ -26,11 +26,14 @@ export default class UI {
 
     this.alert_ui = new AlertUI(player, st => game.saveStatus(st), game.config.alert.time)
     this.board_ui = new BoardUI(board, (loc, id) => game.onBoardClick(loc, id))
+    this.animation_ui = new AnimationUI()
+
     this.all_players_ui = new AllPlayersUI(player, opponents, {
       showLargestArmy: _ => this.player_ui.showCardPreview('lArmy'),
       showLongestRoad: _ => this.player_ui.showCardPreview('lRoad'),
+      showPlayerLongestRoad: pid => this.board_ui.showLongestEdges(game.getPlayer(pid)?.longest_road_list),
+      hidePlayerLongestRoad: _ => this.board_ui.hideLongestRoads(),
     })
-    this.animation_ui = new AnimationUI()
 
     this.player_ui = new PlayerUI(player, {
       onDiceClick: _ => game.onDiceClick(),
