@@ -43,4 +43,8 @@ export default class Corner {
       mem && !this.edges[dir]?.jumpCorner(this)?.piece
       , true)
   }
+
+  surroundedBySea() {
+    return this.tiles.reduce((mem, t) => mem && t.type === 'S', true)
+  }
 }

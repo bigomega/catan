@@ -137,12 +137,16 @@ export default class Board {
 
   getRoadLocationsFromRoads(existing_roads = []) {
     if (!existing_roads.length) return []
-    const valid_edges = existing_roads.reduce((mem, r_loc) => {
-      const edge = this.findEdge(r_loc)
-      const c1_edges = edge?.corner1.getEdges(-1).map(e => e.id)
-      const c2_edges = edge?.corner2.getEdges(-1).map(e => e.id)
-      return mem.concat(c1_edges, c2_edges)
-    }, [])
+    const valid_edges = existing_roads
+      .reduce((mem, r_loc) => {
+        const edge = this.findEdge(r_loc)
+        const c1_edges = edge?.corner1.getEdges(-1)
+        const c2_edges = edge?.corner2.getEdges(-1)
+        return mem.concat(c1_edges, c2_edges)
+      }, [])
+      .filter(_ => !_.corner1.surroundedBySea() && !_.corner2.surroundedBySea()) // Not into sea
+      .map(e => e.id)
+    ;
     return [...new Set(valid_edges)] // remove duplicates
   }
 

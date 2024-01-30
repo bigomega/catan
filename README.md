@@ -52,7 +52,7 @@ npm start
   - Watch games
 
 ### Known Bugs
-  - Road building into the sea from beach 🤷🏻‍♂️
+  -
 
 ## Future Ideas
 - Custom map builder
