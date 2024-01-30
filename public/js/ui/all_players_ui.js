@@ -4,7 +4,7 @@ const $ = document.querySelector.bind(document)
 export default class AllPlayersUI {
   player; opponents
   #showLargestArmy; #showLongestRoad
-  $el = $('#game > .all-players')
+  $el = $('#game .all-players')
   player_refs = []
 
   constructor(player, opponents, { showLargestArmy, showLongestRoad }) {
@@ -17,19 +17,15 @@ export default class AllPlayersUI {
   toggleBlur(bool) { this.$el.classList[bool ? 'add' : 'remove']('blur') }
 
   render() {
-    const all_players = [this.player, ...this.opponents]
+    const all_players = [this.player, ...this.opponents].sort((a, b) => a.id - b.id)
     this.$el.innerHTML = all_players.map(player => `
       <div class="player p${player.id}" data-id="${player.id}">
-        <div class="basic-info">
-          <div class="name">${player.name}</div>
-          <div class="hand-vp">
-            <div class="victory-points"><span>${player.public_vps + (player.private_vps || 0)}</span></div>
-            <div class="resources" data-count="${player.resource_count}" title="Resources in hand"
-              data-robbable="${player.resource_count > 7}"></div>
-            <div class="development-cards" title="Development Cards in hand" data-count="${player.dev_card_count}"></div>
-          </div>
-        </div>
-        <div class="advanced-info">
+        <div class="name">${player.name}</div>
+        <div class="victory-points"><span>${player.public_vps + (player.private_vps || 0)}</span></div>
+        <div class="cards-container">
+          <div class="resources" data-count="${player.resource_count}" title="Resources in hand"
+            data-robbable="${player.resource_count > 7}"></div>
+          <div class="development-cards" title="Development Cards in hand" data-count="${player.dev_card_count}"></div>
           <div class="largest-army" title="Largest Army" data-id="${player.id}"
             data-count="${player.open_dev_cards.dK}"></div>
           <div class="longest-road" title="Longest Road" data-id="${player.id}"

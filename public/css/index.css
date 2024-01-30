@@ -35,9 +35,11 @@ body {
 #game {
   /* transform: scale(0.85); */
   /* transform-origin: top left; */
-  margin: 0 auto;
-  width: fit-content;
-  display: flex; justify-content: center; flex-direction: column; align-items: center;
+  .board-container {
+    margin: 0 auto;
+    width: fit-content;
+    display: flex; justify-content: center; flex-direction: column; align-items: center;
+  }
 
   > .alert {
     opacity: 0;
@@ -55,7 +57,7 @@ body {
     text-align: center;
 
     &.show {
-      z-index: 0;
+      z-index: 1;
       opacity: 1;
     }
 

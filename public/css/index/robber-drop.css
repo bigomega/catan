@@ -1,7 +1,7 @@
 #game > .robber-drop-zone {
   display: none;
   position: fixed; top: 0; left: 0px;
-  width: 100%;
+  width: 100%; z-index: 1;
   /* background: var(--sand-color); */
   background: color-mix(in srgb, var(--sand-color-dark) 80%, #fff0);
   padding: 20px 20px 0;

@@ -1,7 +1,7 @@
 #game > .resouce-selection-zone {
   position: fixed; top: 0; left: 0px;
   display: flex; flex-direction: column; align-items: center;
-  width: 100%;
+  width: 100%; z-index: 1;
   background: color-mix(in srgb, var(--sand-color) 80%, transparent);
   padding: 0 20px 0;
   border-bottom: 5px solid var(--sand-color-dark);

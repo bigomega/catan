@@ -5,7 +5,7 @@ const oKeys = Object.keys
 
 export default class BoardUI {
   #board; #onClick;
-  $el = $('#game > .board')
+  $el = $('#game .board')
 
   /** @param {Board} board  */
   constructor(board, onClick) {

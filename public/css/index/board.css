@@ -13,7 +13,7 @@
   filter: drop-shadow(2px 2px 3px #000a);
   transition: filter .25s cubic-bezier(0.55, 0.06, 0.68, 0.19);
   transform: scale(.8);
-  margin: -70px -100px 100px -100px;
+  margin: -50px 140px 100px -100px;
   &.blur { filter: drop-shadow(2px 2px 3px #000a) blur(2px); }
 
   .row {

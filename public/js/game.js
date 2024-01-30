@@ -34,6 +34,7 @@ export default class Game {
       this.#board.build(pid, piece, loc)
       this.#ui.build(pid, piece, loc)
     })
+    this.#ui.all_players_ui.updateActive(this.active_pid)
     this.#ui.player_ui.setDevCardCount(game_obj.dev_cards_len)
     this.#ui.player_ui.updatePiecesCount()
     game_obj.timer && this.setTimerSoc(game_obj.timer, this.active_pid)

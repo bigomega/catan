@@ -35,7 +35,7 @@ export default class AnimationUI {
   animateLongestRoad(pid, p, locs) {
     if (!locs?.length) return
 
-    const $board = document.querySelector('#game > .board')
+    const $board = document.querySelector('#game .board')
     $board.classList.add('darken')
     const ids = locs.slice()
     const timer = setInterval(_ => {

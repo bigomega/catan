@@ -9,10 +9,11 @@ npm start
 
 ## Status
 ### In Progress
-  ##### Jan '24
+  ##### Feb '24
   - [ ] Login & waiting room UI rework
   - [ ] End Game
-  - [ ] Opponents UI
+  ##### Jan '24
+  - [x] ~~Opponents UI~~
   - [x] ~~Shuffler~~
   - [x] ~~Longest Road & Largest Army~~
   - [ ] Animations (~~DC, Cost, Build~~, Dice, Hand)

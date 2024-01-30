@@ -63,7 +63,6 @@ export default class BoardShuffler {
               Object.values(clear_tile.adjacent_tiles).forEach(t => red_area_tiles[t.id] = true)
             } else {
               const switch_index = new_numbers.findLastIndex(_ => +_ !== 8 && +_ !== 6)
-              console.log(switch_index);
               if (switch_index >= number_index) {
                 const tmp = new_numbers[switch_index]
                 new_numbers[switch_index] = tile.num

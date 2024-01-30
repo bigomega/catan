@@ -1,8 +1,6 @@
 #game > .trade-zone {
-  position: fixed;
-  top: 0;
-  left: 0px;
-  width: 100%;
+  position: fixed; top: 0; left: 0px;
+  width: 100%; z-index: 1;
   /* border-bottom: 5px solid var(--sand-color-dark); */
   box-shadow: 0 0px 15px 0px #000;
   font-family: sans-serif;
