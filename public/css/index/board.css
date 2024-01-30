@@ -140,14 +140,10 @@
   &.M .background { background-image:url('/images/tiles/Mountain.png'); }
   &.F .background { background-image:url('/images/tiles/Fields.png'); }
   &.D .background { background-image:url('/images/tiles/Desert.png'); }
+  &.S .background { background-image:url('/images/tiles/Sea.png'); opacity: .5; z-index: -2; }
 
   &:not(.S) .background {
     /* filter: drop-shadow(0px 0px 1px #000); */
-  }
-  /* &.S { background-image:url('/images/tiles/Sea.png'); } */
-  &.S {
-    /* background-color: red; */
-    /* z-index: -2; */
   }
 
   &.S[data-trade]::after {
