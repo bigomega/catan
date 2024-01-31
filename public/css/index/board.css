@@ -126,9 +126,10 @@
       background-size: cover;
     }
 
-    &.robbed:hover::before {
-      opacity: 0.5;
+    &.robbed.robber-animate::before {
+      opacity: 0; transform: scale(20); transition: all .5s ease-in;
     }
+    &.robbed:not(.robber-animate):hover::before { opacity: 0.5; }
 
     /* &:has(.number:hover),
     &.D:hover {

@@ -181,6 +181,11 @@ export default class BoardUI {
 
   showLongestEdges(ids = []) { ids.forEach(id => this.#$getEdge(id)?.classList.add('longest')) }
 
+  animateRobber() {
+    this.$el.querySelector('.tile.robbed')?.classList.add('robber-animate')
+    setTimeout(_ => this.$el.querySelector('.tile.robber-animate')?.classList.remove('robber-animate'), 700)
+  }
+
   hideAllShown() {
     this.$el.querySelectorAll('.corner.shown, .edge.shown, .tile.shown').forEach($el => {
       $el.classList.remove('shown')

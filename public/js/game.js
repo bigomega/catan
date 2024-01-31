@@ -191,7 +191,10 @@ export default class Game {
     this.#isMyPid(pid) && this.#ui.animation_ui.animateDiceRoll(d1, d2)
     this.#audio_manager.playDice(this.#isMyPid(pid))
     const total = d1 + d2
-    total === 7 && setTimeout(_ => this.#audio_manager.playRobber(), 1000)
+    total === 7 && setTimeout(_ => {
+      this.#audio_manager.playRobber()
+      this.#ui.board_ui.animateRobber()
+    }, 1500)
     const robbed_tile = this.#board.getRobbedTile()
     const rob_tile_type = robbed_tile?.num === total && robbed_tile.type
     this.#ui.alert_ui.alertDiceValue(this.getPlayer(pid), d1, d2, CONST.TILE_RES[rob_tile_type])
