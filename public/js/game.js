@@ -187,7 +187,7 @@ export default class Game {
   // SOC - Dice Value Update
   updateDiceValueSoc([d1, d2], pid) {
     this.#ui.player_ui.toggleDice(false)
-    this.#isMyPid(pid) && this.#ui.showDiceValue(d1, d2)
+    this.#isMyPid(pid) && this.#ui.animation_ui.animateDiceRoll(d1, d2)
     this.#audio_manager.playDice(this.#isMyPid(pid))
     const total = d1 + d2
     total === 7 && setTimeout(_ => this.#audio_manager.playRobber(), 1000)

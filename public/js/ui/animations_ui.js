@@ -6,6 +6,16 @@ export default class AnimationUI {
 
   constructor() {}
 
+  animateDiceRoll(d1, d2) {
+    this.$el.className = `animation-zone ready dice-roll-animation`
+    this.$el.innerHTML = `
+      <div class="dice-animation"></div>
+      <div class="dice d1">${Array(d1).fill(0).map(_ => `<span class="pip"></span>`).join('')}</div>
+      <div class="dice d2">${Array(d2).fill(0).map(_ => `<span class="pip"></span>`).join('')}</div>
+    `
+    setTimeout(_ => this.$el.classList.add('start'), 200)
+  }
+
   animateDevelopmentCard(type, out) {
     if (!DEVELOPMENT_CARDS[type]) return
     this.$el.className = `animation-zone ready dev-c-animation ${out ? 'out' : 'in'} ${type}`
@@ -34,7 +44,6 @@ export default class AnimationUI {
 
   animateLongestRoad(pid, p, locs) {
     if (!locs?.length) return
-
     const $board = document.querySelector('#game .board')
     $board.classList.add('darken')
     const ids = locs.slice()

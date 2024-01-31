@@ -97,10 +97,6 @@ export default class UI {
     })
   }
 
-  showDiceValue() {
-    // Animation + Visuals
-  }
-
   robberDrop(count) {
     this.board_ui.toggleBlur(true)
     this.robber_drop_ui.render(count, this.#player.closed_cards)
