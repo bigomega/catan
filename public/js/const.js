@@ -135,4 +135,5 @@ export const AUDIO_FILES = {
   FAIL: 'fail.mp3',
   LARGEST_ARMY: 'horse-army.mp3',
   LONGEST_ROAD: 'horse-cart.mp3',
+  BGM: 'clouds.mp3',
 }

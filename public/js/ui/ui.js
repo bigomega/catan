@@ -31,6 +31,8 @@ export default class UI {
     this.animation_ui = new AnimationUI()
     this.accessibility_ui = new AccessibilityUI({
       toggleBoardZoom: out => this.board_ui.toggleZoom(out),
+      toggleBgm: allow => game.toggleBgm(allow),
+      toggleNotificationsAudio: allow => game.toggleNotificationsAudio(allow),
     })
 
     this.all_players_ui = new AllPlayersUI(player, opponents, {

@@ -116,7 +116,7 @@ export default class BoardUI {
 
     this.$el.style.paddingLeft = `calc(var(--tile-width) / 2 * ${maxLeft * -1})`
     this.$el.style.width = `calc(var(--tile-width) * ${maxLength})`
-    const size = localStorage.getItem("board-size")
+    const size = localStorage.getItem('board-size')
     this.$el.dataset.size = (size > -6 && size < 1) ? size : 0
     this.#setupEvents()
   }
@@ -166,7 +166,7 @@ export default class BoardUI {
     const size = (+this.$el.dataset.size || 0) + (out ? -1 : 1)
     if (size > -6 && size < 1) {
       this.$el.dataset.size = size
-      localStorage.setItem("board-size", size)
+      localStorage.setItem('board-size', size)
     }
   }
 

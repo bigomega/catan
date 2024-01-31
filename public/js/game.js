@@ -413,6 +413,9 @@ export default class Game {
   onEndTurn() { this.#socket_manager.endTurn() }
   //#endregion
 
+  toggleBgm(allow) { this.#audio_manager.toggleBgm(allow) }
+  toggleNotificationsAudio(allow) { this.#audio_manager.toggleNotifications(allow) }
+
   clearDevCardUsage() {
     if (!this.#player._is_playing_dc) return
     this.#ui.hideAllShown(0)

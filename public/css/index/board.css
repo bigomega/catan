@@ -11,7 +11,7 @@
   transform: scale(1); margin: 50px 240px 150px 0px;
   box-sizing: border-box;
   filter: drop-shadow(2px 2px 3px #000a);
-  transition: filter .25s cubic-bezier(0.55, 0.06, 0.68, 0.19), transform .25s linear, margin .25s linear;
+  transition: filter .25s cubic-bezier(0.55, 0.06, 0.68, 0.19), transform .15s linear, margin .15s linear;
   &[data-size="-1"] { transform: scale(.9); margin: 0px 190px 100px -50px; }
   &[data-size="-2"] { transform: scale(.8); margin: -50px 140px 70px -100px; }
   &[data-size="-3"] { transform: scale(.7); margin: -100px 90px 40px -150px; }
