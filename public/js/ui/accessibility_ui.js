@@ -4,6 +4,27 @@ export default class AccessibilityUI {
   #toggleBoardZoom; #toggleBgm; #toggleNotificationsAudio
   $el = document.querySelector('#game > .accessibility-zone')
 
+  keyboard_shortcuts = [
+    [
+      ['Roll Dice', 'SPACE'],
+      ['Build Road', 'r'],
+      ['Build Settlement', 's'],
+      ['Build City', 'c'],
+      ['Buy Development Card', 'd'],
+      ['Trade options', 't'],
+      ['Play Knight Card', 'k'],
+      ['End Turn', 'e (or) SPACE'],
+    ], [
+      ['Full Screen', 'f'],
+      ['Board Zoom In', '='],
+      ['Board Zoom Out', '-'],
+      ['Toggle Background Music', 'm'],
+      ['Toggle Notification Sounds', 'n'],
+      ['Show this section', '?'],
+      ['Clear/Close things in general', 'ESCAPE'],
+    ]
+  ]
+
   constructor({ toggleBoardZoom, toggleBgm, toggleNotificationsAudio }) {
     this.#toggleBoardZoom = toggleBoardZoom
     this.#toggleBgm = toggleBgm
@@ -21,8 +42,17 @@ export default class AccessibilityUI {
         <div class="icon notifications ${this.muted_notif ? 'off' : ''}" title="${this.muted_notif ? 'Unmute' : 'Mute'} Notifications (n)"></div>
         <div class="icon bgm ${this.muted ? 'off' : ''}" title="${this.muted ? 'Unmute' : 'Mute'} Background Music (m)">♫</div>
       </div>
-      <div class="icon question-mark" title="Shortcuts (?)">?</div>
+      <div class="icon question-mark" title="Keyboard Shortcuts (?)">?</div>
       <div class="icon info" title="About author & game">ℹ</div>
+      <div class="keyboard-shortcuts hide">${this.keyboard_shortcuts.map(group =>
+        `<div class="shortcuts-container">${group.map(([title, shortcut]) =>
+          `<div class="shortcut">
+            <div class="title">${title}</div>
+            <div class="key">${shortcut}</div>
+          </div>`).join('')}
+        </div>`).join('')}
+        <div class="close">X</div>
+      </div>
     `
     this.#setupEvents()
   }
@@ -33,8 +63,9 @@ export default class AccessibilityUI {
     this.$el.querySelector('.zoom-out').addEventListener('click', e => this.toggleZoom(true))
     this.$el.querySelector('.notifications').addEventListener('click', e => this.toggleMuteNotications())
     this.$el.querySelector('.bgm').addEventListener('click', e => this.toggleMuteBgm())
-    this.$el.querySelector('.question-mark').addEventListener('click', e => this.showHideKeyboardShortcuts())
+    this.$el.querySelector('.question-mark').addEventListener('click', e => this.showHideKeyboardShortcuts(true))
     this.$el.querySelector('.info').addEventListener('click', e => this.showHideInfo())
+    this.$el.querySelector('.keyboard-shortcuts .close').addEventListener('click', e => this.showHideKeyboardShortcuts(false))
     document.addEventListener('keydown', e => {
       switch (e.code) {
         case 'KeyF': this.toggleFullScreen(); break
@@ -42,8 +73,9 @@ export default class AccessibilityUI {
         case 'Minus': this.toggleZoom(true); break
         case 'KeyN': this.toggleMuteNotications(); break
         case 'KeyM': this.toggleMuteBgm(); break
+        case 'Escape': this.showHideKeyboardShortcuts(false); break
       }
-      e.key === '?' && this.showHideKeyboardShortcuts()
+      e.key === '?' && this.showHideKeyboardShortcuts(true)
     })
   }
 
@@ -76,6 +108,8 @@ export default class AccessibilityUI {
   }
 
   toggleZoom(out) { this.#toggleBoardZoom(out) }
-  showHideKeyboardShortcuts() {}
+  showHideKeyboardShortcuts(show) {
+    this.$el.querySelector('.keyboard-shortcuts').classList[show ? 'remove' : 'add']('hide')
+  }
   showHideInfo() {}
 }

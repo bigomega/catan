@@ -1,7 +1,7 @@
 #game > .accessibility-zone {
   position: fixed; top: 0; left: 0;
   display: flex; flex-direction: column;
-  margin: 10px 0 0 10px;
+  margin: 10px 0 0 10px; z-index: 50;
 
   .icon {
     width: 30px; height: 30px; box-sizing: border-box;
@@ -30,4 +30,34 @@
     &.off::before { content: '\\'; position: absolute; left: 8px; }
   }
   .question-mark { padding-top: 2px; font-weight: bold; }
+
+  .keyboard-shortcuts {
+    position: fixed; left: 0; top: 0;
+    width: calc(100% - 90px); margin: 30px; padding: 90px 0 30px 30px;
+    background: #fff; border-radius: 10px;
+    box-shadow: 0 0 10px 0px #000;
+    font-family: sans-serif; font-weight: 200;
+    display: flex; justify-content: flex-start; flex-wrap: wrap;
+    &::before {
+      content: 'Keyboard Shortcuts'; font-size: 1.5em;
+      margin-bottom: 20px;
+      position: absolute; top: 30px; left: 30px;
+    }
+    .shortcuts-container { display: inline-block; margin-right: 30px; flex-grow: 1; }
+    .shortcut { display: flex; padding: 10px; border-bottom: 1px solid #ccc; color: #666; }
+    .shortcut:last-child { border-bottom: none; }
+    .title { flex-grow: 1; margin-right: 30px; font-size: .9em; }
+    .key { font-family: monospace; color: #000; }
+    &.hide { display: none; }
+
+    .close {
+      position: absolute; top: 20px; right: 20px;
+      font-size: 20px; color: #ccc; font-family: monospace; font-weight: 600;
+      height: 30px; width: 30px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transform: scaleX(1.3);
+      &:hover { color: var(--trade-negative);}
+    }
+  }
 }
