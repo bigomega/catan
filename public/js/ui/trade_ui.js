@@ -26,7 +26,7 @@ export default class TradeUI {
     this.$type_selection.innerHTML = Object.entries(CONST.TRADE_OFFERS).map(([type, txt]) =>
       `<div class="trade-type ${type.replace(/\*/, '_')}" data-type="${type}">${type == 'Px' ? txt : ''}</div>`
     ).join('')
-    this.$type_selection.innerHTML += `<div class="cancel" title="Cancel (Esc)">x</div>`
+    this.$type_selection.innerHTML += `<div class="cancel" title="Cancel (\`)">x</div>`
     this.$card_selection.innerHTML = `
       <div class="card-section">${Object.keys(CONST.RESOURCES).map(res => `
         <div class="card-container">

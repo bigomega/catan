@@ -154,13 +154,13 @@
 
     .trade-type.Px {
       display: flex; align-items: center;
-      background: var(--sand-color-dark);
+      background: #333;
       color: #fff;
       padding: 5px 10px;
       height: 20px;
       border: 0px solid var(--sand-color);
       border-width: 25px 10px;
-      &.active { border-color: var(--sand-color-dark); }
+      &.active { border-color: var(--sand-color-dark); background: var(--sand-color-dark); }
       &.disabled { background: #ccc; color: #999; cursor: not-allowed; }
       &:not(.active, .disabled):hover { background: #fff; color: #333; }
     }

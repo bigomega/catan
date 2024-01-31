@@ -93,7 +93,7 @@ export default class UI {
 
   #setUpEvents() {
     document.addEventListener('keydown', e => {
-      e.code === 'Escape' && this.#game.clearDevCardUsage()
+      e.code === 'Backquote' && this.#game.clearDevCardUsage()
     })
   }
 

@@ -13,7 +13,7 @@ npm start
   ##### Jan '24
   - [ ] Login & waiting room UI rework
   - [ ] End Game
-  - [ ] Accessibility (~~zoom, Fullscreen~~, Sound, Shortcuts)
+  - [ ] ~~Accessibility (Zoom, Fullscreen, Sound, Shortcuts~~)
   - [x] ~~Opponents UI~~
   - [x] ~~Shuffler~~
   - [x] ~~Longest Road & Largest Army~~

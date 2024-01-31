@@ -21,7 +21,7 @@ export default class AccessibilityUI {
       ['Toggle Background Music', 'm'],
       ['Toggle Notification Sounds', 'n'],
       ['Show this section', '?'],
-      ['Clear/Close things in general', 'ESCAPE'],
+      ['Clear/Close things in general', '\` (Backquote)'],
     ]
   ]
 
@@ -73,7 +73,7 @@ export default class AccessibilityUI {
         case 'Minus': this.toggleZoom(true); break
         case 'KeyN': this.toggleMuteNotications(); break
         case 'KeyM': this.toggleMuteBgm(); break
-        case 'Escape': this.showHideKeyboardShortcuts(false); break
+        case 'Backquote': this.showHideKeyboardShortcuts(false); break
       }
       e.key === '?' && this.showHideKeyboardShortcuts(true)
     })
