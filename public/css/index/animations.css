@@ -65,6 +65,7 @@
   }
 }
 
+/* Resource taken */
 .resource-animation-zone.resources-animation {
   display: flex; justify-content: center; align-items: center;
   &.start { opacity: 0; z-index: -1; transition: opacity .15s .5s linear, z-index 0s .65s linear; }

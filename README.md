@@ -10,9 +10,9 @@ npm start
 ## Status
 ### In Progress
   ##### Feb '24
-  ##### Jan '24
   - [ ] Login & waiting room UI rework
   - [ ] End Game
+  ##### Jan '24
   - [ ] ~~Accessibility (Zoom, Fullscreen, Sound, Shortcuts~~)
   - [x] ~~Opponents UI~~
   - [x] ~~Shuffler~~

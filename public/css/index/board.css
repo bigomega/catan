@@ -234,10 +234,10 @@
       /* filter: drop-shadow(-3px 3px 3px #000); */
       /* filter: drop-shadow(-3px 3px 2px #000) drop-shadow(-3px 3px 4px var(--sand-color)) drop-shadow(-3px 3px 5px var(--sand-color)); */
       filter: drop-shadow(-3px 3px 2px #000) drop-shadow(1px -1px 3px var(--sand-color)) drop-shadow(3px -3px 5px var(--sand-color)) drop-shadow(-3px 3px 5px var(--sand-color)) drop-shadow(-3px 3px 4px var(--sand-color));
-      transform: scale(4);
+      transform: scale(4); z-index: 4;
       transition: all .25s ease-in;
-      &[data-taken=S] { transition: transform .5s cubic-bezier(0.55, 0.06, 0.68, 0.19); transform: scale(1); }
-      &[data-taken=C] { animation: city-show .5s cubic-bezier(0.55, 0.06, 0.68, 0.19); transform: scale(1); }
+      &[data-taken=S] { transition: transform .5s cubic-bezier(0.38, -0.68, 0.67, -0.34); transform: scale(1); }
+      &[data-taken=C] { animation: city-show .5s cubic-bezier(0.38, -0.68, 0.67, -0.34); transform: scale(1); }
 
       &.longest {
         filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff);

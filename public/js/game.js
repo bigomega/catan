@@ -130,7 +130,7 @@ export default class Game {
     this.#ui.alert_ui.alertRobberDrop(drop_count)
   }
   // STATE - Robber Move
-  #onRobberMove() {
+  #onRobberMove(no_alert) {
     this.#ui.robber_drop_ui.hide()
     this.#ui.board_ui.toggleBlur()
     if (this.#isMyPid(this.active_pid)) {
@@ -140,7 +140,7 @@ export default class Game {
       }
       this.#ui.showTiles(this.#board.getRobbableTiles())
     }
-    this.#ui.alert_ui.alertRobberMove(this.getActivePlayer())
+    no_alert || this.#ui.alert_ui.alertRobberMove(this.getActivePlayer())
   }
   //#endregion
 
@@ -389,7 +389,7 @@ export default class Game {
     if (!this.canPlayDevCard(type)) return
     this.#player._is_playing_dc = type
     switch (type) {
-      case 'dK': this.#onRobberMove(); break
+      case 'dK': this.#onRobberMove(true); break
       case 'dR':
         this.#temp = {}
         this.#ui.showEdges(this.#board.getRoadLocationsFromRoads(this.#player.pieces.R))
@@ -422,7 +422,7 @@ export default class Game {
 
   clearDevCardUsage() {
     if (!this.#player._is_playing_dc) return
-    this.#ui.hideAllShown(0)
+    this.#ui.hideAllShown()
     if (this.#player._is_playing_dc === 'dR' && this.#temp.r1) {
       this.#board.findEdge(this.#temp.r1)?.buildRoad(null)
     }

@@ -8,6 +8,7 @@ export default class AnimationUI {
   constructor() {}
 
   animateResourcesTaken(cards) {
+    if (Object.values(cards).reduce((mem, v) => mem + v, 0) <= 0) return
     this.$res_el.className = `resource-animation-zone ready resources-animation`
     this.$res_el.innerHTML = `
       <div class="container">${Object.entries(cards).map(([k, v]) => v ? `
