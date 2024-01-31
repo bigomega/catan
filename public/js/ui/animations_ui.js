@@ -3,8 +3,21 @@ import GAME_MESSAGES from "../const_messages.js"
 
 export default class AnimationUI {
   $el = document.querySelector('#game > .animation-zone')
+  $res_el = document.querySelector('#game > .resource-animation-zone')
 
   constructor() {}
+
+  animateResourcesTaken(cards) {
+    this.$res_el.className = `resource-animation-zone ready resources-animation`
+    this.$res_el.innerHTML = `
+      <div class="container">${Object.entries(cards).map(([k, v]) => v ? `
+        <div class="res-circle" data-count="${v}">
+          <div class="res-icon ${k}"></div>
+        </div>` : '').join('')}
+      </div>
+    `
+    setTimeout(_ => this.$res_el.classList.add('start'), 200)
+  }
 
   animateDiceRoll(d1, d2) {
     this.$el.className = `animation-zone ready dice-roll-animation`

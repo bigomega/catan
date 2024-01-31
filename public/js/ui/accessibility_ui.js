@@ -21,7 +21,7 @@ export default class AccessibilityUI {
       ['Toggle Background Music', 'm'],
       ['Toggle Notification Sounds', 'n'],
       ['Show this section', '?'],
-      ['Clear/Close things in general', '\` (Backquote)'],
+      ['Cancel action / Close stuff', '\` (Backquote)'],
     ]
   ]
 

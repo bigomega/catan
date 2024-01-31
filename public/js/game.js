@@ -175,6 +175,7 @@ export default class Game {
         if (key === 'closed_cards') {
           const count = Object.values(context).reduce((mem, v) => mem + v, 0)
           this.#audio_manager.playCardTake(count)
+          this.#ui.animation_ui.animateResourcesTaken(context)
         }
       }
     } else {

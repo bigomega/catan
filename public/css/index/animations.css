@@ -1,4 +1,4 @@
-.animation-zone {
+.animation-zone, .resource-animation-zone {
   z-index: -1; opacity: 0;
   transition: opacity .15s linear, z-index 0s linear;
 
@@ -13,12 +13,13 @@
     transition: opacity .15s linear, z-index 0s .15s linear !important;
   }
 }
+.resource-animation-zone.ready { z-index: 0; }
 
 /* Dice Roll */
 .animation-zone.dice-roll-animation {
   background: color-mix(in srgb, #3a3527 80%, transparent);
   display: flex; justify-content: center; align-items: center;
-  &.start { opacity: 0; z-index: -1; transition: opacity .15s 2.5s linear, z-index 0s 2.65s linear !important; }
+  &.start { opacity: 0; z-index: -1; transition: opacity .15s 1.5s linear, z-index 0s 1.65s linear; }
 
   .dice-animation {
     background-image: url(/images/dice-1-animation.gif);
@@ -26,7 +27,7 @@
     width: 560px; height: 290px;
     position: absolute; margin-top: -80px; visibility: hidden;
   }
-  &.start .dice-animation { visibility: visible; opacity: 0; transition: opacity .25s 1.25s linear; }
+  &.start .dice-animation { visibility: visible; opacity: 0; transition: opacity .25s .75s linear; }
 
   /* https: //dev.to/ekeijl/creating-dice-using-css-grid-j4 */
   .dice {
@@ -44,7 +45,7 @@
     &.d1 { margin-left: 20px; }
     &.d2 { margin-left: 160px; }
   }
-  &.start .dice { opacity: 1; transition: opacity .5s 1s linear; }
+  &.start .dice { opacity: 1; transition: opacity .5s .5s linear; }
 
   .pip {
     display: block;
@@ -62,6 +63,29 @@
     &:nth-child(6) { grid-area: f; }
     &:nth-child(odd):last-child { grid-area: g; }
   }
+}
+
+.resource-animation-zone.resources-animation {
+  display: flex; justify-content: center; align-items: center;
+  &.start { opacity: 0; z-index: -1; transition: opacity .15s .5s linear, z-index 0s .65s linear; }
+
+  .container {
+    transition: margin .5s cubic-bezier(1, 0.02, 1, 0.07), width .5s cubic-bezier(0.83, 0.16, 0.99, 0.41), opacity .15s ease;
+    width: 100px; margin-top: -20%;
+    display: flex; justify-content: center; opacity: 0;
+  }
+  &.start .container { opacity: 1; margin-top: 100%; width: 100%; justify-content: space-around; }
+
+  .res-circle {
+    width: 35px; height: 35px; box-sizing: border-box;
+    border: 1px solid var(--sand-color-dark); border-radius: 100px;
+    background: #e8d49c;
+    display: flex; justify-content: center; align-items: center;
+    transform: scale(.5);
+    transition: all .5s ease-in;
+    .res-icon { margin: 0; }
+  }
+  &.start .res-circle { transform: scale(4); }
 }
 
 /* Development Card - Intro & Outro */
