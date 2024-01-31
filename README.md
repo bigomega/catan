@@ -10,9 +10,10 @@ npm start
 ## Status
 ### In Progress
   ##### Feb '24
+  ##### Jan '24
   - [ ] Login & waiting room UI rework
   - [ ] End Game
-  ##### Jan '24
+  - [ ] Accessibility (~~zoom, Fullscreen~~, Sound, Shortcuts)
   - [x] ~~Opponents UI~~
   - [x] ~~Shuffler~~
   - [x] ~~Longest Road & Largest Army~~
@@ -45,7 +46,6 @@ npm start
   - [x] ~~Decoding the map from key~~
 ### Next Steps
   - Optimization (memory, speed, colors)
-  - Accessibility (zoom, Fullscreen, Sound, Shortcuts)
   - Alert history
   - Trade negotiations
   - Join random games

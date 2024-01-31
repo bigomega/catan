@@ -9,11 +9,13 @@ import AllPlayersUI from "./all_players_ui.js"
 import TradeUI from "./trade_ui.js"
 import ResSelectionUI from "./res_selection_ui.js"
 import AnimationUI from "./animations_ui.js"
+import AccessibilityUI from "./accessibility_ui.js"
 const $ = document.querySelector.bind(document)
 
 export default class UI {
   #game; #board; #player; #game_config
-  board_ui; player_ui; alert_ui; trade_ui
+  board_ui; player_ui; alert_ui; trade_ui; animation_ui; all_players_ui
+  robber_drop_ui; res_selection_ui; accessibility_ui
   #temp = {}
   $splash = $('.splash')
 
@@ -27,6 +29,9 @@ export default class UI {
     this.alert_ui = new AlertUI(player, st => game.saveStatus(st), game.config.alert.time)
     this.board_ui = new BoardUI(board, (loc, id) => game.onBoardClick(loc, id))
     this.animation_ui = new AnimationUI()
+    this.accessibility_ui = new AccessibilityUI({
+      toggleBoardZoom: out => this.board_ui.toggleZoom(out),
+    })
 
     this.all_players_ui = new AllPlayersUI(player, opponents, {
       showLargestArmy: _ => this.player_ui.showCardPreview('lArmy'),
@@ -74,6 +79,7 @@ export default class UI {
 
   render() {
     this.board_ui.render()
+    this.accessibility_ui.render()
     this.player_ui.render()
     this.all_players_ui.render()
     this.alert_ui.render()

@@ -4,7 +4,7 @@ const $ = document.querySelector.bind(document)
 export default class AllPlayersUI {
   player; opponents
   #showLargestArmy; #showLongestRoad; #showPlayerLongestRoad; #hidePlayerLongestRoad
-  $el = $('#game .all-players')
+  $el = $('#game > .all-players')
   player_refs = []
 
   constructor(player, opponents, { showLargestArmy, showLongestRoad,

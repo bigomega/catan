@@ -116,6 +116,8 @@ export default class BoardUI {
 
     this.$el.style.paddingLeft = `calc(var(--tile-width) / 2 * ${maxLeft * -1})`
     this.$el.style.width = `calc(var(--tile-width) * ${maxLength})`
+    const size = localStorage.getItem("board-size")
+    this.$el.dataset.size = (size > -6 && size < 1) ? size : 0
     this.#setupEvents()
   }
 
@@ -158,6 +160,14 @@ export default class BoardUI {
   moveRobber(id) {
     this.$el.querySelector('.tile.robbed')?.classList.remove('robbed')
     this.#$getTile(id)?.classList.add('robbed')
+  }
+
+  toggleZoom(out) {
+    const size = (+this.$el.dataset.size || 0) + (out ? -1 : 1)
+    if (size > -6 && size < 1) {
+      this.$el.dataset.size = size
+      localStorage.setItem("board-size", size)
+    }
   }
 
   #$getCorner(id) { return this.$el.querySelector(`.corner[data-id="${id}"]`) }

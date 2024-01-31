@@ -1,6 +1,6 @@
 .all-players {
   position: fixed; right: 0; top: 0;
-  width: 240px; z-index: 1;
+  width: 240px;
   font-family: sans-serif;
   filter: drop-shadow(0px 0px 30px #000);
   &.blur:not(:hover) { filter: blur(2px); }
@@ -89,6 +89,7 @@
         background-color: #c8b66d; background-size: 155px; background-repeat: no-repeat;
         filter: grayscale(1) brightness(2) contrast(0.5);
       }
+      &[data-count="0"]::after { filter: grayscale(1) brightness(1.5) contrast(0.5); }
     }
     .largest-army {
       &::before{ background-position: -43px -54px; background-size: 200px; }

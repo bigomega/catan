@@ -62,7 +62,7 @@ export default class PlayerUI {
     this.$el.classList.add('id-' + this.player.id)
     this.$action_bar.innerHTML = `
       <div class="timer disabled">0:00</div>
-      <div class="roll-dice disabled" title="Roll Dice (SPACE)">🎲🎲</div>
+      <div class="roll-dice disabled" title="Roll Dice (Space)">🎲🎲</div>
       <div class="build-road disabled" title="Build Road (r)" data-count="${CONST.PIECES_COUNT.R}">
         <div class="cost-tooltip">${resToText(CONST.COST.R)}</div>
       </div>
@@ -77,7 +77,7 @@ export default class PlayerUI {
         <img src="/images/dc-back.png"/>
       </div>
       <div class="trade disabled" title="Trade (t/Esc)">Trade</div>
-      <div class="end-turn disabled" title="End Turn (e)">End Turn</div>
+      <div class="end-turn disabled" title="End Turn (e/Space)">End Turn</div>
     `
     this.#setRefs()
     this.#setupActionEvents()
@@ -153,9 +153,12 @@ export default class PlayerUI {
           break
         case 'Space':
           e.target === document.body && e.preventDefault()
-          if (this.$dice.classList.contains('disabled')) { break }
-          this.#onDiceClick()
-          e.target.classList.add('disabled')
+          if (!this.$dice.classList.contains('disabled')) {
+            this.#onDiceClick()
+            e.target.classList.add('disabled')
+          } else if (!this.$end_turn.classList.contains('disabled')) {
+            this.#onEndTurnClick()
+          }
           break
         case 'Escape':
           if (this.isAnyActionActive()) {
