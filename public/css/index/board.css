@@ -12,11 +12,16 @@
   box-sizing: border-box;
   filter: drop-shadow(2px 2px 3px #000a);
   transition: filter .25s cubic-bezier(0.55, 0.06, 0.68, 0.19), transform .15s linear, margin .15s linear;
+  &[data-size="2"] { transform: scale(1.2); margin: 150px 320px 250px 110px; }
+  &[data-size="1"] { transform: scale(1.1); margin: 100px 280px 210px 60px; }
+  &[data-size="0"] { transform: scale(1.0); margin: 50px 240px 150px 0px; }
   &[data-size="-1"] { transform: scale(.9); margin: 0px 190px 100px -50px; }
   &[data-size="-2"] { transform: scale(.8); margin: -50px 140px 70px -100px; }
   &[data-size="-3"] { transform: scale(.7); margin: -100px 90px 40px -150px; }
   &[data-size="-4"] { transform: scale(.6); margin: -150px 40px 0px -210px; }
   &[data-size="-5"] { transform: scale(.5); margin: -200px -10px -30px -260px; }
+  &[data-size="-6"] { transform: scale(.4); margin: -250px -40px -60px -310px; }
+  &[data-size="-7"] { transform: scale(.3); margin: -300px -100px -100px -365px; }
   &.blur { filter: drop-shadow(2px 2px 3px #000a) blur(2px); }
 
   .row {

@@ -3,6 +3,7 @@ import * as CONST from "../const.js"
 const $ = document.querySelector.bind(document)
 const oKeys = Object.keys
 
+const SIZE = { MIN: -7, MAX: 2 }
 export default class BoardUI {
   #board; #onClick;
   $el = $('#game .board')
@@ -117,7 +118,7 @@ export default class BoardUI {
     this.$el.style.paddingLeft = `calc(var(--tile-width) / 2 * ${maxLeft * -1})`
     this.$el.style.width = `calc(var(--tile-width) * ${maxLength})`
     const size = localStorage.getItem('board-size')
-    this.$el.dataset.size = (size > -6 && size < 1) ? size : 0
+    this.$el.dataset.size = (size >= SIZE.MIN && size <= SIZE.MAX) ? size : 0
     this.#setupEvents()
   }
 
@@ -164,7 +165,7 @@ export default class BoardUI {
 
   toggleZoom(out) {
     const size = (+this.$el.dataset.size || 0) + (out ? -1 : 1)
-    if (size > -6 && size < 1) {
+    if (size >= SIZE.MIN && size <= SIZE.MAX) {
       this.$el.dataset.size = size
       localStorage.setItem('board-size', size)
     }
