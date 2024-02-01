@@ -9,12 +9,12 @@ import Game from "./models/game.js"
 import { parse as parseCookie } from "cookie"
 import * as CONST from "./public/js/const.js"
 import BoardShuffler from "./public/js/board/board_shuffler.js"
+import { generate as generateRandomWords } from "random-words"
 
 const app = express()
 const PORT = process.env.PORT || 3000
 const server = http.createServer(app)
 const io = new Server(server)
-const SESSION_EXPIRE_HOURS = 5
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 app.use(express.static(path.join(__dirname, 'public')))
@@ -23,12 +23,15 @@ app.engine('html', mustacheExpress())
 app.set('view engine', 'html')
 app.set('views', __dirname + '/views')
 
-/**
- * @todo random hexval for game ids
- * @todo Move to a db for game state maintenance?
- */
-/** @type {Game[]} */
-const GAME_SESSIONS = { next: 1 }
+const SESSION_EXPIRE_HOURS = 5
+const API_SALT = process.env.API_SALT || 'cultivate'
+/** @todo Move to a db for game state maintenance? */
+/** @type {Object.<string, Game>} */
+const GAME_SESSIONS = {}
+
+function onGameEnd(id) {
+  delete GAME_SESSIONS[id]
+}
 
 app.get('/', function (req, res) {
   if (req.cookies.game_id && GAME_SESSIONS[req.cookies.game_id]) {
@@ -39,16 +42,17 @@ app.get('/', function (req, res) {
 })
 
 app.get('/game/new', function (req, res) {
-  // New Game
+  let id
+  do { id = generateRandomWords({ min: 2, max: 2, join: '-' }) } while (GAME_SESSIONS[id])
+  const { name } = req.query
   const game = new Game({
-    id: GAME_SESSIONS.next,
-    playerName: req.query.name,
+    id, io,
+    playerName: name,
+    onGameEnd: id => onGameEnd(id),
     config: Object.assign({}, CONST.GAME_CONFIG, {
       mapkey: (new BoardShuffler(CONST.GAME_CONFIG.mapkey)).shuffle(),
     }),
-    io,
   })
-  GAME_SESSIONS.next++
   res.cookie('game_id', game.id, { maxAge: SESSION_EXPIRE_HOURS * 60 * 60 * 1000, httpOnly: true })
   res.cookie('player_id', 1, { maxAge: SESSION_EXPIRE_HOURS * 60 * 60 * 1000, httpOnly: true })
   GAME_SESSIONS[game.id] = game
@@ -65,8 +69,6 @@ app.get('/game/:id', function(req, res) {
   if (!req.cookies.player_id || !game.hasPlayer(req.cookies.player_id)) {
     return res.redirect('/login?notice=Player not found in the game')
   }
-  // res.clearCookie('game_id')
-  // console.log(game.players.length, game.player_count)
   if (game.players.length < game.player_count) {
     res.render('waiting_room', {
       players: JSON.stringify(game.players),
@@ -84,21 +86,17 @@ app.get('/game/:id', function(req, res) {
 })
 
 app.get('/login', function (req, res) {
-  const { gameid, name, notice } = req.query
+  const { game_id, name, notice } = req.query
   res.clearCookie('game_id')
   res.clearCookie('player_id')
-  if (notice) {
-    return res.render('login', { notice })
-  }
-  if (!gameid) {
-    return res.render('login')
-  }
-  if (!GAME_SESSIONS[gameid]) {
+  if (notice) { return res.render('login', { notice }) }
+  if (!game_id) { return res.render('login') }
+  if (!GAME_SESSIONS[game_id]) {
     return res.render('login', { notice: 'Game not found!' })
   }
 
   // Joining a game
-  const game = GAME_SESSIONS[gameid]
+  const game = GAME_SESSIONS[game_id + '']
   const player = game.join(name)
 
   if (!player) {
@@ -116,32 +114,31 @@ app.get('/logout', function (req, res) {
   res.redirect('/login')
 })
 
-app.get('/all-sessions', function (req, res) {
+app.get('/api/sessions', function (req, res) {
+  if (req.query.salt !== API_SALT) return
   const loggable_json = JSON.parse(JSON.stringify(GAME_SESSIONS))
-  // console.log(loggable_json)
   res.json(loggable_json)
 })
 
-app.get('/clear-sessions/:id?', function(req, res) {
+app.get('/api/sessions/clear/:id?', function(req, res) {
+  if (req.query.salt !== API_SALT) return
   if (req.params.id) {
     delete GAME_SESSIONS[req.params.id]
     return res.redirect('/all-sessions')
   }
   Object.keys(GAME_SESSIONS).forEach(gid => delete GAME_SESSIONS[gid])
-  GAME_SESSIONS.next = 1
-  res.redirect('/all-sessions')
+  res.redirect('/api/sessions')
 })
 
 const SOCK_INFO = {}
 io.on('connection', (socket) => {
   let { game_id, player_id } = parseCookie(socket.handshake.headers.cookie || '')
-  game_id = +game_id; player_id = +player_id
+  player_id = +player_id
   socket.join(game_id || -1)
   // Only setup socket events for the correct game
   GAME_SESSIONS[game_id]?.setUpPlayerSocket(player_id, socket)
   SOCK_INFO[socket.id] = { game_id, player_id }
 
-  /** @todo implement pause and continue */
   socket.on('disconnect', () => {
     const { game_id, player_id } = SOCK_INFO[socket.id]
     GAME_SESSIONS[game_id]?.removePlayerSocket(player_id, socket)

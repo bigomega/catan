@@ -546,6 +546,7 @@ export default class Game {
 
   #onPlayerVpChange(pid, vps) {
     if (vps < this.config.win_points) return
+    setTimeout(_ => {
     const player = this.getPlayer(pid)
     this.#io_manager.updateGameEnd({
       pid, vps,
@@ -556,6 +557,7 @@ export default class Game {
       longest_road: player.longest_road && player.longest_road_list.length,
     })
     this.players.forEach(p => this.removePlayerSocket(p.id))
+    }, 200) // Wait for other actions to complete
   }
   //#endregion
 
