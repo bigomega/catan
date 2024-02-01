@@ -20,7 +20,7 @@ export default class Game {
   #active_pid = 0
   config = CONST.GAME_CONFIG
   /** @type {Player[]} */ players = []
-  ready_players = {}; map_changes = []; expected_actions = []; robbing_players = []
+  map_changes = []; expected_actions = []; robbing_players = []
   /** @type {{ pid, giving, asking, id, status:('open'|'closed'|'success'|'failed'|'deleted'), rejected:number[] }[]} */
   ongoing_trades = []
   turn = 1; dice_value = 2
@@ -39,15 +39,15 @@ export default class Game {
     this.#active_pid = (pid - 1) % this.player_count
   }
 
-  constructor({ id, host_name, config, io }) {
+  constructor({ id, host, config, io }) {
     this.id = id
     this.config = config
     this.player_count = config.player_count
     this.#io_manager = new IOManager({ game: this, io })
-    this.players.push(new Player(host_name, 1, {
+    this.players[host.id - 1] = new Player(host.id, host.name, {
       onChange: (...params) => this.#onPlayerUpdate(...params),
       onVpChange: (pid, vp) => this.#onPlayerVpChange(pid, vp),
-    }))
+    })
     this.mapkey = this.config.mapkey
     this.expected_actions.add = (...elems) => elems.forEach(obj => {
       this.expected_actions.push(Object.assign({ type: this.state, pid: this.active_pid }, obj))
@@ -55,18 +55,22 @@ export default class Game {
   }
 
   join(name) {
-    if (this.players.length >= this.player_count) { return }
-    const player = new Player(name, this.players.length + 1, {
+    const joined_players = this.players.filter(p => p?.id)
+    if (joined_players.length >= this.player_count) { return }
+    // Array.from({ length: this.player_count }, (_, i) => i + 1)
+    const remaining_ids = [...Array(this.player_count).keys()].map(_ => _+1)
+      .filter(id => !this.players[id - 1])
+    const id = remaining_ids[Math.floor(Math.random() * remaining_ids.length)]
+    const player = new Player(id, name, {
       onChange: (...params) => this.#onPlayerUpdate(...params),
       onVpChange: (pid, vp) => this.#onPlayerVpChange(pid, vp),
     })
-    this.players.push(player)
+    this.players[id - 1] = player
     this.#io_manager.updateWaitingRoom(player)
     return player
   }
 
   start() {
-    if (this.state) return
     this.board = new Board(this.mapkey)
     this.state = ST.INITIAL_SETUP
     this.config.timer ? this.setTimer(this.config.strategize_time) : this.#next()
@@ -213,6 +217,15 @@ export default class Game {
   // ===================
   //      IO EVENTS
   //#region ===================
+
+  /** Player Online */
+  playerOnlineSoc(pid) {
+    this.getPlayer(pid).ready = true
+    if (!this.state && this.players.filter(p => p?.ready).length === this.player_count) {
+      this.start()
+    }
+  }
+
   /** Initial Build Locations */
   initialBuildIO(pid, settlement_loc, road_loc) {
     const expected_index = this.expected_actions.findIndex(_ => _.type === ST.INITIAL_SETUP)
@@ -547,16 +560,16 @@ export default class Game {
   #onPlayerVpChange(pid, vps) {
     if (vps < this.config.win_points) return
     setTimeout(_ => {
-    const player = this.getPlayer(pid)
-    this.#io_manager.updateGameEnd({
-      pid, vps,
-      S: player.pieces.S.length,
-      C: player.pieces.C.length,
-      dVp: player.private_vps,
-      largest_army: player.largest_army && player.open_dev_cards.dK,
-      longest_road: player.longest_road && player.longest_road_list.length,
-    })
-    this.players.forEach(p => this.removePlayerSocket(p.id))
+      const player = this.getPlayer(pid)
+      this.#io_manager.updateGameEnd({
+        pid, vps,
+        S: player.pieces.S.length,
+        C: player.pieces.C.length,
+        dVp: player.private_vps,
+        largest_army: player.largest_army && player.open_dev_cards.dK,
+        longest_road: player.longest_road && player.longest_road_list.length,
+      })
+      this.players.forEach(p => this.removePlayerSocket(p.id))
     }, 200) // Wait for other actions to complete
   }
   //#endregion
@@ -595,7 +608,7 @@ export default class Game {
     this.#io_manager.removeEvents(socket)
   }
 
-  hasPlayer(id) { return id <= this.players.length }
+  hasPlayer(id) { return !!this.getPlayer(id)?.id }
   getPlayer(id) { return this.players[id - 1] }
   getOpponents(id) { return this.players.filter((_, i) => i !== (id - 1)) }
   getActivePlayer() { return this.players[this.#active_pid] || this.players[0] }

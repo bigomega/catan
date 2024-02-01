@@ -45,19 +45,21 @@ app.get('/game/new', function (req, res) {
   let id
   do { id = generateRandomWords({ min: 2, max: 2, join: '-' }) } while (GAME_SESSIONS[id])
   const { name } = req.query
+  const game_config = CONST.GAME_CONFIG
+  const pid = Math.floor(Math.random() * game_config.player_count + 1)
   const game = new Game({
     id, io,
-    playerName: name,
+    host: { name, id: pid },
     onGameEnd: id => onGameEnd(id),
-    config: Object.assign({}, CONST.GAME_CONFIG, {
-      mapkey: (new BoardShuffler(CONST.GAME_CONFIG.mapkey)).shuffle(),
+    config: Object.assign({}, game_config, {
+      mapkey: (new BoardShuffler(game_config.mapkey)).shuffle(),
     }),
   })
-  res.cookie('game_id', game.id, { maxAge: SESSION_EXPIRE_HOURS * 60 * 60 * 1000, httpOnly: true })
-  res.cookie('player_id', 1, { maxAge: SESSION_EXPIRE_HOURS * 60 * 60 * 1000, httpOnly: true })
-  GAME_SESSIONS[game.id] = game
-  // res.send(`<script>window.location.href = "/game/${game.id}"</script>`)
-  res.redirect('/game/' + game.id)
+  res.cookie('game_id', id, { maxAge: SESSION_EXPIRE_HOURS * 60 * 60 * 1000, httpOnly: true })
+  res.cookie('player_id', pid, { maxAge: SESSION_EXPIRE_HOURS * 60 * 60 * 1000, httpOnly: true })
+  GAME_SESSIONS[id] = game
+  // res.send(`<script>window.location.href = "/game/${id}"</script>`)
+  res.redirect('/game/' + id)
 })
 
 app.get('/game/:id', function(req, res) {
@@ -66,10 +68,10 @@ app.get('/game/:id', function(req, res) {
     return res.redirect('/login?notice=Game id not found')
   }
   const game = GAME_SESSIONS[game_id]
-  if (!req.cookies.player_id || !game.hasPlayer(req.cookies.player_id)) {
+  if (!req.cookies.player_id || !game.hasPlayer(+req.cookies.player_id)) {
     return res.redirect('/login?notice=Player not found in the game')
   }
-  if (game.players.length < game.player_count) {
+  if (game.players.filter(p => p?.id).length < game.player_count) {
     res.render('waiting_room', {
       players: JSON.stringify(game.players),
       player_count: game.player_count,
@@ -77,7 +79,7 @@ app.get('/game/:id', function(req, res) {
     })
     return
   }
-  const player = game.getPlayer(req.cookies.player_id)
+  const player = game.getPlayer(+req.cookies.player_id)
   res.render('index', {
     game: JSON.stringify(game),
     player: JSON.stringify(player.toJSON(1)),
@@ -115,13 +117,13 @@ app.get('/logout', function (req, res) {
 })
 
 app.get('/api/sessions', function (req, res) {
-  if (req.query.salt !== API_SALT) return
+  if (req.query.salt !== API_SALT) return res.json({})
   const loggable_json = JSON.parse(JSON.stringify(GAME_SESSIONS))
   res.json(loggable_json)
 })
 
 app.get('/api/sessions/clear/:id?', function(req, res) {
-  if (req.query.salt !== API_SALT) return
+  if (req.query.salt !== API_SALT) res.json({})
   if (req.params.id) {
     delete GAME_SESSIONS[req.params.id]
     return res.redirect('/all-sessions')

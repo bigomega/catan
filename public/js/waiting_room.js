@@ -3,13 +3,14 @@ import * as CONST from "./const.js"
 window.player_count > 2 && document.querySelector('.player-3').classList.remove('hide')
 window.player_count > 3 && document.querySelector('.player-4').classList.remove('hide')
 
+// const tile_keys = Object.keys(CONST.TILES).filter(_ => !['S', 'D'].includes(_))
+const tile_keys = Object.keys(CONST.TILES).filter(_ => _ !== 'S' && _ !== 'D')
+
 function getRandomTile() {
-  // const keys = Object.keys(CONST.TILES).filter(_ => !['S', 'D'].includes(_))
-  const keys = Object.keys(CONST.TILES).filter(_ => _ !== 'S' && _ !== 'D')
-  return CONST.TILES[keys[Math.floor(Math.random() * keys.length)]]
+  return CONST.TILES[tile_keys[Math.floor(Math.random() * tile_keys.length)]]
 }
 
-function addPlayer(id, name) {
+function addPlayer({ id, name }) {
   document.querySelector('.player-' + id).innerHTML = `<div class="name">${name}</div>`
   const tile_img = `url('/images/tiles/${getRandomTile()}.png')`
   document.querySelector('.player-' + id).style.backgroundImage = tile_img
@@ -17,25 +18,22 @@ function addPlayer(id, name) {
   document.querySelector('.title span').innerHTML = +document.querySelector('.title span').innerHTML + 1
 }
 
-function blurBody(players_joined) {
+function changeBackground(players_joined) {
   const blur_val = Math.round((window.player_count - players_joined) * 50 / (window.player_count - 1))
-  document.querySelector('body').style.backdropFilter = `blur(${blur_val}px)`
+  const gray_val = Math.round((window.player_count - players_joined) * 100 / (window.player_count - 1))/100
+  document.querySelector('body').style.backdropFilter = `blur(${blur_val}px) grayscale(${gray_val})`
 }
 
-for (let i = 0; i < window.players.length; i++) {
-  const player = window.players[i]
-  addPlayer(player.id, player.name)
-}
-blurBody(window.players.length)
+let joined_count = 0
+window.players.forEach(p => p && (joined_count++, addPlayer(p)))
+changeBackground(joined_count)
 
 const socket = io()
 socket.on(CONST.SOCKET_EVENTS.JOINED_WAITING_ROOM, function(player) {
-  addPlayer(player.id, player.name)
-  blurBody(player.id)
-  if (player.id === window.player_count) {
+  addPlayer(player)
+  changeBackground(++joined_count)
+  if (joined_count === window.player_count) {
     document.querySelector('.container').classList.add('hide')
-    setTimeout(_ => {
-      window.location.reload()
-    }, 1000)
+    setTimeout(_ => window.location.reload(), 1000)
   }
 })

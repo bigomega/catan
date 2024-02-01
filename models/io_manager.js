@@ -20,12 +20,7 @@ export default class IOManager {
     if (!socket || !pid) return
 
     /** @event Player-Online */
-    socket.on(SOC.PLAYER_ONLINE, _ => {
-      game.ready_players[pid] = 1
-      if (Object.keys(game.ready_players).length === game.player_count) {
-        game.start()
-      }
-    })
+    socket.on(SOC.PLAYER_ONLINE, _ => game.playerOnlineSoc(pid))
 
     /** @event Initial-Setup */
     socket.on(SOC.INITIAL_SETUP, (s_loc, r_loc) => game.initialBuildIO(pid, s_loc, r_loc))

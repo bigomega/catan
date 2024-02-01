@@ -5,6 +5,8 @@ export default class Player {
   #onChange; #onVpChange
   id; name; socket; last_status
   static #names = ['Cheran(சே)', 'Cholan(ழ)', 'Paandian(பா)', 'Karikalan(க)']
+  online = false
+  ready = false
   resource_count = 0
   dev_card_count = 0
   public_vps = 0
@@ -22,7 +24,7 @@ export default class Player {
   longest_road = false
   longest_road_list = []
 
-  constructor(name, id, { onChange, onVpChange }) {
+  constructor(id, name, { onChange, onVpChange }) {
     this.id = id
     this.name = name || Player.#names[this.id - 1]
     this.#onChange = onChange
@@ -32,8 +34,8 @@ export default class Player {
   }
 
   getSocket() { return this.socket }
-  setSocket(socket) { this.socket = socket }
-  deleteSocket() { delete this.socket }
+  setSocket(socket) { this.socket = socket; this.online = true }
+  deleteSocket() { delete this.socket; this.online = false; this.ready = false }
 
   giveCards(cards = {}) {
     const _give = (type, count) => {
