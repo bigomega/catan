@@ -84,7 +84,18 @@
     display: flex; justify-content: center; align-items: center;
     transform: scale(.5);
     transition: all .5s ease-in;
-    .res-icon { margin: 0; }
+    .res-icon {
+      margin: 0;
+      &.dK, &.dM, &.dY, &.dR, &.dVp {
+        width: 30px; height: 30px; border-radius: 30px;
+        background: url(/images/cards_sprite.png) -314px -460px/1047px no-repeat;
+      }
+      &.dK { background-position: -280px -14px; background-size: 321px; }
+      &.dR { background-position: -9px -78px; background-size: 301px; }
+      &.dM { background-position: -51px -71px; background-size: 290px; }
+      &.dY { background-position: -97px -75px; background-size: 301px; }
+      &.dVp { background-position: -96px -139px; background-size: 301px; }
+    }
   }
   &.start .res-circle { transform: scale(4); }
 }
