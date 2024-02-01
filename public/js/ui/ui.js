@@ -13,7 +13,7 @@ import AccessibilityUI from "./accessibility_ui.js"
 const $ = document.querySelector.bind(document)
 
 export default class UI {
-  #game; #board; #player; #game_config
+  #game; #board; #player
   board_ui; player_ui; alert_ui; trade_ui; animation_ui; all_players_ui
   robber_drop_ui; res_selection_ui; accessibility_ui
   #temp = {}
@@ -24,7 +24,6 @@ export default class UI {
     this.#game = game
     this.#board = board
     this.#player = player
-    this.#game_config = game.config
 
     this.alert_ui = new AlertUI(player, st => game.saveStatus(st), game.config.alert_time)
     this.board_ui = new BoardUI(board, (loc, id) => game.onBoardClick(loc, id))
@@ -42,7 +41,7 @@ export default class UI {
       hidePlayerLongestRoad: _ => this.board_ui.hideLongestRoads(),
     })
 
-    this.player_ui = new PlayerUI(player, {
+    this.player_ui = new PlayerUI(player, game.config.timer, {
       onDiceClick: _ => game.onDiceClick(),
       onPieceClick: (piece, is_active) => game.onPieceClick(piece, is_active),
       onBuyDevCardClick: _ => game.onBuyDevCardClick(),
@@ -65,7 +64,7 @@ export default class UI {
       playRobberAudio: _ => game.playRobberAudio(),
     })
 
-    this.trade_ui = new TradeUI(player, game.config, {
+    this.trade_ui = new TradeUI(player, game.config.max_trade_requests, {
       toggleHandRes: type => this.player_ui.toggleHandResource(type),
       resetHand: _ => this.player_ui.renderHand(),
       toggleBoardBlur: hide => { this.board_ui.toggleBlur(hide); this.all_players_ui.toggleBlur(hide) },

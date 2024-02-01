@@ -63,7 +63,7 @@ export default class Game {
     if (this.state) return
     this.board = new Board(this.mapkey)
     this.state = ST.INITIAL_SETUP
-    this.setTimer(this.config.strategize_time)
+    this.config.timer ? this.setTimer(this.config.strategize_time) : this.#next()
   }
 
   // ===================
@@ -542,6 +542,7 @@ export default class Game {
 
   setTimer(time_in_seconds, fn) {
     this.clearTimer()
+    if (!this.config.timer) { return }
     this.#io_manager.updateTimer(time_in_seconds, this.active_pid)
     this.#timer = setTimeout(_ => {
       fn && (typeof fn === 'function') && fn()

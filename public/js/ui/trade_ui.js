@@ -3,7 +3,7 @@ import { resToText } from "../const_messages.js";
 import { newObject } from "../utils.js";
 
 export default class TradeUI {
-  #giving_res; #taking_res; #trade_type; #counter_id; #game_config
+  #giving_res; #taking_res; #trade_type; #counter_id; #max_trade_requests
   #player; #onTradeProposal; #onTradeResponse; #toggleHandRes; #resetHand; #toggleBoardBlur
   $submit; $giving_text; $taking_text;
   $el = document.querySelector('#game > .trade-zone')
@@ -11,10 +11,10 @@ export default class TradeUI {
   $type_selection = this.$el.querySelector('.trade-type-selection')
   $card_selection = this.$el.querySelector('.trade-card-selection')
 
-  constructor(player, game_config, { onTradeProposal, onTradeResponse,
+  constructor(player, max_trade_requests, { onTradeProposal, onTradeResponse,
     toggleHandRes, resetHand, toggleBoardBlur }) {
     this.#player = player
-    this.#game_config = game_config
+    this.#max_trade_requests = max_trade_requests
     this.#onTradeProposal = onTradeProposal
     this.#onTradeResponse = onTradeResponse
     this.#toggleHandRes = toggleHandRes
@@ -108,7 +108,7 @@ export default class TradeUI {
 
   renderTradeSelection() {
     const $og_req = this.$requests.querySelectorAll('.ongoing[data-id="-1"] .og-request:not(.deleted)')
-    const Px_limit_crossed = $og_req.length >= this.#game_config.max_trade_requests
+    const Px_limit_crossed = $og_req.length >= this.#max_trade_requests
     this.$type_selection.classList.remove('hide')
     Object.entries(this.#player.trade_offers).forEach(([type, allowed]) => {
       const $el = this.$type_selection.querySelector(`.trade-type[data-type="${type}"]`)
@@ -264,7 +264,7 @@ export default class TradeUI {
     } else {
       this.$requests.insertAdjacentHTML('afterbegin', `
         <div class="ongoing" data-id="-1">
-          <span class="text">Max ${this.#game_config.max_trade_requests} Requests: </span>${$og_req}
+          <span class="text">Max ${this.#max_trade_requests} Requests: </span>${$og_req}
         </div>
       `)
     }
