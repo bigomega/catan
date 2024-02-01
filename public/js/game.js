@@ -37,7 +37,7 @@ export default class Game {
     this.#ui.all_players_ui.updateActive(this.active_pid)
     this.#ui.player_ui.setDevCardCount(game_obj.dev_cards_len)
     this.#ui.player_ui.updatePiecesCount()
-    game_obj.timer && this.setTimerSoc(game_obj.timer, this.active_pid)
+    game_obj.timer && this.config.timer && this.setTimerSoc(game_obj.timer, this.active_pid)
     if (game_obj.robber_loc) {
       this.#board.moveRobber(game_obj.robber_loc)
       this.#ui.moveRobber(game_obj.robber_loc)
@@ -47,20 +47,8 @@ export default class Game {
         this.#ui.trade_ui.renderNewRequest(this.getPlayer(pid), { pid, ...params })
       })
     }
-    // Active Player State updates
-    if (this.#player.id === this.active_pid) {
-      switch (this.state) {
-        case ST.INITIAL_SETUP: this.requestInitialSetupSoc(this.active_pid, 1); break
-        case ST.PLAYER_ROLL: this.#ui.player_ui.toggleDice(true); this.#ui.player_ui.toggleShow(1); break
-        case ST.PLAYER_ACTIONS: this.#ui.toggleActions(true); this.#ui.player_ui.toggleShow(1); break
-        case ST.ROBBER_DROP: break
-        case ST.ROBBER_MOVE: this.#ui.showTiles(this.#board.getRobbableTiles()); break
-      }
-    }
-    if (this.state === ST.ROBBER_DROP) {
-      this.#player.resource_count > 7
-        && this.#ui.robberDrop(Math.floor(this.#player.resource_count / 2))
-    }
+    // State updates
+    this.updateStateChangeSoc(this.state, this.active_pid)
   }
 
 
@@ -102,16 +90,16 @@ export default class Game {
   // STATE - Roll
   #onPlayerRoll() {
     this.#ui.toggleActions(0)
-    this.#ui.hideAllShown(0)
+    this.#ui.hideAllShown()
     this.#ui.trade_ui.clearRequests()
     if (this.#isMyPid(this.active_pid)) {
       this.#audio_manager.playTurnNotification()
-      this.#ui.player_ui.toggleDice(1)
+      this.config.auto_roll || this.#ui.player_ui.toggleDice(1)
       this.#ui.player_ui.toggleShow(1)
     } else {
       this.#ui.player_ui.toggleShow()
     }
-    this.#ui.alert_ui.alertRollTurn(this.getActivePlayer())
+    this.config.auto_roll || this.#ui.alert_ui.alertRollTurn(this.getActivePlayer())
   }
   // STATE - Player Action
   #onPlayerAction() {

@@ -141,6 +141,7 @@
       cursor: pointer;
       line-height: 90px;
       transition: all .25s linear;
+      &.hide { display: none; }
 
       &.disabled {
         filter: grayscale(1) contrast(0.5);
@@ -355,7 +356,7 @@
     }
   }
 }
-#game .board:not(.hide):has(+ .current-player .hand.blur:hover) {
+#game .board-container:has(~ .current-player .hand.blur:hover) .board:not(.hide) {
   filter: drop-shadow(2px 2px 3px #000a) blur(2px);
 }
 

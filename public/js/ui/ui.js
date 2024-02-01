@@ -41,7 +41,7 @@ export default class UI {
       hidePlayerLongestRoad: _ => this.board_ui.hideLongestRoads(),
     })
 
-    this.player_ui = new PlayerUI(player, game.config.timer, {
+    this.player_ui = new PlayerUI(player, game.config.timer, game.config.auto_roll, {
       onDiceClick: _ => game.onDiceClick(),
       onPieceClick: (piece, is_active) => game.onPieceClick(piece, is_active),
       onBuyDevCardClick: _ => game.onBuyDevCardClick(),

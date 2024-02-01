@@ -27,7 +27,7 @@ export default class AnimationUI {
       <div class="dice d1">${Array(d1).fill(0).map(_ => `<span class="pip"></span>`).join('')}</div>
       <div class="dice d2">${Array(d2).fill(0).map(_ => `<span class="pip"></span>`).join('')}</div>
     `
-    setTimeout(_ => this.$el.classList.add('start'), 200)
+    setTimeout(_ => this.$el.classList.add('start'), 250)
   }
 
   animateDevelopmentCard(type, out) {

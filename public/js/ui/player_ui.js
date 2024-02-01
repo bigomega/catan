@@ -7,7 +7,7 @@ export default class PlayerUI {
   #ui; #onDiceClick; #onPieceClick; #onBuyDevCardClick; #onTradeClick; #onExitTrade;
   #onEndTurnClick; #onCardClick; #getPossibleLocations; #toggleBoardBlur; #onDevCardActivate
   #canPlayDevCard
-  player; has_timer; timer; hand
+  player; has_timer; timer; auto_roll; hand
 
   $timer; $dice; $build_road; $build_settlement; $build_city; $buy_dev_card; $trade_btn; $end_turn
   $el = $('#game > .current-player')
@@ -15,11 +15,12 @@ export default class PlayerUI {
   $action_bar = this.$el.querySelector('.actions')
   $card_preview = $('#game > .card-preview-zone')
 
-  constructor(player, has_timer, { onDiceClick, onPieceClick, onBuyDevCardClick, onTradeClick,
-    onExitTrade, onEndTurnClick, onCardClick, getPossibleLocations, toggleBoardBlur,
-    onDevCardActivate, canPlayDevCard }) {
+  constructor(player, has_timer, auto_roll, { onDiceClick, onPieceClick, onBuyDevCardClick,
+    onTradeClick, onExitTrade, onEndTurnClick, onCardClick, getPossibleLocations,
+    toggleBoardBlur, onDevCardActivate, canPlayDevCard }) {
     this.player = player
     this.has_timer = has_timer
+    this.auto_roll = auto_roll
     this.#onDiceClick = onDiceClick
     this.#onPieceClick = onPieceClick
     this.#onBuyDevCardClick = onBuyDevCardClick
@@ -63,7 +64,7 @@ export default class PlayerUI {
     this.$el.classList.add('id-' + this.player.id)
     this.$action_bar.innerHTML = `
       <div class="timer disabled ${this.has_timer ? '' : 'hide'}">0:00</div>
-      <div class="roll-dice disabled" title="Roll Dice (Space)">🎲🎲</div>
+      <div class="roll-dice disabled ${this.auto_roll ? 'hide' : ''}" title="Roll Dice (Space)">🎲🎲</div>
       <div class="build-road disabled" title="Build Road (r)" data-count="${CONST.PIECES_COUNT.R}">
         <div class="cost-tooltip">${resToText(CONST.COST.R)}</div>
       </div>

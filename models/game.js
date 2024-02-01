@@ -84,7 +84,7 @@ export default class Game {
     switch (this.state) {
       case ST.PLAYER_ROLL:
         this.expected_actions.add({ callback: this.#expectedRoll.bind(this) })
-        this.setTimer(this.config.roll_time)
+        this.config.auto_roll ? this.#next() : this.setTimer(this.config.roll_time)
         break
 
       case ST.PLAYER_ACTIONS:
@@ -217,6 +217,9 @@ export default class Game {
       this.#next()
     }
   }
+
+  /** Player Roll Click */
+  playerRollIO() { this.#next() }
 
   /** Building - Edge & Corner click (other than initial-build) */
   clickedLocationIO(pid, loc_type, id) {
@@ -421,7 +424,6 @@ export default class Game {
     })
   }
 
-  playerRollIO() { this.#next() }
   endTurnIO() { this.#next() }
   saveStatusIO(pid, text) { this.getPlayer(pid).setLastStatus(text) }
   //#endregion
