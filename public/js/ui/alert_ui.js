@@ -16,6 +16,10 @@ export default class AlertUI {
 
   render() {
     this.$status_bar.innerHTML = this.#player.last_status || '...'
+    this.$alert.querySelector('.close').addEventListener('click', e => this.closeBigAlert())
+    document.addEventListener('keydown', e => {
+      e.code === 'Backquote' && this.closeBigAlert()
+    })
   }
 
   closeBigAlert() {
