@@ -44,7 +44,10 @@ export default class Game {
     this.config = config
     this.player_count = config.player_count
     this.#io_manager = new IOManager({ game: this, io })
-    this.players.push(new Player(host_name, 1, this.#onPlayerUpdate.bind(this)))
+    this.players.push(new Player(host_name, 1, {
+      onChange: (...params) => this.#onPlayerUpdate(...params),
+      onVpChange: (pid, vp) => this.#onPlayerVpChange(pid, vp),
+    }))
     this.mapkey = this.config.mapkey
     this.expected_actions.add = (...elems) => elems.forEach(obj => {
       this.expected_actions.push(Object.assign({ type: this.state, pid: this.active_pid }, obj))
@@ -53,7 +56,10 @@ export default class Game {
 
   join(name) {
     if (this.players.length >= this.player_count) { return }
-    const player = new Player(name, this.players.length+1, this.#onPlayerUpdate.bind(this))
+    const player = new Player(name, this.players.length + 1, {
+      onChange: (...params) => this.#onPlayerUpdate(...params),
+      onVpChange: (pid, vp) => this.#onPlayerVpChange(pid, vp),
+    })
     this.players.push(player)
     this.#io_manager.updateWaitingRoom(player)
     return player
@@ -196,7 +202,7 @@ export default class Game {
         player.giveCards({ [stolen_res]: 1})
         this.players.forEach(p => {
           const send_res = p.id === pid || p.id === stolen_pid
-          this.#io_manager.updateStolen_Private(p.socket_id, pid, stolen_pid, send_res && stolen_res)
+          this.#io_manager.updateStolen_Private(this.getPlayerSocId(p.id), pid, stolen_pid, send_res && stolen_res)
         })
       }
     }
@@ -261,7 +267,7 @@ export default class Game {
     const bought_card = this.dev_cards.pop()
     player.bought('DEV_C', bought_card)
     this.players.forEach(p => {
-      this.#io_manager.updateDevCardTaken_Private(p.socket_id, pid, this.dev_cards.length, p.id === pid && bought_card)
+      this.#io_manager.updateDevCardTaken_Private(this.getPlayerSocId(p.id), pid, this.dev_cards.length, p.id === pid && bought_card)
     })
     this.#updateOngoingTrades(player)
   }
@@ -279,7 +285,7 @@ export default class Game {
     callback(pid, { drop_count, resources })
     this.expected_actions.splice(expected_index, 1)
     if (this.robbing_players.length) {
-      this.#io_manager.updateRobbed_Private(this.getPlayerSoc(pid))
+      this.#io_manager.updateRobbed_Private(this.getPlayerSocId(pid))
     } else {
       this.#next()
     }
@@ -407,7 +413,7 @@ export default class Game {
     const total_count = Object.values(res_from_player).reduce((mem, v) => mem + v, 0)
     player.giveCards({ [res]: total_count })
     this.players.forEach(p => {
-      this.#io_manager.updateMonopolyUsed_Private(this.getPlayerSoc(p.id), pid, res, total_count, res_from_player[p.id])
+      this.#io_manager.updateMonopolyUsed_Private(this.getPlayerSocId(p.id), pid, res, total_count, res_from_player[p.id])
     })
   }
 
@@ -420,7 +426,7 @@ export default class Game {
     const res_obj = res1 === res2 ? { [res1]: 2 } : { [res1]: 1, [res2]: 1 }
     player.giveCards(res_obj)
     this.players.forEach(p => {
-      this.#io_manager.updateYearOfPlentyUsed_Private(this.getPlayerSoc(p.id), pid, pid === p.id && res_obj)
+      this.#io_manager.updateYearOfPlentyUsed_Private(this.getPlayerSocId(p.id), pid, pid === p.id && res_obj)
     })
   }
 
@@ -454,7 +460,7 @@ export default class Game {
     resource_by_pid.forEach((res, index) => {
       const player = this.getPlayer(index + 1)
       player.giveCards(res)
-      this.#io_manager.updateResourceReceived_Private(this.getPlayerSoc(player.id), res)
+      this.#io_manager.updateResourceReceived_Private(this.getPlayerSocId(player.id), res)
     })
   }
 
@@ -519,7 +525,7 @@ export default class Game {
     const player = this.getPlayer(pid)
     this.players.forEach(p => {
       const is_pid = pid === p.id
-      this.#io_manager.updatePlayerData_Private(p.socket_id, player.toJSON(is_pid), key, is_pid && context)
+      this.#io_manager.updatePlayerData_Private(this.getPlayerSocId(p.id), player.toJSON(is_pid), key, is_pid && context)
     })
   }
 
@@ -536,6 +542,20 @@ export default class Game {
       obj.status = this.getPlayer(obj.pid)?.hasAllResources(obj.giving) ? 'open' : 'closed'
     })
     this.#io_manager.updateOngoingTrades(this.ongoing_trades)
+  }
+
+  #onPlayerVpChange(pid, vps) {
+    if (vps < this.config.win_points) return
+    const player = this.getPlayer(pid)
+    this.#io_manager.updateGameEnd({
+      pid, vps,
+      S: player.pieces.S.length,
+      C: player.pieces.C.length,
+      dVp: player.private_vps,
+      largest_army: player.largest_army && player.open_dev_cards.dK,
+      longest_road: player.longest_road && player.longest_road_list.length,
+    })
+    this.players.forEach(p => this.removePlayerSocket(p.id))
   }
   //#endregion
 
@@ -563,11 +583,14 @@ export default class Game {
   #getRandom(list) { return list[Math.floor(Math.random() * list.length)] }
   #gotoNextState() { this.state = NEXT_STATE[this.state] }
 
-  setSocketID(pid, sid) { this.getPlayer(pid)?.setSocket(sid) }
-  removeSocketID(pid, sid) { this.getPlayer(pid)?.deleteSocket(sid) }
-  setUpSocketEvents(socket, pid) {
-    this.setSocketID(pid, socket.id)
+  setUpPlayerSocket(pid, socket) {
+    this.removePlayerSocket(pid)
+    this.getPlayer(pid)?.setSocket(socket)
     this.#io_manager.setUpEvents(socket, pid)
+  }
+  removePlayerSocket(pid, socket = this.getPlayerSoc(pid)) {
+    this.getPlayer(pid)?.deleteSocket()
+    this.#io_manager.removeEvents(socket)
   }
 
   hasPlayer(id) { return id <= this.players.length }
@@ -575,12 +598,13 @@ export default class Game {
   getOpponents(id) { return this.players.filter((_, i) => i !== (id - 1)) }
   getActivePlayer() { return this.players[this.#active_pid] || this.players[0] }
 
-  getPlayerSoc(id) { return this.getPlayer(id)?.socket_id }
-  getOtherPlayerSocs(id) {
-    return this.players.filter((_, i) => i !== (id - 1)).map(p => p.socket_id)
-  }
-  getActivePlayerSoc() { return this.getPlayerSoc(this.active_pid) }
-  getNonActivePlayerSocs() { return this.getOtherPlayerSocs(this.active_pid) }
+  getPlayerSoc(id) { return this.getPlayer(id)?.getSocket() }
+  getPlayerSocId(id) { return this.getPlayerSoc(id)?.id }
+
+  // removePlayer(pid) {
+  //   // More to do
+  //   this.removeSockeEvents(this.getPlayerSoc(pid))
+  // }
 
   toJSON() {
     const timer_left = this.#timer && Math.ceil((this.#timer._idleStart + this.#timer._idleTimeout) / 1000 - process.uptime())

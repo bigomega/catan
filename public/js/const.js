@@ -130,6 +130,7 @@ export const SOCKET_EVENTS = {
   ONGOING_TRADES: 'update_ongoing_trades_status',
   LARGEST_ARMY: 'largest_army',
   LONGEST_ROAD: 'longest_road',
+  GAME_END: 'game_end',
 }
 
 export const AUDIO_FILES = {
@@ -150,4 +151,5 @@ export const AUDIO_FILES = {
   LARGEST_ARMY: 'horse-army.mp3',
   LONGEST_ROAD: 'horse-cart.mp3',
   BGM: 'clouds.mp3',
+  END: 'start-end.mp3',
 }

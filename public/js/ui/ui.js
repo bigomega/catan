@@ -25,9 +25,14 @@ export default class UI {
     this.#board = board
     this.#player = player
 
-    this.alert_ui = new AlertUI(player, st => game.saveStatus(st), game.config.alert_time)
     this.board_ui = new BoardUI(board, (loc, id) => game.onBoardClick(loc, id))
     this.animation_ui = new AnimationUI()
+
+    this.alert_ui = new AlertUI(player, game.config.alert_time, {
+      onStatusUpdate: st => game.saveStatus(st),
+      showCard: type => this.player_ui.showCardPreview(type),
+    })
+
     this.accessibility_ui = new AccessibilityUI({
       toggleBoardZoom: out => this.board_ui.toggleZoom(out),
       toggleBgm: allow => game.toggleBgm(allow),

@@ -60,4 +60,5 @@ export default class AudioManager {
   playFail() { this.play(AUDIO.FAIL) }
   playLargestArmy() { this.play(AUDIO.LARGEST_ARMY) }
   playLongestRoad() { this.play(AUDIO.LONGEST_ROAD) }
+  playGameEnd() { this.play(AUDIO.END); this.toggleBgm(false) }
 }

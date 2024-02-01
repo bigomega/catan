@@ -12,9 +12,12 @@ export default class IOManager {
     this.#io = io
   }
 
+  removeEvents(socket) { socket?.removeAllListeners() }
+
   setUpEvents(socket, pid) {
     // pid works as a closure for all events
     const game = this.#game
+    if (!socket || !pid) return
 
     /** @event Player-Online */
     socket.on(SOC.PLAYER_ONLINE, _ => {
@@ -120,6 +123,8 @@ export default class IOManager {
   updateLargestArmy(pid, count) { this.emit(SOC.LARGEST_ARMY, pid, count) }
 
   updateLongestRoad(pid, locs) { this.emit(SOC.LONGEST_ROAD, pid, locs) }
+
+  updateGameEnd(context) { this.emit(SOC.GAME_END, context) }
 
   emit(type, ...data) { this.#io.to(this.#game.id).emit(type, ...data) }
 }

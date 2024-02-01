@@ -8,6 +8,7 @@
 @import './index/res-selection.css';
 @import './index/animations.css';
 @import './index/accessibility.css';
+@import './index/alert.css';
 
 body {
   margin: 0;
@@ -40,61 +41,6 @@ body {
     margin: 0 auto;
     width: fit-content;
     display: flex; justify-content: center; flex-direction: column; align-items: center;
-  }
-
-  > .alert {
-    opacity: 0;
-    z-index: -10;
-    transition: opacity .25s linear;
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    width: calc(100% - 40px);
-    font-family: papyrus, fantasy;
-    font-weight: bold;
-    font-size: 2.5em;
-    line-height: 2em;
-    letter-spacing: 1px;
-    text-align: center;
-
-    &.show {
-      z-index: 1;
-      opacity: 1;
-    }
-
-    small {
-      font-size: .5em;
-      text-shadow: none;
-    }
-
-    .parchment {
-      box-shadow: 2px 3px 20px black, 0 0 125px #8f5922 inset;
-      background: #fffef0;
-      filter: url(#wavy2);
-      padding: 1em;
-      color: transparent;
-
-      b {
-        background: #734101;
-        padding: 8px;
-      }
-    }
-
-    .text {
-      color: rgb(157 90 13);
-      text-shadow: 1px 2px 0px #000000, -3px -3px 5px #ffffff;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
-      padding: 1em;
-      width: calc(100% - 2em);
-      b {
-        padding: 8px;
-        color: #e5dac1;
-        text-shadow: none;
-      }
-    }
   }
 }
 

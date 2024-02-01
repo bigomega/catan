@@ -285,6 +285,14 @@ export default class Game {
     }, 500) // Wait for the road animation
   }
 
+  // SOC - Game Ended
+  updateGameEndSoc(context) {
+    setTimeout(_ => {
+      this.#ui.alert_ui.alertGameEnd(this.getPlayer(context.pid), context)
+      this.#audio_manager.playGameEnd()
+    }, 3000) // Waiting for other animations to end
+  }
+
   setTimerSoc(t, pid) { this.#ui.player_ui.resetTimer(t, this.#isMyPid(pid)) }
   //#endregion
 

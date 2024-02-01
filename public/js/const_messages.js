@@ -70,6 +70,7 @@ const GAME_MESSAGES = {
   YEAR_OF_PLENTY_USED: { all: (p, res_obj) => `${getName(p)} used "Year of Plenty" and took ${p ? '2 resources' : resToText(res_obj)}.` },
   LARGEST_ARMY: { all: (p, c) => `⚔️ ${getName(p)} took over the "Largest Army" with <b>${c} Knights</b> ⚔️` },
   LONGEST_ROAD: { all: (p, l) => `👣 ${getName(p)} took over the "Longest Road" with <b>${l} Roads</b> 🐾` },
+  END_STATUS: { all: (p, pt) => `🏆 ${getName(p)} won with <b>${pt} V</b>ictory <b>P</b>oints.` },
 }
 
 export default GAME_MESSAGES

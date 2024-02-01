@@ -27,6 +27,7 @@ app.set('views', __dirname + '/views')
  * @todo random hexval for game ids
  * @todo Move to a db for game state maintenance?
  */
+/** @type {Game[]} */
 const GAME_SESSIONS = { next: 1 }
 
 app.get('/', function (req, res) {
@@ -137,13 +138,13 @@ io.on('connection', (socket) => {
   game_id = +game_id; player_id = +player_id
   socket.join(game_id || -1)
   // Only setup socket events for the correct game
-  GAME_SESSIONS[game_id]?.setUpSocketEvents(socket, player_id)
+  GAME_SESSIONS[game_id]?.setUpPlayerSocket(player_id, socket)
   SOCK_INFO[socket.id] = { game_id, player_id }
 
   /** @todo implement pause and continue */
   socket.on('disconnect', () => {
     const { game_id, player_id } = SOCK_INFO[socket.id]
-    GAME_SESSIONS[game_id]?.removeSocketID(player_id, socket.id)
+    GAME_SESSIONS[game_id]?.removePlayerSocket(player_id, socket)
     delete SOCK_INFO[socket.id]
   })
 })

@@ -2,7 +2,8 @@ import * as CONST from "../public/js/const.js"
 import { newObject } from "../public/js/utils.js"
 
 export default class Player {
-  id; name; socket_id; onChange; last_status;
+  #onChange; #onVpChange
+  id; name; socket; last_status
   static #names = ['Cheran(சே)', 'Cholan(ழ)', 'Paandian(பா)', 'Karikalan(க)']
   resource_count = 0
   dev_card_count = 0
@@ -21,17 +22,18 @@ export default class Player {
   longest_road = false
   longest_road_list = []
 
-  constructor(name, id, onChange) {
+  constructor(name, id, { onChange, onVpChange }) {
     this.id = id
     this.name = name || Player.#names[this.id - 1]
-    this.onChange = onChange
+    this.#onChange = onChange
+    this.#onVpChange = onVpChange
     this.trade_offers.Px = true
     this.trade_offers['*4'] = true
   }
 
-  getSocket() { return this.socket_id }
-  setSocket(sid) { this.socket_id = sid }
-  deleteSocket(sid) { if (sid == this.socket_id) { delete this.socket_id } }
+  getSocket() { return this.socket }
+  setSocket(socket) { this.socket = socket }
+  deleteSocket() { delete this.socket }
 
   giveCards(cards = {}) {
     const _give = (type, count) => {
@@ -42,7 +44,7 @@ export default class Player {
       else { this.dev_card_count += count }
     }
     Object.entries(cards).forEach(([k, v]) => _give(k, v))
-    this.onChange(this.id, `closed_cards`, cards)
+    this.#onChange(this.id, `closed_cards`, cards)
   }
 
   takeCards(cards = {}) {
@@ -57,7 +59,7 @@ export default class Player {
       else { this.dev_card_count -= count }
     }
     Object.entries(cards).forEach(([k, v]) => _take(k, v))
-    this.onChange(this.id, 'closed_cards.taken', cards)
+    this.#onChange(this.id, 'closed_cards.taken', cards)
   }
 
   bought(type, dev_c_key) {
@@ -66,7 +68,7 @@ export default class Player {
     this.takeCards(CONST.COST[type])
     if (type === 'DEV_C') {
       this.turn_bought_dc[dev_c_key] = (this.turn_bought_dc[dev_c_key] || 0) + 1
-      if (dev_c_key === 'dVp') { this.private_vps++ }
+      dev_c_key === 'dVp' && this.changeVp(0, 1)
       this.giveCards({ [dev_c_key]: 1 })
     }
   }
@@ -79,10 +81,14 @@ export default class Player {
       else { console.warn(`Cannot build city without settlement. pid:${this.id}, loc: ${location}`); return  }
     }
     this.pieces[piece].push(location)
-    if (piece !== 'R') {
-      this.public_vps++
-    }
-    this.onChange(this.id, 'pieces', { piece, location })
+    piece !== 'R' && this.changeVp()
+    this.#onChange(this.id, 'pieces', { piece, location })
+  }
+
+  changeVp(value = 1, is_private) {
+    this.public_vps += value
+    this.private_vps += is_private ? is_private : 0
+    this.#onVpChange(this.id, this.public_vps + this.private_vps)
   }
 
   addPort(type) {
@@ -93,7 +99,7 @@ export default class Player {
   resetDevCard(allowed) {
     this.can_play_dc = !!allowed
     if (allowed) { this.turn_bought_dc = {} }
-    this.onChange(this.id, 'dc_update', { can_play_dc: this.can_play_dc, turn_bought_dc: {} })
+    this.#onChange(this.id, 'dc_update', { can_play_dc: this.can_play_dc, turn_bought_dc: {} })
   }
 
   canPlayDevCard(type) {
@@ -140,30 +146,30 @@ export default class Player {
   toggleLargestArmy(given) {
     if (given && !this.largest_army) {
       this.largest_army = true
-      this.public_vps += 2
-      this.onChange(this.id, 'largest_army', { largest_army: true })
+      this.changeVp(2)
+      this.#onChange(this.id, 'largest_army', { largest_army: true })
     } else if (!given && this.largest_army) {
       this.largest_army = false
-      this.public_vps -= 2
-      this.onChange(this.id, 'largest_army', { largest_army: false })
+      this.changeVp(-2)
+      this.#onChange(this.id, 'largest_army', { largest_army: false })
     }
   }
 
   toggleLongestRoad(given) {
     if (given && !this.longest_road) {
       this.longest_road = true
-      this.public_vps += 2
-      this.onChange(this.id, 'longest_road', { longest_road: true })
+      this.changeVp(2)
+      this.#onChange(this.id, 'longest_road', { longest_road: true })
     } else if (!given && this.longest_road) {
       this.longest_road = false
-      this.public_vps -= 2
-      this.onChange(this.id, 'longest_road', { longest_road: false })
+      this.changeVp(-2)
+      this.#onChange(this.id, 'longest_road', { longest_road: false })
     }
   }
 
   setLongestRoadPath(locs) {
     this.longest_road_list = locs
-    this.onChange(this.id, 'longest_road_list', { longest_road_list: locs })
+    this.#onChange(this.id, 'longest_road_list', { longest_road_list: locs })
   }
 
   setLastStatus(message) { this.last_status = message }
