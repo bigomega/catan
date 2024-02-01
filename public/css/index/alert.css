@@ -76,7 +76,10 @@
   .text .game-ended :is(.dVp, .army, .road) {
     cursor: pointer;
     b::after { box-shadow: 0 0 0px 1px #733f05; border-radius: 3px; }
-    &:hover b::after { box-shadow: 0 0 0px 1px #733f05, 0 0 10px 0 #000; }
+    &:hover {
+      text-shadow: 0 0 5px #ff8a00;
+      b::after { box-shadow: 0 0 0px 1px #733f05, 0 0 10px 0 #000; }
+    }
   }
 
 

@@ -1,4 +1,4 @@
-import { default as MSG } from "../const_messages.js"
+import { default as MSG, getName } from "../const_messages.js"
 const $ = document.querySelector.bind(document)
 
 export default class AlertUI {
@@ -98,9 +98,9 @@ export default class AlertUI {
         <small>
           ${S ? `<div class="pts S"><b>${S} VP:</b> ${S} Settlement</div>` : ''}
           ${C ? `<div class="pts C"><b>${C * 2} VP:</b> ${C} City</div>` : ''}
-          ${dVp ? `<div class="pts dVp" data-type="dVp"><b>${dVp} VP:</b> ${dVp} Victory Development Card</div>` : ''}
+          ${dVp ? `<div class="pts dVp" data-type="dVp"><b>${dVp} VP:</b> ${dVp} Development Card</div>` : ''}
           ${largest_army ? `<div class="pts army" data-type="lArmy"><b>2 VP:</b> Largest Army with ${largest_army} Knights</div>` : ''}
-          ${longest_road ? `<div class="pts road" data-type="lRoad"><b>2 VP:</b> Longest Road with ${longest_road} connected roads</div>` : ''}
+          ${longest_road ? `<div class="pts road" data-type="lRoad"><b>2 VP:</b> Longest Road with ${longest_road} roads</div>` : ''}
         </small>
         <div class="bg"></div>
       </div>
@@ -108,7 +108,7 @@ export default class AlertUI {
     this.$alert.classList.add('show')
     setTimeout(_ => this.$alert.classList.add('animate'), 200)
     this.$alert.querySelectorAll('.dVp, .army, .road').forEach($_ => $_.addEventListener('click', e => {
-      this.#showCard(e.target.dataset.type)
+      this.#showCard(e.target.dataset.type || e.target.parentElement.dataset.type)
     }))
   }
 

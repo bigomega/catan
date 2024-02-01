@@ -293,6 +293,7 @@ export default class Game {
     setTimeout(_ => {
       this.#ui.alert_ui.alertGameEnd(this.getPlayer(context.pid), context)
       this.#audio_manager.playGameEnd()
+      context.longest_road && this.#ui.board_ui.showLongestEdges(this.#player.longest_road_list)
     }, 3000) // Waiting for other animations to end
   }
 
