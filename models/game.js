@@ -615,6 +615,7 @@ export default class Game {
       config: this.config,
       active_pid: this.active_pid,
       state: this.state,
+      turn: this.turn,
       dev_cards_len: this.dev_cards.length,
       robber_loc: this.board?.robber_loc,
       ongoing_trades: this.ongoing_trades,

@@ -49,6 +49,9 @@ export default class Game {
     }
     // State updates
     this.updateStateChangeSoc(this.state, this.active_pid)
+    if (this.state === ST.INITIAL_SETUP) {
+      this.requestInitialSetupSoc(this.active_pid, game_obj.turn)
+    }
   }
 
 
