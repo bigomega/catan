@@ -26,7 +26,7 @@ export default class UI {
     this.#player = player
     this.#game_config = game.config
 
-    this.alert_ui = new AlertUI(player, st => game.saveStatus(st), game.config.alert.time)
+    this.alert_ui = new AlertUI(player, st => game.saveStatus(st), game.config.alert_time)
     this.board_ui = new BoardUI(board, (loc, id) => game.onBoardClick(loc, id))
     this.animation_ui = new AnimationUI()
     this.accessibility_ui = new AccessibilityUI({

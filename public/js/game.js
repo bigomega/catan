@@ -93,7 +93,7 @@ export default class Game {
   //#region
   // STATE - Initial Setup
   #onInitialSetup() {
-    const time = this.config.strategize.time
+    const time = this.config.strategize_time
     this.#ui.alert_ui.alertStrategy(time)
     this.#audio_manager.playStart()
   }

@@ -45,7 +45,7 @@ export default class Game {
     this.player_count = config.player_count
     this.#io_manager = new IOManager({ game: this, io })
     this.players.push(new Player(host_name, 1, this.#onPlayerUpdate.bind(this)))
-    this.mapkey = this.config.mapkey || this.config.starting_map_key
+    this.mapkey = this.config.mapkey
     this.expected_actions.add = (...elems) => elems.forEach(obj => {
       this.expected_actions.push(Object.assign({ type: this.state, pid: this.active_pid }, obj))
     })
@@ -63,7 +63,7 @@ export default class Game {
     if (this.state) return
     this.board = new Board(this.mapkey)
     this.state = ST.INITIAL_SETUP
-    this.setTimer(this.config.strategize.time)
+    this.setTimer(this.config.strategize_time)
   }
 
   // ===================
@@ -76,7 +76,7 @@ export default class Game {
     if (this.turn < 3) {
       this.expected_actions.add({ callback: this.#expectedInitialBuild.bind(this) })
       this.#io_manager.requestInitialSetup(this.active_pid, this.turn)
-      this.setTimer(this.config.initial_build.time)
+      this.setTimer(this.config.initial_build_time)
       return
     }
 
@@ -84,7 +84,7 @@ export default class Game {
     switch (this.state) {
       case ST.PLAYER_ROLL:
         this.expected_actions.add({ callback: this.#expectedRoll.bind(this) })
-        this.setTimer(this.config.roll.time)
+        this.setTimer(this.config.roll_time)
         break
 
       case ST.PLAYER_ACTIONS:
@@ -93,7 +93,7 @@ export default class Game {
           this.players.forEach(p => p.resetDevCard(this.#isActive(p.id)))
           this.#gotoNextState(); this.ongoing_trades = []
         }})
-        this.setTimer(this.config.player_turn.time)
+        this.setTimer(this.config.player_turn_time)
         break
 
       case ST.ROBBER_DROP:
@@ -107,12 +107,12 @@ export default class Game {
             this.robbing_players.push(pl.id)
           }
         })
-        this.setTimer(this.config.robber.drop_time)
+        this.setTimer(this.config.robber_drop_time)
         break
 
       case ST.ROBBER_MOVE:
         this.expected_actions.add({ callback: this.#expectedRobberMove.bind(this) })
-        this.setTimer(this.config.robber.move_time)
+        this.setTimer(this.config.robber_move_time)
         break
     }
   }
@@ -306,7 +306,7 @@ export default class Game {
     // Notify others of the Trade Request
     if (type === 'Px') {
       const total_requests = this.ongoing_trades.filter(_ => _.pid == pid).length
-      if (total_requests >= this.config.trade.max_requests) return
+      if (total_requests >= this.config.max_trade_requests) return
       const trade_obj = { pid, giving, asking: taking, id: this.ongoing_trades.length, rejected: [], status: 'open' }
       this.ongoing_trades.push(trade_obj)
       this.#io_manager.requestPlayerTrade(pid, trade_obj)
@@ -362,7 +362,7 @@ export default class Game {
     if (this.largest_army_pid !== pid
       && (army_player
         ? player.open_dev_cards.dK > army_player.open_dev_cards.dK
-        : player.open_dev_cards.dK >= this.config.largest_army_start)
+        : player.open_dev_cards.dK >= this.config.largest_army_count)
     ) {
       army_player && army_player.toggleLargestArmy(false)
       player.toggleLargestArmy(true)
@@ -504,7 +504,7 @@ export default class Game {
     if (this.longest_road_pid !== player.id
       && (curr_long_player
         ? longest_path.length > curr_long_player.longest_road_list.length
-        : longest_path.length >= this.config.longest_road_start)
+        : longest_path.length >= this.config.longest_road_count)
     ) {
       curr_long_player?.toggleLongestRoad(false)
       player.toggleLongestRoad(true)

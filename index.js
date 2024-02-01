@@ -43,7 +43,7 @@ app.get('/game/new', function (req, res) {
     id: GAME_SESSIONS.next,
     playerName: req.query.name,
     config: Object.assign({}, CONST.GAME_CONFIG, {
-      mapkey: (new BoardShuffler(CONST.GAME_CONFIG.starting_map_key)).shuffle(),
+      mapkey: (new BoardShuffler(CONST.GAME_CONFIG.mapkey)).shuffle(),
     }),
     io,
   })

@@ -108,7 +108,7 @@ export default class TradeUI {
 
   renderTradeSelection() {
     const $og_req = this.$requests.querySelectorAll('.ongoing[data-id="-1"] .og-request:not(.deleted)')
-    const Px_limit_crossed = $og_req.length >= this.#game_config.trade.max_requests
+    const Px_limit_crossed = $og_req.length >= this.#game_config.max_trade_requests
     this.$type_selection.classList.remove('hide')
     Object.entries(this.#player.trade_offers).forEach(([type, allowed]) => {
       const $el = this.$type_selection.querySelector(`.trade-type[data-type="${type}"]`)
@@ -264,7 +264,7 @@ export default class TradeUI {
     } else {
       this.$requests.insertAdjacentHTML('afterbegin', `
         <div class="ongoing" data-id="-1">
-          <span class="text">Max ${this.#game_config.trade.max_requests} Requests: </span>${$og_req}
+          <span class="text">Max ${this.#game_config.max_trade_requests} Requests: </span>${$og_req}
         </div>
       `)
     }

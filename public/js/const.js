@@ -58,19 +58,33 @@ export const TRADE_OFFERS = {
 export const ROLL = _ => Math.ceil(Math.random() * 6)
 
 export const GAME_CONFIG = {
+  private_game: true,
   player_count: 2,
-  strategize: { time: 120 },
-  initial_build: { time: 60 },
-  roll: { time: 15 },
-  player_turn: { time: 60 },
-  robber: { drop_time: 60, move_time: 30 },
-  trade: { max_requests: 3 },
+  strategize_time: 120,
+  timer: true,
+  initial_build_time: 60,
+  auto_roll: false,
+  roll_time: 30,
+  player_turn_time: 120,
+  robber_drop_time: 30,
+  robber_move_time: 30,
+  max_trade_requests: 4,
   win_points: 10,
-  alert: { time: 3 },
-  largest_army_start: 3,
-  longest_road_start: 5,
-  starting_map_key: `S(br-S2).S.S(bl-B2).S\n-S.M5.J10.J8.S(bl-*3)\n-S(r-O2).J2.C9.G11.C4.S\n-S.G6.J4.D.F3.F11.S(l-W2)\n+S(r-L2).F3.G5.C6.M12.S\n+S.F8.G10.M9.S(tl-*3)\n+S(tr-*3).S.S(tl-*3).S`,
+  alert_time: 3,
+  largest_army_count: 3,
+  longest_road_count: 5,
+  mapkey: DEFAULT_MAPKEY,
+  map_shuffle: true,
 }
+
+const DEFAULT_MAPKEY =
+  `S(br-S2).S.S(bl-B2).S
+  -S.M5.J10.J8.S(bl-*3)
+  -S(r-O2).J2.C9.G11.C4.S
+  -S.G6.J4.D.F3.F11.S(l-W2)
+  +S(r-L2).F3.G5.C6.M12.S
+  +S.F8.G10.M9.S(tl-*3)
+  +S(tr-*3).S.S(tl-*3).S`
 
 export const GAME_STATES = {
   INITIAL_SETUP: 'INITIAL_SETUP',
