@@ -15,8 +15,8 @@ const NEXT_STATE = {
 
 export default class Game {
   /** @type {Board} */ board;
-  id; player_count; mapkey;
-  #state; #timer; #io_manager;
+  id; player_count
+  #state; #timer; #io_manager; #onGameEnd
   #active_pid = 0
   config = CONST.GAME_CONFIG
   /** @type {Player[]} */ players = []
@@ -39,7 +39,7 @@ export default class Game {
     this.#active_pid = (pid - 1) % this.player_count
   }
 
-  constructor({ id, host, config, io }) {
+  constructor({ id, host, config, io, onGameEnd }) {
     this.id = id
     this.config = config
     this.player_count = config.player_count
@@ -48,7 +48,7 @@ export default class Game {
       onChange: (...params) => this.#onPlayerUpdate(...params),
       onVpChange: (pid, vp) => this.#onPlayerVpChange(pid, vp),
     })
-    this.mapkey = this.config.mapkey
+    this.#onGameEnd = onGameEnd
     this.expected_actions.add = (...elems) => elems.forEach(obj => {
       this.expected_actions.push(Object.assign({ type: this.state, pid: this.active_pid }, obj))
     })
@@ -71,7 +71,7 @@ export default class Game {
   }
 
   start() {
-    this.board = new Board(this.mapkey)
+    this.board = new Board(this.config.mapkey)
     this.state = ST.INITIAL_SETUP
     this.config.timer ? this.setTimer(this.config.strategize_time) : this.#next()
   }
@@ -570,6 +570,8 @@ export default class Game {
         longest_road: player.longest_road && player.longest_road_list.length,
       })
       this.players.forEach(p => this.removePlayerSocket(p.id))
+      this.clearTimer()
+      this.#onGameEnd()
     }, 200) // Wait for other actions to complete
   }
   //#endregion
@@ -625,7 +627,6 @@ export default class Game {
     const timer_left = this.#timer && Math.ceil((this.#timer._idleStart + this.#timer._idleTimeout) / 1000 - process.uptime())
     return {
       id: this.id,
-      mapkey: this.mapkey,
       map_changes: this.map_changes,
       config: this.config,
       active_pid: this.active_pid,

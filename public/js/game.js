@@ -21,7 +21,7 @@ export default class Game {
     this.state = game_obj.state
     this.opponents = opponents_obj
 
-    this.#board = new Board(game_obj.mapkey, game_obj.map_changes)
+    this.#board = new Board(game_obj.config.mapkey, game_obj.map_changes)
     this.#player = new Player(player_obj)
     this.#ui = new UI(this, this.#board, this.#player, opponents_obj)
     this.#socket_manager = new SocketManager(this, socket)

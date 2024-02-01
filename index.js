@@ -1,15 +1,15 @@
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { parse as parseCookie } from "cookie"
+import http from "http"
 import express from 'express'
 import cookieParser from 'cookie-parser'
 import mustacheExpress from 'mustache-express'
 import { Server } from "socket.io"
-import http from "http"
+import { generate as generateRandomWords } from "random-words"
 import Game from "./models/game.js"
-import { parse as parseCookie } from "cookie"
 import * as CONST from "./public/js/const.js"
 import BoardShuffler from "./public/js/board/board_shuffler.js"
-import { generate as generateRandomWords } from "random-words"
 
 const app = express()
 const PORT = process.env.PORT || 3000
