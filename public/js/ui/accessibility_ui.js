@@ -33,17 +33,17 @@ export default class AccessibilityUI {
 
   render() {
     this.$el.innerHTML = `
-      <div class="icon full-screen" title="Full screen (f)"></div>
+      <button class="icon full-screen" title="Full screen (f)"></button>
       <div class="grouped">
-        <div class="icon zoom-in" title="Zoom In (=)">✚</div>
-        <div class="icon zoom-out" title="Zoom Out (-)">-</div>
+        <button class="icon zoom-in" title="Zoom In (=)">✚</button>
+        <button class="icon zoom-out" title="Zoom Out (-)">-</button>
       </div>
       <div class="grouped">
-        <div class="icon notifications ${this.muted_notif ? 'off' : ''}" title="${this.muted_notif ? 'Unmute' : 'Mute'} Notifications (n)"></div>
-        <div class="icon bgm ${this.muted ? 'off' : ''}" title="${this.muted ? 'Unmute' : 'Mute'} Background Music (m)">♫</div>
+        <button class="icon notifications ${this.muted_notif ? 'off' : ''}" title="${this.muted_notif ? 'Unmute' : 'Mute'} Notifications (n)"></button>
+        <button class="icon bgm ${this.muted ? 'off' : ''}" title="${this.muted ? 'Unmute' : 'Mute'} Background Music (m)">♫</button>
       </div>
-      <div class="icon question-mark" title="Keyboard Shortcuts (?)">?</div>
-      <div class="icon info" title="About author & game">ℹ</div>
+      <button class="icon question-mark" title="Keyboard Shortcuts (?)">?</button>
+      <button class="icon info" title="About author & game">ℹ</button>
       <div class="keyboard-shortcuts hide">${this.keyboard_shortcuts.map(group =>
         `<div class="shortcuts-container">${group.map(([title, shortcut]) =>
           `<div class="shortcut">
@@ -51,7 +51,7 @@ export default class AccessibilityUI {
             <div class="key">${shortcut}</div>
           </div>`).join('')}
         </div>`).join('')}
-        <div class="close">X</div>
+        <button class="close">X</button>
       </div>
     `
     this.#setupEvents()

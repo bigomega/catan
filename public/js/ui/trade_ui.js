@@ -24,9 +24,9 @@ export default class TradeUI {
 
   render() {
     this.$type_selection.innerHTML = Object.entries(CONST.TRADE_OFFERS).map(([type, txt]) =>
-      `<div class="trade-type ${type.replace(/\*/, '_')}" data-type="${type}">${type == 'Px' ? txt : ''}</div>`
+      `<button class="trade-type ${type.replace(/\*/, '_')}" data-type="${type}">${type == 'Px' ? txt : ''}</button>`
     ).join('')
-    this.$type_selection.innerHTML += `<div class="cancel" title="Cancel (\`)">x</div>`
+    this.$type_selection.innerHTML += `<button class="cancel" title="Cancel (\`)">x</button>`
     this.$card_selection.innerHTML = `
       <div class="card-section">${Object.keys(CONST.RESOURCES).map(res => `
         <div class="card-container">
@@ -37,8 +37,8 @@ export default class TradeUI {
       <div class="info-section">
         <div class="giving-text"></div>
         <div class="action-container">
-          <div class="reset">↺</div>
-          <div class="submit"></div>
+          <button class="reset">↺</button>
+          <button class="submit"></button>
         </div>
         <div class="taking-text"></div>
       </div>
@@ -225,9 +225,9 @@ export default class TradeUI {
           &<span class="asking disabled">asking ${resToText(asking)}</span>
         </div>
         <div class="actions">
-          <div class="confirm" data-id="${id}">Accept</div>
-          <div class="counter" data-id="${id}">Counter</div>
-          <div class="ignore" data-id="${id}">Ignore</div>
+          <button class="confirm" data-id="${id}">Accept</button>
+          <button class="counter" data-id="${id}">Counter</button>
+          <button class="ignore" data-id="${id}">Ignore</button>
         </div>
       </div>
     `)

@@ -138,7 +138,6 @@
       border: 3px solid;
       border-color: inherit;
       padding-bottom: 20px;
-      cursor: pointer;
       line-height: 90px;
       transition: all .25s linear;
       &.hide { display: none; }
@@ -149,7 +148,7 @@
         line-height: 70px;
       }
 
-      &:not(.disabled):hover {
+      &:not(.disabled):is(:hover, :focus) {
         filter: brightness(1.2);
       }
     }
@@ -159,9 +158,8 @@
       position: relative;
       width: 6px;
       height: 40px;
-      border: 2px solid #fff;
+      box-shadow: 0 0 0 2px #fff;
       background: var(--sand-color-dark);
-      cursor: pointer;
 
       &::after {
         content: '';
@@ -177,16 +175,16 @@
         z-index: -1;
       }
 
-      &:hover:not(.disabled), &.active {
+      &:is(:hover, :focus):not(.disabled), &.active {
         border-color: #333;
-        box-shadow: 2px 2px 0px 2px #000;
+        box-shadow: 2px 0px 0px 2px #000;
         border-color: transparent;
       }
 
       &.disabled, &[data-count="0"] {
         cursor: not-allowed;
         background: #919191c0;
-        border-color: #666666c0;
+        box-shadow: 0 0 0 2px #666666c0;
         &::after { visibility: hidden; }
       }
     }
@@ -196,13 +194,13 @@
     .build-settlement
     {
       height: 100%; position: relative;
-      cursor: pointer;
       &::after {
-        content: ''; position: absolute; width: 100%; height: 100%;
+        content: ''; position: absolute; top: 0; left: 0;
+        width: 100%; height: 100%;
         background-repeat: no-repeat; background-position: center;
         filter: drop-shadow(1px 1px 0px #fff) drop-shadow(-1px -1px 0px #fff) drop-shadow(1px -1px 0px #fff) drop-shadow(-1px 1px 0px #fff);
       }
-      &:hover::after, &.active::after { filter: brightness(0.7); }
+      &:is(:hover, :focus)::after, &.active::after { filter: brightness(0.7); }
 
       &.disabled, &[data-count="0"] {
         cursor: not-allowed;
@@ -216,10 +214,9 @@
 
     /* DEV CARD */
     .dev-card {
-      cursor: pointer;
       position: relative;
       img { width: 30px; }
-      &:hover img { filter: brightness(0.7); }
+      &:is(:hover, :focus) img { filter: brightness(0.7); }
       &.disabled, &[data-count="0"] {
         cursor: not-allowed;
         img { filter: grayscale(1); opacity: .5; }
@@ -250,7 +247,7 @@
         .res-count:has(+ .res-icon.disabled) { color: #0004; }
         .res-icon.disabled { filter: grayscale(1) contrast(0.5) brightness(1.5) opacity(1); }
       }
-      :is(&:hover, .active) .cost-tooltip {
+      &:is(:hover, :focus, .active) .cost-tooltip {
         display: block;
       }
     }
@@ -265,8 +262,7 @@
 
     /* TRADE */
     .trade {
-      cursor: pointer;
-      &:not(.disabled):hover {
+      &:not(.disabled):is(:hover, :focus) {
         text-shadow: 0px 0 10px #fff;
       }
       &.disabled {
@@ -281,9 +277,8 @@
       color: var(--sand-color-dark);
       padding: 5px 10px;
       border-radius: 3px;
-      cursor: pointer;
 
-      &:not(.disabled):hover {
+      &:not(.disabled):is(:hover, :focus) {
         box-shadow: 0px 0 10px 0px #fff;
       }
 
@@ -382,7 +377,7 @@
     display: flex; align-items: center; justify-content: center;
     position: absolute; top: 20px; right: 20px;
     cursor: pointer;
-    &:hover { background-color: var(--sand-color); color: var(--sand-color-dark);}
+    &:hover, &:focus { background-color: var(--sand-color); color: var(--sand-color-dark);}
   }
 
   .card-container {
@@ -444,7 +439,7 @@
   }
 
   .card-container {
-    &:has(+ .activate:hover) .card {
+    &:has(+ .activate:is(:hover, :focus)) .card {
       box-shadow: 0px 5px 0 -2px #5a460e, 0px 65px 20px -30px #000;
       transform: rotateX(50deg);
     }
@@ -470,7 +465,7 @@
     color: var(--sand-color); background: #333;
     font-family: sans-serif; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;
     cursor: pointer; z-index: 1; position: relative;
-    &:hover {
+    &:hover, &:focus {
       box-shadow: 0 0 10px 0px var(--sand-color), 0 0 30px 0px var(--sand-color);
     }
     &.hide { display: none; }

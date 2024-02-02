@@ -5,12 +5,13 @@
 
   .icon {
     width: 30px; height: 30px; box-sizing: border-box;
-    padding-left: 7px; margin-bottom: 10px; margin-right: 10px;
+    margin-bottom: 10px; margin-right: 10px;
     background-color: #fff3; color: #fffc;
     font-family: monospace; font-size: 20px;
     border: 2px solid; border-radius: 100px;
-    cursor: pointer; opacity: 0.5;
-    &:hover { opacity: 1; box-shadow: 0 0 10px 0 #0009; color: #fff; background-color: #0009; }
+    opacity: 0.5;
+    display: flex; align-items: flex-start; justify-content: center;
+    &:hover, &:focus { opacity: 1; box-shadow: 0 0 10px 0 #0009; color: #fff; background-color: #0009; }
   }
 
   .grouped { display: flex; }
@@ -19,14 +20,15 @@
     &::before { content: '⇱'; }
     &.on::before { content: '⇲'; }
   }
+  .zoom-in { padding-top: -1px; }
   .zoom-out { padding-top: .5px; font-weight: bold; }
   .notifications {
-    font-size: 18px; padding-left: 6px;
+    font-size: 18px; padding-left: 3px; padding-top: 1px;
     &::before { content: '🔊'; }
     &.off::before { content: '🔇'; }
   }
   .bgm {
-    padding-left: 6px; padding-top: 0.5px; position: relative;
+    position: relative; padding-top: 1px;
     &.off::before { content: '\\'; position: absolute; left: 8px; }
   }
   .question-mark { padding-top: 2px; font-weight: bold; }
@@ -56,8 +58,8 @@
       height: 30px; width: 30px;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transform: scaleX(1.3);
-      &:hover { color: var(--trade-negative);}
+      transform: scaleX(1.3);
+      &:hover, &:focus { color: var(--trade-negative);}
     }
   }
 }

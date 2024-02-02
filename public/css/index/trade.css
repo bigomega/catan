@@ -91,19 +91,19 @@
           margin: -4px 0; padding: 5px 12px 3px; background: #ccc;
           &.active {
             background: #333; color: var(--sand-color);
-            &:hover { box-shadow: 0 0 10px 0px var(--sand-color-dark), 0 0 20px 0px var(--sand-color-dark); }
+            &:hover, &:focus { box-shadow: 0 0 10px 0px var(--sand-color-dark), 0 0 20px 0px var(--sand-color-dark); }
           }
         }
         .counter {display: none;
           margin: -4px 10px; padding: 3px 12px 2px; border: 2px solid #999;
           &.active {
             border-color: var(--sand-color-text-dark); color: inherit;
-            &:hover { background: var(--sand-color-text-dark); color: var(--sand-color); border-color: transparent; }
+            &:hover, &:focus { background: var(--sand-color-text-dark); color: var(--sand-color); border-color: transparent; }
           }
         }
         .ignore {
           margin: -2px 10px; padding: 3px 5px; cursor: pointer;
-          &:hover { text-decoration: underline; }
+          &:hover, &:focus { text-decoration: underline; }
         }
       }
     }
@@ -119,8 +119,8 @@
 
     &.hide { display: none; }
 
-    > div {
-      cursor: pointer;
+    > button {
+      box-sizing: content-box;
       &.hide { display: none; }
     }
 
@@ -140,7 +140,7 @@
         background-size: contain; background-repeat: no-repeat;
       }
 
-      &:not(.disabled):hover::before { filter: drop-shadow(2px 2px 3px #000a); top: -2px; left: -2px;}
+      &:not(.disabled):is(:hover, :focus)::before { filter: drop-shadow(2px 2px 3px #000a); top: -2px; left: -2px;}
 
       &.B2::before { background-image: url(/images/trade/Brick.png); }
       &.L2::before { background-image: url(/images/trade/Lumber.png); }
@@ -162,7 +162,7 @@
       border-width: 25px 10px;
       &.active { border-color: var(--sand-color-dark); background: var(--sand-color-dark); }
       &.disabled { background: #ccc; color: #999; cursor: not-allowed; }
-      &:not(.active, .disabled):hover { background: #fff; color: #333; }
+      &:not(.active, .disabled):is(:hover, :focus) { background: #fff; color: #333; }
     }
 
     .cancel {
@@ -177,7 +177,7 @@
       border-radius: 50%;
       /* box-shadow: 0 0 5px -1px #000; */
       /* border: 1px solid var(--trade-negative); */
-      &:hover { background: var(--trade-negative); color: #fff; }
+      &:is(:hover, :focus) { background: var(--trade-negative); color: #fff; }
     }
   }
 
@@ -277,7 +277,7 @@
               border-bottom-left-radius: 20px; justify-content: flex-end;
             }
 
-            &:not(.full):hover{
+            &:not(.full):is(:hover, :focus){
               &::after {
                 width: calc(100% - 2px); height: calc(100% - 3px - 1px); padding: 0;
                 display: flex; align-items: center; justify-content: center;
@@ -327,8 +327,8 @@
         width: 35px; height: 35px; border-radius: 30px;
         font-size: 30px; line-height: 32px; text-align: center;
         background-color: var(--sand-color-dark); color: var(--sand-color);
-        border: 2px solid; cursor: pointer;
-        &:hover { background-color: var(--sand-color); color: #333; }
+        border: 2px solid;
+        &:hover, &:focus { background-color: var(--sand-color); color: #333; }
       }
 
       .submit {
@@ -346,8 +346,8 @@
         &::before { content: 'Trade'; }
         &.active {
           background: #333; color: var(--sand-color);
-          cursor: pointer; border-color: var(--sand-color);
-          &:hover {
+          border-color: var(--sand-color);
+          &:hover, &:focus {
             box-shadow: 0 0 10px 0px var(--sand-color), 0 0 20px 0px var(--sand-color);
           }
         }
@@ -355,10 +355,10 @@
     }
     &[data-trade_type="Px"] .info-section .taking-text::before { content: 'Asking…'; }
     &[data-trade_type="Px"] .info-section .submit::before { content: 'Send Request'; }
-    &[data-trade_type="Px"] .card-section .card-container .card.giving-card:not(.disabled):not(.full):hover::after { content: 'Give 1 →' }
-    &[data-trade_type="Px"] .card-section .card-container .card.taking-card:not(.disabled):not(.full):hover::after { content: '← Ask 1' }
+    &[data-trade_type="Px"] .card-section .card-container .card.giving-card:not(.disabled):not(.full):is(:hover, :focus)::after { content: 'Give 1 →' }
+    &[data-trade_type="Px"] .card-section .card-container .card.taking-card:not(.disabled):not(.full):is(:hover, :focus)::after { content: '← Ask 1' }
 
-    &[data-trade_type="*3"] .card-section .card-container .card.giving-card:not(.disabled):not(.full):hover::after { content: 'Give 3 →' }
-    &[data-trade_type="*4"] .card-section .card-container .card.giving-card:not(.disabled):not(.full):hover::after { content: 'Give 4 →' }
+    &[data-trade_type="*3"] .card-section .card-container .card.giving-card:not(.disabled):not(.full):is(:hover, :focus)::after { content: 'Give 3 →' }
+    &[data-trade_type="*4"] .card-section .card-container .card.giving-card:not(.disabled):not(.full):is(:hover, :focus)::after { content: 'Give 4 →' }
   }
 }

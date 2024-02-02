@@ -64,22 +64,22 @@ export default class PlayerUI {
     this.$el.classList.add('id-' + this.player.id)
     this.$action_bar.innerHTML = `
       <div class="timer disabled ${this.has_timer ? '' : 'hide'}">0:00</div>
-      <div class="roll-dice disabled ${this.auto_roll ? 'hide' : ''}" title="Roll Dice (Space)">🎲🎲</div>
-      <div class="build-road disabled" title="Build Road (r)" data-count="${CONST.PIECES_COUNT.R}">
+      <button class="roll-dice disabled ${this.auto_roll ? 'hide' : ''}" title="Roll Dice (Space)">🎲🎲</button>
+      <button class="build-road disabled" title="Build Road (r)" data-count="${CONST.PIECES_COUNT.R}">
         <div class="cost-tooltip">${resToText(CONST.COST.R)}</div>
-      </div>
-      <div class="build-settlement disabled" title="Build Settlement (s)" data-count="${CONST.PIECES_COUNT.S}">
+      </button>
+      <button class="build-settlement disabled" title="Build Settlement (s)" data-count="${CONST.PIECES_COUNT.S}">
         <div class="cost-tooltip">${resToText(CONST.COST.S)}</div>
-      </div>
-      <div class="build-city disabled" title="Build City (c)" data-count="${CONST.PIECES_COUNT.C}">
+      </button>
+      <button class="build-city disabled" title="Build City (c)" data-count="${CONST.PIECES_COUNT.C}">
         <div class="cost-tooltip">${resToText(CONST.COST.C)}</div>
-      </div>
-      <div class="dev-card disabled" title="Buy Development Card (d)" data-count="-">
+      </button>
+      <button class="dev-card disabled" title="Buy Development Card (d)" data-count="-">
         <div class="cost-tooltip">${resToText(CONST.COST.DEV_C)}</div>
         <img src="/images/dc-back.png"/>
-      </div>
-      <div class="trade disabled" title="Trade (t/\`)">Trade</div>
-      <div class="end-turn disabled" title="End Turn (e/Space)">End Turn</div>
+      </button>
+      <button class="trade disabled" title="Trade (t/\`)">Trade</button>
+      <button class="end-turn disabled" title="End Turn (e/Space)">End Turn</button>
     `
     this.#setRefs()
     this.#setupActionEvents()
