@@ -19,7 +19,7 @@ function addPlayer({ id, name }) {
 }
 
 function changeBackground(players_joined) {
-  const blur_val = Math.round((window.player_count - players_joined) * 50 / (window.player_count - 1))
+  const blur_val = Math.round((window.player_count - players_joined) * 30 / (window.player_count - 1))
   const gray_val = Math.round((window.player_count - players_joined) * 100 / (window.player_count - 1))/100
   document.querySelector('body').style.backdropFilter = `blur(${blur_val}px) grayscale(${gray_val})`
 }

@@ -1,0 +1,11 @@
+/* Used */
+@font-face { font-family: Papyrus; src: url(/css/fonts/Papyrus.ttf); }
+@font-face { font-family: Maconda; src: url(/css/fonts/Macondo-Regular.ttf); }
+@font-face { font-family: Medieval; src: url(/css/fonts/MedievalSharp-Regular.ttf); }
+/* Used */
+@font-face { font-family: EagleLake; src: url(/css/fonts/EagleLake-Regular.ttf); }
+
+@font-face { font-family: Roboto; src: url(/css/fonts/Roboto-Thin.ttf); font-weight: 100; }
+@font-face { font-family: Roboto; src: url(/css/fonts/Roboto-Light.ttf); font-weight: 200; }
+@font-face { font-family: Roboto; src: url(/css/fonts/Roboto-Regular.ttf); }
+@font-face { font-family: Roboto; src: url(/css/fonts/Roboto-Bold.ttf); font-weight: 600; }

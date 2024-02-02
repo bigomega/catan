@@ -44,7 +44,7 @@ app.get('/', function (req, res) {
 app.get('/game/new', function (req, res) {
   let id
   do { id = generateRandomWords({ min: 2, max: 2, join: '-' }) } while (GAME_SESSIONS[id])
-  const { name } = req.query
+  const { name, players } = req.query
   const game_config = CONST.GAME_CONFIG
   const pid = Math.floor(Math.random() * game_config.player_count + 1)
   const game = new Game({
@@ -52,6 +52,7 @@ app.get('/game/new', function (req, res) {
     host: { name, id: pid },
     onGameEnd: id => onGameEnd(id),
     config: Object.assign({}, game_config, {
+      player_count: +players || game_config.player_count,
       mapkey: (new BoardShuffler(game_config.mapkey)).shuffle(),
     }),
   })
@@ -113,6 +114,8 @@ app.get('/login', function (req, res) {
 app.get('/logout', function (req, res) {
   res.clearCookie('game_id')
   res.clearCookie('player_id')
+  /** @todo remove player from game */
+  // req.cookies.game_id && GAME_SESSIONS[req.cookies.game_id]
   res.redirect('/login')
 })
 
@@ -148,6 +151,6 @@ io.on('connection', (socket) => {
   })
 })
 
-server.listen(PORT, function(){
+server.listen(PORT, function() {
   console.log(`Server running on port ${PORT}`)
 })

@@ -5,16 +5,6 @@
   --tile-width: 151px;
 }
 
-@keyframes blink {
-  /* from {
-    opacity: 1;
-  } */
-
-  30% {
-    opacity: .5;
-  }
-}
-
 @media screen and (max-width: 800px) {
   :root {
     --title-padding: 2em 20px 1em;
@@ -39,16 +29,11 @@ body {
   transition: all linear .5s;
 }
 
+@keyframes blink { 50% { opacity: .5; } }
 .container {
   /* height: 100%; */
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
-
-  &.hide {
-    opacity: 0;
-    transition: opacity .5s linear;
-  }
+  display: flex; flex-wrap: wrap; align-content: flex-start;
+  &.hide { opacity: 0; transition: opacity .5s linear; }
 
   .title {
     color: #fff;
@@ -72,7 +57,7 @@ body {
     display: flex;
     filter: drop-shadow(0px 0px 10px #000);
 
-    >div {
+    > div {
       width: var(--tile-width);
       margin-right: -2px;
       height: 176px;
@@ -81,16 +66,11 @@ body {
       background-size: cover;
       position: relative;
       background-image: url(/images/tiles/Desert.png);
-      display: flex;
-      flex-wrap: wrap;
-      flex-direction: column;
-      justify-content: center;
+      display: flex; flex-wrap: wrap; flex-direction: column; justify-content: center;
       /* animation: 1s infinite alternate blink ease; */
-      animation: blink 3s step-start 0s infinite;
+      animation: blink 2s step-start 0s infinite;
 
-      &.hide {
-        display: none;
-      }
+      &.hide { display: none; }
 
       .name {
         color: #fff;
@@ -109,24 +89,22 @@ body {
         /* background: color-mix(in srgb, var(--player-1-color) 66%, transparent); */
         background: var(--player-1-color);
       }
-      &.player-2 .name {
-        background: var(--player-2-color);
+
+      &.player-2 {
+        animation-delay: .5s;
+        .name { background: var(--player-2-color); }
       }
 
       &.player-3 {
-        position: absolute;
-        top: -131px;
-        left: 74px;
-        animation-delay: 2.7s;
+        position: absolute; top: -131px; left: 74px;
+        animation-delay: .75s;
 
         .name { background: var(--player-3-color); }
       }
 
       &.player-4 {
-        position: absolute;
-        top: 131px;
-        left: 74px;
-        animation-delay: .26s;
+        position: absolute; top: 131px; left: 74px;
+        animation-delay: .25s;
 
         .name { background: var(--player-4-color); }
       }
