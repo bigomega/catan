@@ -93,6 +93,7 @@ export default class AccessibilityUI {
 
   toggleFullScreen() {
     if (!this.#shown_icons.fullscreen) return
+    if (document.querySelector('input[type="text"]:focus')) return
     if (document.fullscreenElement) {
       document.exitFullscreen?.()
       this.$el.querySelector('.full-screen').classList.remove('on')
@@ -106,6 +107,7 @@ export default class AccessibilityUI {
 
   toggleMuteBgm() {
     if (!this.#shown_icons.bgm) return
+    if (document.querySelector('input[type="text"]:focus')) return
     this.muted = !this.muted
     localStorage.setItem('mute', +this.muted)
     this.#toggleBgm(!this.muted)
@@ -123,9 +125,14 @@ export default class AccessibilityUI {
   }
 
   toggleZoom(out) { this.#shown_icons.zoom && this.#toggleBoardZoom(out) }
+
   showHideKeyboardShortcuts(show) {
     this.#shown_icons.shorcuts
     && this.$el.querySelector('.keyboard-shortcuts').classList[show ? 'remove' : 'add']('hide')
   }
-  showHideInfo() {}
+
+  showHideInfo() {
+    if (!this.#shown_icons.info) return
+    if (document.querySelector('input[type="text"]:focus')) return
+  }
 }
