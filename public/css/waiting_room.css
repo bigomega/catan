@@ -32,6 +32,14 @@ body {
   transition: all linear .5s;
 }
 
+button {
+  display: block;
+  background: none; color: inherit; border: none;
+  font: inherit; cursor: pointer;
+  outline: inherit; appearance: unset;
+  padding: 0; padding-block: 0px; padding-inline: 0px;
+}
+
 @keyframes blink { 50% { opacity: .5; } }
 #waiting-room {
   /* height: 100%; */

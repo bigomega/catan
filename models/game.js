@@ -100,6 +100,10 @@ export default class Game {
       case ST.PLAYER_ACTIONS:
         this.expected_actions.add({ callback: _ => {
           this.active_pid++
+          for (let i = 1; i < this.player_count; i++) {
+            if (this.getActivePlayer().removed) { this.active_pid++ }
+            else { break }
+          }
           this.players.forEach(p => p.resetDevCard(this.#isActive(p.id)))
           this.#gotoNextState(); this.ongoing_trades = []
         }})
@@ -109,7 +113,7 @@ export default class Game {
       case ST.ROBBER_DROP:
         this.robbing_players = []
         this.players.forEach(pl => {
-          if (pl.resource_count > 7) {
+          if (!pl.removed && pl.resource_count > 7) {
             this.expected_actions.add({
               pid: pl.id, drop_count: Math.floor(pl.resource_count / 2),
               callback: this.#expectedRobberDrop.bind(this)
@@ -229,6 +233,7 @@ export default class Game {
   /** Initial Build Locations */
   initialBuildIO(pid, settlement_loc, road_loc) {
     const expected_index = this.expected_actions.findIndex(_ => _.type === ST.INITIAL_SETUP)
+    if (expected_index < 0) return
     const { pid: expected_pid, callback } = this.expected_actions[expected_index]
     if (pid && pid === expected_pid) {
       callback(pid, { settlement_loc, road_loc })
@@ -472,6 +477,7 @@ export default class Game {
     })
     resource_by_pid.forEach((res, index) => {
       const player = this.getPlayer(index + 1)
+      if (player.removed) return
       player.giveCards(res)
       this.#io_manager.updateResourceReceived_Private(this.getPlayerSocId(player.id), res)
     })
@@ -571,8 +577,39 @@ export default class Game {
       })
       this.players.forEach(p => this.removePlayerSocket(p.id))
       this.clearTimer()
-      this.#onGameEnd()
+      this.#onGameEnd(this.id)
     }, 200) // Wait for other actions to complete
+  }
+
+  removePlayer(pid) {
+    const player = this.getPlayer(pid)
+    if (!player || player.removed) return
+    player.removePlayer()
+    this.removePlayerSocket(pid)
+    this.#io_manager.updatePlayerQuit(pid)
+    // In Waiting Room
+    const joined_player_count = this.players.filter(p => p?.id).length
+    if (!this.state && joined_player_count < this.player_count) {
+      delete this.players[pid - 1]
+      joined_player_count < 2 && this.#onGameEnd(this.id)
+      return
+    }
+    // Initial Build Phase - End Game
+    if (!this.state || this.state === ST.INITIAL_SETUP) {
+      this.players.forEach(p => this.removePlayerSocket(p.id))
+      this.clearTimer()
+      return this.#onGameEnd(this.id)
+    }
+    const remaining_players = this.players.filter(p => !p.removed).length
+    // Everybody Quit - End Game
+    if (remaining_players.length === 1) {
+      return this.#onPlayerVpChange(remaining_players[0].id, this.config.win_points)
+    }
+    if (remaining_players.length === 0) {
+      return this.#onGameEnd(this.id)
+    }
+    // Otherwise - Game Continues
+    while (this.active_pid === pid) { this.#next() }
   }
   //#endregion
 

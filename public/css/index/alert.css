@@ -39,16 +39,21 @@
     }
   }
 
-  .text .game-ended:not(.animate) {
-    color: transparent; text-shadow: none;
-    b::after { opacity: 0; }
-  }
   .game-ended {
     .title-emoji { font-size: 2em; }
+    .player-name {
+      border-radius: 100px; width: fit-content;
+      margin: 0 auto; padding: 10px 30px 0; text-shadow: none;
+    }
     small { display: flex; flex-direction: column; flex-wrap: wrap; align-content: center; }
     .pts { line-height: 3em; text-align: left; }
     .S, .C, .dVp, .army, .road { b { position: relative; margin-right: 40px; color: inherit; background: inherit; } }
   }
+  .text .game-ended .player-name { color: #fff; background-color: var(--sand-color-text-dark); }
+  .text .game-ended.p1 .player-name { box-shadow: 0 0 35px 0 var(--player-1-color); background: var(--player-1-color); }
+  .text .game-ended.p2 .player-name { box-shadow: 0 0 35px 0 var(--player-2-color); background: var(--player-2-color); }
+  .text .game-ended.p3 .player-name { box-shadow: 0 0 35px 0 var(--player-3-color); background: var(--player-3-color); }
+  .text .game-ended.p4 .player-name { box-shadow: 0 0 35px 0 var(--player-4-color); background: var(--player-4-color); }
   .text .game-ended .S b::after, .text .game-ended .C b::after {
     content: ''; background-size: cover; background-repeat: no-repeat;
     position: absolute; right: -30px; top: 9px;
@@ -82,6 +87,10 @@
     }
   }
 
+  .text .game-ended:not(.animate) {
+    color: transparent; text-shadow: none;
+    b::after, .player-name { opacity: 0; }
+  }
 
   .parchment:has(.game-ended) { background: transparent; box-shadow: none; }
   .parchment .game-ended .bg {
@@ -93,6 +102,6 @@
   &.animate .parchment .game-ended .bg { height: 100%; border-radius: 0; }
   &.animate .text .game-ended {
     color: inherit; text-shadow: inherit; transition: all 1s .5s ease-in;
-    b::after { opacity: 1; transition: opacity 1s .5s ease-in; }
+    b::after, .player-name { opacity: 1; transition: opacity 1s .5s ease-in; }
   }
 }

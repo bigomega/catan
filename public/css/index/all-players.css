@@ -11,6 +11,10 @@
     border: 3px solid var(--sand-color-dark);
     border-top: none; border-right: none;
     margin: 0 -3px;
+    &.deactivated {
+      filter: grayscale(1) contrast(0.5) brightness(0.7); cursor: not-allowed;
+      &::before { content: '🏃' !important;}
+    }
 
     &::before {
       position: absolute; left: -60px; top: 0px;

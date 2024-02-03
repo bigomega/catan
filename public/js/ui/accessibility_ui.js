@@ -28,8 +28,9 @@ export default class AccessibilityUI {
   ]
 
   constructor({ toggleBoardZoom = _dummyFn, toggleBgm = _dummyFn, toggleNotificationsAudio = _dummyFn,
-    icons: { fullscreen = true, zoom = true, bgm = true, notifcation_sounds = true, shorcuts = true, info = true } = {}} = {}) {
-    this.#shown_icons = { fullscreen, zoom, bgm, notifcation_sounds, shorcuts, info }
+    icons: { fullscreen = true, zoom = true, bgm = true, notifcation_sounds = true,
+      shorcuts = true, info = true, quit = true } = {}} = {}) {
+    this.#shown_icons = { fullscreen, zoom, bgm, notifcation_sounds, shorcuts, info, quit }
     this.#toggleBoardZoom = toggleBoardZoom
     this.#toggleBgm = toggleBgm
     this.#toggleNotificationsAudio = toggleNotificationsAudio
@@ -53,6 +54,7 @@ export default class AccessibilityUI {
             </button>` : ''}
       </div>
       ${this.#shown_icons.shorcuts ? `<button class="icon question-mark" title="Keyboard Shortcuts (?)">?</button>` : ''}
+      ${this.#shown_icons.quit ? `<button class="icon quit" title="Quit Game">O</button>` : ''}<!-- ⦿◎◉●◦◦⚬☉ -->
       ${this.#shown_icons.info ? `<button class="icon info" title="About author & game">ℹ</button>` : ''}
       ${this.#shown_icons.shorcuts ? `
         <div class="keyboard-shortcuts hide">${this.keyboard_shortcuts.map(group =>
@@ -76,6 +78,7 @@ export default class AccessibilityUI {
     this.$el.querySelector('.notifications')?.addEventListener('click', e => this.toggleMuteNotications())
     this.$el.querySelector('.bgm')?.addEventListener('click', e => this.toggleMuteBgm())
     this.$el.querySelector('.question-mark')?.addEventListener('click', e => this.showHideKeyboardShortcuts(true))
+    this.$el.querySelector('.quit')?.addEventListener('click', e => window.location.href = '/logout')
     this.$el.querySelector('.info')?.addEventListener('click', e => this.showHideInfo())
     this.$el.querySelector('.keyboard-shortcuts .close')?.addEventListener('click', e => this.showHideKeyboardShortcuts(false))
     document.addEventListener('keydown', e => {

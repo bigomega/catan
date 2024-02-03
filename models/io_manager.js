@@ -121,5 +121,7 @@ export default class IOManager {
 
   updateGameEnd(context) { this.emit(SOC.GAME_END, context) }
 
+  updatePlayerQuit(pid) { this.emit(SOC.PLAYER_QUIT, pid) }
+
   emit(type, ...data) { this.#io.to(this.#game.id).emit(type, ...data) }
 }

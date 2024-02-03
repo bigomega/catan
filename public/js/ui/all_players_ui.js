@@ -22,7 +22,7 @@ export default class AllPlayersUI {
   render() {
     const all_players = [this.player, ...this.opponents].sort((a, b) => a.id - b.id)
     this.$el.innerHTML = all_players.map(player => `
-      <div class="player p${player.id}" data-id="${player.id}">
+      <div class="player p${player.id} ${player.removed ? 'deactivated' : ''}" data-id="${player.id}">
         <div class="name">${player.name}</div>
         <div class="victory-points"><span>${player.public_vps + (player.private_vps || 0)}</span></div>
         <div class="cards-container">
@@ -88,5 +88,9 @@ export default class AllPlayersUI {
     //   case 'longest_road_list': break
     //   case 'dc_update': break
     // }
+  }
+
+  deactivatePlayer(pid) {
+    this.player_refs[pid]?.$p.classList.add('deactivated')
   }
 }

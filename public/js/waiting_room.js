@@ -33,6 +33,12 @@ class WaitingRoomUI {
       this.checkAndEnd()
     })
 
+    /** @event Player-Quit */
+    window.io().on(CONST.SOCKET_EVENTS.PLAYER_QUIT, pid => {
+      this.removePlayer(pid)
+      this.changeBackground()
+    })
+
     this.$game_id.addEventListener('focus', _ => this.$game_id.select())
   }
 
@@ -50,11 +56,17 @@ class WaitingRoomUI {
   addPlayer({ id, name }) {
     const $player = $('.player-' + id)
     if (!$player) return
-    this.joined_count++
-    this.$joined_count.innerHTML = this.player_count - this.joined_count
+    this.$joined_count.innerHTML = this.player_count - ++this.joined_count
     $player.innerHTML = `<div class="name">${name}</div>`
     $player.style.backgroundImage = `url('/images/tiles/${this.getRandomTile()}.png')`
     $player.style.animation = 'none'
+  }
+
+  removePlayer(pid) {
+    const $player = $('.player-' + pid)
+    if (!$player) return
+    this.$joined_count.innerHTML = this.player_count - --this.joined_count
+    $player.innerHTML = $player.style.backgroundImage = $player.style.animation = ''
   }
 
   changeBackground() {

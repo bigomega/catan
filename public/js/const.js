@@ -131,6 +131,7 @@ export const SOCKET_EVENTS = {
   LARGEST_ARMY: 'largest_army',
   LONGEST_ROAD: 'longest_road',
   GAME_END: 'game_end',
+  PLAYER_QUIT: 'player_quit',
 }
 
 export const AUDIO_FILES = {
@@ -152,4 +153,5 @@ export const AUDIO_FILES = {
   LONGEST_ROAD: 'horse-cart.mp3',
   BGM: 'clouds.mp3',
   END: 'start-end.mp3',
+  PLAYER_QUIT: 'power-down.mp3',
 }

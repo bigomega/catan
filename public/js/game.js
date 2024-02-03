@@ -297,6 +297,19 @@ export default class Game {
     }, 3000) // Waiting for other animations to end
   }
 
+  // SOC - Update Player Quit
+  updatePlayerQuitSoc(pid) {
+    this.#audio_manager.playPlayerQuit()
+    this.#ui.alert_ui.alertPlayerQuit(this.getPlayer(pid), this.state === ST.INITIAL_SETUP)
+    if (this.state === ST.INITIAL_SETUP) {
+      [...Array(this.config.player_count).keys()].forEach(_ => {
+        this.#ui.all_players_ui.deactivatePlayer(_ + 1)
+      })
+    } else {
+      this.#ui.all_players_ui.deactivatePlayer(pid)
+    }
+  }
+
   setTimerSoc(t, pid) { this.#ui.player_ui.resetTimer(t, this.#isMyPid(pid)) }
   //#endregion
 

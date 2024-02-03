@@ -50,7 +50,7 @@ app.get('/game/new', function (req, res) {
   const game = new Game({
     id, io,
     host: { name, id: pid },
-    onGameEnd: id => onGameEnd(id),
+    onGameEnd: _id => onGameEnd(_id),
     config: Object.assign({}, game_config, {
       player_count: +players || game_config.player_count,
       mapkey: (new BoardShuffler(game_config.mapkey)).shuffle(),
@@ -99,7 +99,7 @@ app.get('/login', function (req, res) {
   }
 
   // Joining a game
-  const game = GAME_SESSIONS[game_id + '']
+  const game = GAME_SESSIONS[game_id]
   const player = game.join(name)
 
   if (!player) {
@@ -112,10 +112,12 @@ app.get('/login', function (req, res) {
 })
 
 app.get('/logout', function (req, res) {
+  const { game_id, player_id } = req.cookies
+  if (game_id && player_id && GAME_SESSIONS[game_id]?.hasPlayer(+player_id)) {
+    GAME_SESSIONS[game_id].removePlayer(+player_id)
+  }
   res.clearCookie('game_id')
   res.clearCookie('player_id')
-  /** @todo remove player from game */
-  // req.cookies.game_id && GAME_SESSIONS[req.cookies.game_id]
   res.redirect('/login')
 })
 

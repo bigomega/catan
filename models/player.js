@@ -7,6 +7,7 @@ export default class Player {
   static #names = ['Cheran(சே)', 'Cholan(ழ)', 'Paandian(பா)', 'Karikalan(க)']
   online = false
   ready = false
+  removed = false
   resource_count = 0
   dev_card_count = 0
   public_vps = 0
@@ -176,6 +177,8 @@ export default class Player {
 
   setLastStatus(message) { this.last_status = message }
 
+  removePlayer() { this.removed = true }
+
   toJSON(get_private) {
     const playerJSON = {
       id: this.id,
@@ -191,6 +194,7 @@ export default class Player {
       largest_army: this.largest_army,
       longest_road: this.longest_road,
       longest_road_list: this.longest_road_list,
+      removed: this.removed,
       ...(get_private ? {
         turn_bought_dc: this.turn_bought_dc,
         private_vps: this.private_vps,

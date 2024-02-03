@@ -72,6 +72,9 @@ export default class SocketManager {
 
     /** @event Game-End */
     socket.on(SOC.GAME_END, context => game.updateGameEndSoc(context))
+
+    /** @event Player-Quit */
+    socket.on(SOC.PLAYER_QUIT, pid => game.updatePlayerQuitSoc(pid))
   }
 
   sendInitialSetup({ settlement_loc, road_loc }) { this.#socket.emit(SOC.INITIAL_SETUP, settlement_loc, road_loc) }
