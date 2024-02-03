@@ -7,13 +7,20 @@ npm i
 npm start
 ```
 
+##### Maojor Frameworks
+  - **[ExpressJS](https://expressjs.com/)** for HTTP server
+  - **[Mustache](https://mustache.github.io/)** for sending server data in HTML
+  - **[Socket.io](https://socket.io/)** for websocket activities
+  - **[VanillaJS](http://vanilla-js.com/)** for front-end
+
 ## Status
 ### In Progress
   ##### Feb '24
-  - [ ] Login & waiting room UI rework
-  - [ ] End Game
+  - [ ] Quit game
+  - [x] ~~Login & waiting room UI rework~~
+  - [x] ~~End Game~~
   ##### Jan '24
-  - [ ] ~~Accessibility (Zoom, Fullscreen, Sound, Shortcuts~~)
+  - [x] ~~Accessibility (Zoom, Fullscreen, Sound, Shortcuts~~)
   - [x] ~~Opponents UI~~
   - [x] ~~Shuffler~~
   - [x] ~~Longest Road & Largest Army~~
