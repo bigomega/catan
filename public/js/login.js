@@ -66,6 +66,13 @@ class LoginUI {
       const game_key = this.$container.querySelector('.join-section input.game-key').value
       window.location.href = `/login?name=${encodeURIComponent(name)}&game_id=${encodeURIComponent(game_key)}`
     })
+
+    this.$container.querySelector('.join-section input.game-key').addEventListener('keydown', e => {
+      if (e.code === 'Space') {
+        e.target.value += '-'
+        e.preventDefault()
+      }
+    })
   }
 }
 

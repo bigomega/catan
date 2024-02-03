@@ -5,12 +5,11 @@
   <title>Catan</title>
   <link rel="stylesheet" href="/css/waiting_room.css">
 </head>
-<div class="container">
+<div id="waiting-room">
   <div class="title">
-    <div>Game ID: {{ game_id }}</div>
-    <div>
-      Waiting for Players... (<span>0</span>/{{ player_count }})</div>
-    </div>
+    <div>Game Key: <input type="text" id="game_id" value="{{ game_id }}" readonly></div>
+    <small>Waiting for <span>0</span> more players to join...</small>
+  </div>
   <div class="players">
     <div class="player-1"></div>
     <div class="player-2"></div>
@@ -18,6 +17,7 @@
     <div class="player-4 hide"></div>
   </div>
 </div>
+<div id="game"><div class="accessibility-zone"></div></div>
 
 <script>
   window.game_id = "{{ game_id }}";

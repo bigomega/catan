@@ -3,6 +3,10 @@
 @import "/css/constants.css";
 @import "/css/fonts.css";
 
+:root {
+  --box-width: 400px;
+}
+
 html,
 body {
   height: 100%;
@@ -35,7 +39,7 @@ button {
   }
 
   > .container {
-    width: 400px; margin-top: 100px;
+    width: var(--box-width); margin-top: 100px;
 
     .action-types {
       display: flex; margin: 0px 40px;
@@ -45,7 +49,7 @@ button {
 
       > label {
         width: 33%; padding: 5px 10px 5px; text-align: center; cursor: pointer;
-        border-right: 1px solid color-mix(in srgb, var(--sand-color), transparent 70%);
+        border-left: 1px solid var(--sand-color);
         transition: all .25s ease;
         &:first-child { width: 34%; border: none; }
         &:has(input:checked) { background-color: var(--sand-color); color: var(--sand-color-text-dark); }
@@ -58,11 +62,13 @@ button {
 
     .action-container {
       background: #fff3; box-shadow: 0 0px 40px #0009; margin: 50px 0 50px;
-      border-radius: 10px; backdrop-filter: blur(6px); padding: 40px;
+      border-radius: 10px; backdrop-filter: blur(6px); display: flex; overflow: hidden;
 
       .section {
-        width: 100%;
-        display: none; flex-direction: column; align-items: center;
+        flex: 0 0 100%; max-width: var(--box-width); padding: 40px; box-sizing: border-box;
+        display: flex; flex-direction: column; align-items: center;
+        /* transition: all .5s cubic-bezier(.68, -0.55, .27, 1.55); */
+        transition: all .25s cubic-bezier(0.65, 0.05, 0.36, 1);
 
         input[type="text"] {
           background: #fffc; text-align: center;
@@ -137,13 +143,14 @@ button {
       }
 
       .join-section {
+        /* justify-content: center; max-height: 400px; */
         input.game-key { font-size: 1em; }
       }
 
       .watch-section { color: #fff; }
     }
-    .action-types:has(input[value="host"]:checked) + .action-container .host-section { display: flex; }
-    .action-types:has(input[value="join"]:checked) + .action-container .join-section { display: flex; }
-    .action-types:has(input[value="watch"]:checked) + .action-container .watch-section { display: flex; }
+    .action-types:has(input[value="host"]:checked) + .action-container .host-section { margin-left: 0%; }
+    .action-types:has(input[value="join"]:checked) + .action-container .host-section { margin-left: -100%; }
+    .action-types:has(input[value="watch"]:checked) + .action-container .host-section { margin-left: -200%; }
   }
 }

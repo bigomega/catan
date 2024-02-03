@@ -1,4 +1,7 @@
-@import './constants.css';
+@import "/css/index/accessibility.css";
+@import "/css/index/alert.css";
+@import "/css/constants.css";
+@import "/css/fonts.css";
 
 :root {
   --title-padding: .8em 20px .2em;
@@ -30,27 +33,36 @@ body {
 }
 
 @keyframes blink { 50% { opacity: .5; } }
-.container {
+#waiting-room {
   /* height: 100%; */
   display: flex; flex-wrap: wrap; align-content: flex-start;
-  &.hide { opacity: 0; transition: opacity .5s linear; }
+  font-family: EagleLake;
+  /* &.hide { opacity: 0; transition: opacity .5s linear; } */
 
   .title {
-    color: #fff;
-    text-shadow: 0 0 2px #000, 0 0 2px #000, 0 0 2px #000, 0 0 2px #000, 0 0 2px #000;
-    font-size: max(4vw, 30px);
-    padding: var(--title-padding);
+    position: absolute; top: 0; left: 0; width: 100%;
     text-align: center;
-    font-family: sans-serif;
-    width: 100%;
-
-    > div:nth-child(2) {
-      font-size: 60%;
+    div {
+      font-size: 1em;
+      color: #0006;
+      background-color: var(--sand-color);
+      border-bottom: 2px solid var(--sand-color-dark);
+      input {
+        border: none; background: none;
+        width: 100%; margin-bottom: 10px; margin-top: -5px;
+        font-size: 2em; text-align: center; font-family: inherit;
+        /* font-size: max(4vw, 30px); */
+        color: var(--sand-color-text-dark);
+        &:focus { outline: none; }
+      }
+    }
+    small {
+      display: block; color: var(--sand-color); margin-top: 10px;
     }
   }
 
   .players {
-    margin: 135px auto 130px;
+    margin: 335px auto 130px;
     /* width: 298px; */
     position: relative;
     padding-right: 2px;
@@ -73,16 +85,10 @@ body {
       &.hide { display: none; }
 
       .name {
-        color: #fff;
-        width: 100%;
-        background: #ffffffa8;
-        margin: 73px 0;
-        padding: 4px 5px;
+        color: #fff; background: #ffffffa8;
+        width: 100%; margin: 73px 0; padding: 4px 5px;
         box-sizing: border-box;
-        text-align: center;
-        font-family: cursive;
-        font-weight: bold;
-        letter-spacing: 1px;
+        text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
       }
 
       &.player-1 .name {
