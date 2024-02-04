@@ -103,10 +103,10 @@ export default class BoardShuffler {
       return diff + row.map(tile => {
         if (tile.type === 'D') return 'D'
         if (tile.type === 'S') {
-          return 'S' + (tile.trade_edge ? `(${edge_shortcut[tile.trade_edge]}-${tile.trade_type}${tile.trade_ratio})` : '')
+          return 'S' + (tile.trade_edge ? `(${edge_shortcut[tile.trade_edge]}_${tile.trade_type}${tile.trade_ratio})` : '')
         }
         return tile.type + tile.num
       }).join('.')
-    }).join('\n')
+    }).join('')
   }
 }

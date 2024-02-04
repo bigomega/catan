@@ -13,7 +13,7 @@ export const RESOURCES = { S: 'Sheep', L: 'Lumber', B: 'Brick', O: 'Ore', W: 'Wh
 export const RESOURCE_EMOJIS = { S: '🐑', L: '🪵', B: '🧱', O: '🏔', W: '🌾' }
 export const TILE_EMOJIS = { G: '🐑', J: '🪵', C: '🧱', M: '🏔', F: '🌾', S: '🌊', D: '🌵' }
 
-export const SEA_REGEX = `S\\((?<dir>tl|tr|l|r|bl|br)-(?<res>${Object.keys(RESOURCES).join('|')}|\\*)(?<num>\\d*)\\)`
+export const SEA_REGEX = `S\\((?<dir>tl|tr|l|r|bl|br)_(?<res>${Object.keys(RESOURCES).join('|')}|\\*)(?<num>\\d*)\\)`
 
 export const RESOURCE_REGEX = `(?<tile_type>[${Object.keys(TILES).join('|')}])(?<num>\\d*)`
 
@@ -58,13 +58,13 @@ export const TRADE_OFFERS = {
 export const ROLL = _ => Math.ceil(Math.random() * 6)
 
 export const DEFAULT_MAPKEY =
-  `S(br-S2).S.S(bl-B2).S
-  -S.M5.J10.J8.S(bl-*3)
-  -S(r-O2).J2.C9.G11.C4.S
-  -S.G6.J4.D.F3.F11.S(l-W2)
-  +S(r-L2).F3.G5.C6.M12.S
-  +S.F8.G10.M9.S(tl-*3)
-  +S(tr-*3).S.S(tl-*3).S`
+  `S(br_S2).S.S(bl_B2).S
+  -S.M5.J10.J8.S(bl_*3)
+  -S(r_O2).J2.C9.G11.C4.S
+  -S.G6.J4.D.F3.F11.S(l_W2)
+  +S(r_L2).F3.G5.C6.M12.S
+  +S.F8.G10.M9.S(tl_*3)
+  +S(tr_*3).S.S(tl_*3).S`
 
 export const GAME_CONFIG = {
   private_game: true,

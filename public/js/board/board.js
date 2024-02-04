@@ -18,10 +18,10 @@ export default class Board {
      * ============
      * MAP DECODING
      * ============
-     * split by \n - each line is each row in map
+     * split by +/- every row except the first MUST have a sign
      * + or - represent where the hex starts in the next line. bottom right or left
      * each tile is split by dor (.) and each tile has it's own regex
-     * Sea -> S(direction - ResourceKey number)? <sea has optional trade in a direction>
+     * Sea -> S(direction _ ResourceKey number)? <sea has optional trade in a direction>
      * Desert -> D
      * ResourceTile -> TileKey number {F|G|J|C|M}
      * ex., +S(r-L2).F3.G5.C6.M12.S
@@ -29,16 +29,17 @@ export default class Board {
      * Since decoding always happens from left to right and top to bottom,
      * we reuse previous corners
      */
-    const mapkey_list = mapkey.trim().split('\n')
+    const mapkey_list = mapkey.trim().split(/[-,+]/)
     for (let i = 0; i < mapkey_list.length; i++) {
       let row_map = mapkey_list[i].trim()
       const prev_row = i > 0 ? this.tile_rows[i - 1] : null
       const row_data = []
-      // With the current implementation - ONLY ONE +/- can be used for Row Diff
-      if (row_map[0] === '+' || row_map[0] === '-') {
-        row_data.diff = +(row_map[0] + '1')
-        row_map = row_map.substr(1)
-      } else if (i > 0) { // edge case
+      // ONLY ONE +/- can be used for Row Difference
+      mapkey_list.slice(0, i).reduce((mem, _) => mem + _.length, 0)
+      const plus_minus = mapkey[mapkey_list.slice(0, i).reduce((mem, _) => mem + _.length, 0) + i - 1]
+      if (plus_minus === '+' || plus_minus === '-') {
+        row_data.diff = +(plus_minus + '1')
+      } else {
         row_data.diff = 1
       }
       const row_map_arr = row_map.split('.')
