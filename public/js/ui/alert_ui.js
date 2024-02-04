@@ -28,14 +28,14 @@ export default class AlertUI {
     `).join('')
     this.$alert.querySelector('.close').addEventListener('click', e => this.closeBigAlert())
     this.$status_history.querySelector('.close').addEventListener('click', e => this.toggleStatusHistory(false))
-    $('#game > .current-player .status-bar-history').addEventListener('click', e => this.toggleStatusHistory(true))
+    $('#game > .current-player .status-bar-history').addEventListener('click', e => this.toggleStatusHistory())
     document.addEventListener('keydown', e => {
       e.code === 'Backquote' && (this.closeBigAlert(), this.toggleStatusHistory(false))
-      e.code === 'KeyH' && this.toggleStatusHistory(!this.$status_history.classList.contains('show'))
+      e.code === 'KeyH' && this.toggleStatusHistory()
     })
   }
 
-  toggleStatusHistory(show) {
+  toggleStatusHistory(show = !this.$status_history.classList.contains('show')) {
     this.$status_history.classList[show ? 'add' : 'remove']('show')
   }
 

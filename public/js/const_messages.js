@@ -35,7 +35,7 @@ const GAME_MESSAGES = {
   RES_TAKEN: {//---
     all: res_obj => {
       if (!Object.keys(res_obj).length) { return '' }
-      return ' :: took→ ' + resToText(res_obj)
+      return ' :: you took→ ' + resToText(res_obj)
     }
   },
   BUILDING: { all: (piece, p) => `${getName(p)} built a ${CONST.PIECES[piece]}.` }, //----

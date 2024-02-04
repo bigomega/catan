@@ -3,9 +3,9 @@ import { fileURLToPath } from 'url'
 import { parse as parseCookie } from "cookie"
 import http from "http"
 import express from 'express'
-import cookieParser from 'cookie-parser'
-import mustacheExpress from 'mustache-express'
 import { Server } from "socket.io"
+import mustacheExpress from 'mustache-express'
+import cookieParser from 'cookie-parser'
 import { generate as generateRandomWords } from "random-words"
 import Game from "./models/game.js"
 import * as CONST from "./public/js/const.js"
@@ -44,17 +44,17 @@ app.get('/', function (req, res) {
 app.get('/game/new', function (req, res) {
   let id
   do { id = generateRandomWords({ min: 2, max: 2, join: '-' }) } while (GAME_SESSIONS[id])
-  const { name, players } = req.query
-  const game_config = CONST.GAME_CONFIG
-  const pid = Math.floor(Math.random() * game_config.player_count + 1)
+  const { name, players = CONST.GAME_CONFIG.player_count, config: query_config } = req.query
+  if (+players < 2 || +players > 4) { return res.redirect('/login?notice=Player count must be between 2 and 4.') }
+  let config = Object.assign({}, CONST.GAME_CONFIG, { player_count: +players || 2 })
+  try { config = Object.assign(config, JSON.parse(decodeURIComponent(query_config))) } catch(e){}
+  config.mapkey = (new BoardShuffler(config.mapkey)).shuffle(config.map_shuffle)
+  const pid = Math.floor(Math.random() * config.player_count + 1)
   const game = new Game({
     id, io,
     host: { name, id: pid },
+    config,
     onGameEnd: _id => onGameEnd(_id),
-    config: Object.assign({}, game_config, {
-      player_count: +players || game_config.player_count,
-      mapkey: (new BoardShuffler(game_config.mapkey)).shuffle(),
-    }),
   })
   res.cookie('game_id', id, { maxAge: SESSION_EXPIRE_HOURS * 60 * 60 * 1000, httpOnly: true })
   res.cookie('player_id', pid, { maxAge: SESSION_EXPIRE_HOURS * 60 * 60 * 1000, httpOnly: true })

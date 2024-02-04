@@ -1,4 +1,4 @@
-// import * as CONST from "./const.js"
+import * as CONST from "./const.js"
 import AudioManager from "./audio_manager.js"
 import AccessibilityUI from "./ui/accessibility_ui.js"
 const $ = document.querySelector.bind(document)
@@ -53,6 +53,17 @@ class LoginUI {
     `
     this.#setupEvents()
     setTimeout(_ => $('.notice')?.classList.add('hide'), 5000)
+    console.log('%c🛠 Advanced Game Configurations 🪚', 'border-radius: 100px; padding: 10px 25px; font: 2em EagleLake, fantasy, cursive; background: #e8d49c; color: #9c5e15;')
+    console.log('%c→ Edit %cwindow.config', 'font-size: 1.2em', 'font-size: 1.2em; background: #eee; color: #333; padding: 2px 5px')
+    console.log(CONST.GAME_CONFIG)
+    window.config = CONST.GAME_CONFIG
+    console.log('%c→ Send it as a query param to "/game/new" (everything is optional including name)', 'font-size: 1.2em')
+    console.log(`%cExample: %cwindow.location.href = '/game/new?name=Mr.Robot&config=' +
+      encodeURIComponent(JSON.stringify(Object.assign(window.config, {
+        player_count: 2, win_points: 5, map_shuffle: false,
+        mapkey: \`S.S(bl_O2).S(br_O2).S-S.M8.D.M8.S-S.G9.S.S.G9.S-S.F10.S.S.S.F10.S-S.S.C11.S.S.C12.S.S-S.S.S.C2.S.C3.S.S.S-S(r_L2).J6.J5.J4.S.S.J4.J5.J6.S(l_L2)+S.S.S.S.S.S.S.S.S\`,
+      })))`, 'font-size: 1em', 'font-size: 1em; background: #eee; color: #333; padding: 2px 5px')
+    console.log('%c→ Have Fun Playing Around. Come say Hi here https://github.com/bigomega/catan when you break things badly!\nThe README.md has the rules for writing your own mapkeys.\n%cCheers%c🍻', 'font-size: 1.2em', 'font-size: 3em', 'font-size: 6em')
   }
 
   #setupEvents() {

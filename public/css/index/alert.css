@@ -124,7 +124,8 @@
     box-shadow: 0 0 10px 0; background: var(--sand-color);
   }
   &::before {
-    content: 'Newest First…'; width: 100%; color: #0003;;
+    content: 'Newest First…'; width: 100%; color: #0003;
+    font-family: Roboto, sans-serif;
   }
 
   .close {
