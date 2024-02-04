@@ -333,6 +333,15 @@
       &.p4 { border-color: var(--player-4-color); }
     }
   }
+  .status-bar-history {
+    position: absolute; bottom: 11px; right: 10px;
+    width: 32px; height: 32px;
+    font-size: 1.3em; cursor: pointer;
+    background: #fff6; border-radius: 50px;
+    display: flex; justify-content: center; align-items: center;
+    &:hover { background: #fff; box-shadow: 0 0 5px #0009; }
+    &::before { content: '⌛️'; }
+  }
 
   &.show .hand,
   &:not(.show) .hand:has(~.actions:hover, ~ .status-bar:hover) { bottom: -120px; }

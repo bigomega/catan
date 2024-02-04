@@ -2,24 +2,41 @@ import { default as MSG, getName } from "../const_messages.js"
 const $ = document.querySelector.bind(document)
 
 export default class AlertUI {
-  #player; #alert_time; #alert_timer
+  #player; #alert_time; #alert_timer;
   #onStatusUpdate; #showCard
+  #status_history = []
+  $status_history = $('#game > .status-history-zone')
+  $status_history_container = $('#game > .status-history-zone > .container')
   $alert = $('#game > .alert')
-  $status_bar = document.querySelector('#game > .current-player .status-bar')
+  $status_bar = $('#game > .current-player .status-bar')
 
   constructor(player, alert_time = 3, { onStatusUpdate, showCard }){
     this.#player = player
     this.#onStatusUpdate = onStatusUpdate
     this.#showCard = showCard
     this.#alert_time = alert_time
+    try {
+      this.#status_history = JSON.parse(localStorage.getItem('status_history'))
+      if (!(this.#status_history instanceof Array)) { this.#status_history = [] }
+    } catch (e) {}
   }
 
   render() {
     this.$status_bar.innerHTML = this.#player.last_status || '...'
+    this.$status_history_container.innerHTML = this.#status_history.map(s => `
+      <div class="status">${s}</div>
+    `).join('')
     this.$alert.querySelector('.close').addEventListener('click', e => this.closeBigAlert())
+    this.$status_history.querySelector('.close').addEventListener('click', e => this.toggleStatusHistory(false))
+    $('#game > .current-player .status-bar-history').addEventListener('click', e => this.toggleStatusHistory(true))
     document.addEventListener('keydown', e => {
-      e.code === 'Backquote' && this.closeBigAlert()
+      e.code === 'Backquote' && (this.closeBigAlert(), this.toggleStatusHistory(false))
+      e.code === 'KeyH' && this.toggleStatusHistory(!this.$status_history.classList.contains('show'))
     })
+  }
+
+  toggleStatusHistory(show) {
+    this.$status_history.classList[show ? 'add' : 'remove']('show')
   }
 
   closeBigAlert() {
@@ -37,12 +54,19 @@ export default class AlertUI {
   }
 
   setStatus(message = '...') {
-    this.$status_bar.innerHTML = message.replace(/<br\/?>/g, '. ')
-    this.#onStatusUpdate(this.$status_bar.innerHTML)
+    const msg = message.replace(/<br\/?>/g, '. ')
+    this.$status_bar.innerHTML = msg
+    this.#status_history.unshift(msg)
+    localStorage.setItem('status_history', JSON.stringify(this.#status_history))
+    this.$status_history_container.innerHTML = `<div class="status">${msg}</div>` + this.$status_history_container.innerHTML
+    this.#onStatusUpdate(msg)
   }
 
   appendStatus(message = '...') {
     this.$status_bar.innerHTML += message.replace(/<br\/?>/g, '. ')
+    this.#status_history[0] = this.$status_bar.innerHTML
+    localStorage.setItem('status_history', JSON.stringify(this.#status_history))
+    this.$status_history_container.querySelector('.status:first-child').innerHTML = this.$status_bar.innerHTML
     this.#onStatusUpdate(this.$status_bar.innerHTML)
   }
 

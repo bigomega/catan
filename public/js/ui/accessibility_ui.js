@@ -22,6 +22,7 @@ export default class AccessibilityUI {
       ['Board Zoom Out', '-'],
       ['Toggle Background Music', 'm'],
       ['Toggle Notification Sounds', 'n'],
+      ['Show Status History', 'h'],
       ['Show this section', '?'],
       ['Cancel action / Close stuff', '\` (Backquote)'],
     ]

@@ -600,7 +600,7 @@ export default class Game {
       this.clearTimer()
       return this.#onGameEnd(this.id)
     }
-    const remaining_players = this.players.filter(p => !p.removed).length
+    const remaining_players = this.players.filter(p => !p.removed)
     // Everybody Quit - End Game
     if (remaining_players.length === 1) {
       return this.#onPlayerVpChange(remaining_players[0].id, this.config.win_points)

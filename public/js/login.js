@@ -14,6 +14,7 @@ class LoginUI {
       toggleBgm: allow => this.audio_manager.toggleBgm(allow),
       icons: { zoom: false, notifcation_sounds: false, shorcuts: false, quit: false }
     })
+    localStorage.setItem('status_history', '[]')
   }
 
   render() {

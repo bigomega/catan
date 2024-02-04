@@ -16,7 +16,8 @@ npm start
 ## Status
 ### In Progress
   ##### Feb '24
-  - [ ] Quit game
+  - [x] Alert history
+  - [x] ~~Quit game~~
   - [x] ~~Login & waiting room UI rework~~
   - [x] ~~End Game~~
   ##### Jan '24
@@ -24,7 +25,7 @@ npm start
   - [x] ~~Opponents UI~~
   - [x] ~~Shuffler~~
   - [x] ~~Longest Road & Largest Army~~
-  - [ ] Animations (~~DC, Cost, Build~~, Dice, Hand)
+  - [x] ~~Animations (DC, Cost, Build, Dice, Hand)~~
   - [x] Dev Card Actions
   - [x] ~~Trade~~
   - [x] ~~Keyboard Shortcuts~~
@@ -52,15 +53,15 @@ npm start
   - [x] ~~Simple Server~~
   - [x] ~~Decoding the map from key~~
 ### Next Steps
-  - Optimization (memory, speed, colors)
-  - Alert history
-  - Trade negotiations
-  - Join random games
+  - [ ] Browser Notifications
+  - [ ] Optimization (memory, speed, colors) ([#ref](https://www.ditdot.hr/en/causes-of-memory-leaks-in-javascript-and-how-to-avoid-them))
+  - [ ] Trade negotiations
+  - [ ] Join random games
     - Private & public game
-  - Watch games
+  - [ ] Watch games
 
-### Known Bugs
-  -
+### Bugs
+  - [x] ~~Road into the Sea~~
 
 ## Future Ideas
 - Custom map builder
