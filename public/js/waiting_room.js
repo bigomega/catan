@@ -9,8 +9,8 @@ const tile_keys = Object.keys(CONST.TILES).filter(_ => _ !== 'S' && _ !== 'D')
 class WaitingRoomUI {
   player_count = window.player_count
   joined_count = 0
-  $joined_count = $('.title small span')
-  $game_id = $('#game_id')
+  $joined_count = $('.title small .p-count')
+  $game_key = $('.title .text')
 
   constructor() {
     this.audio_manager = new AudioManager()
@@ -39,7 +39,11 @@ class WaitingRoomUI {
       this.changeBackground()
     })
 
-    this.$game_id.addEventListener('focus', _ => this.$game_id.select())
+    this.$game_key.addEventListener('click', e => {
+      window.navigator.clipboard.writeText(window.game_id)
+      this.$game_key.classList.add('copied')
+    })
+    this.$game_key.addEventListener('mouseout', e => this.$game_key.classList.remove('copied'))
   }
 
   checkAndEnd() {

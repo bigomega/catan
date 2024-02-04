@@ -7,8 +7,14 @@
 </head>
 <div id="waiting-room">
   <div class="title">
-    <div>Game Key: <input type="text" id="game_id" value="{{ game_id }}" readonly></div>
-    <small>Waiting for <span>0</span> more players to join...</small>
+    <div class="colored">
+      <div class="name">Game Key</div>
+      <div class="text">
+        <span>{{ game_id }}</span>
+          <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 9h3a3 3 0 013 3v6a3 3 0 01-3 3h-6a3 3 0 01-3-3v-3m6-6h-3a3 3 0 00-3 3v3m6-6V6a3 3 0 00-3-3H6a3 3 0 00-3 3v6a3 3 0 003 3h3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <small>Waiting for <span class="p-count">0</span> more players to join...</small>
   </div>
   <div class="players">
     <div class="player-1"></div>

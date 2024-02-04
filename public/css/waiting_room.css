@@ -49,19 +49,30 @@ button {
 
   .title {
     position: absolute; top: 0; left: 0; width: 100%;
-    text-align: center;
-    div {
-      font-size: 1em;
-      color: #0006;
-      background-color: var(--sand-color);
-      border-bottom: 2px solid var(--sand-color-dark);
-      input {
-        border: none; background: none;
-        width: 100%; margin-bottom: 10px; margin-top: -5px;
-        font-size: 2em; text-align: center; font-family: inherit;
-        /* font-size: max(4vw, 30px); */
-        color: var(--sand-color-text-dark);
-        &:focus { outline: none; }
+    text-align: center; cursor: default;
+    .colored {
+      border-bottom: 2px solid var(--sand-color-dark); background-color: var(--sand-color);
+    }
+    .name {
+      font-size: 1em; color: #0006;
+    }
+    .text {
+      margin-bottom: 10px; margin-top: -5px;
+      font-size: 2.5em; text-align: center; position: relative;
+      color: var(--sand-color-text-dark); cursor: copy;
+      transition: all .15s ease;
+      svg { transform: scale(1.3); margin-left: 5px; opacity: 0.7; }
+      &:hover{
+        filter: drop-shadow(0 0 5px #fff) drop-shadow(0 0 2px #fff);
+        &::after {
+          content: 'Copy'; position: absolute; bottom: -20px; left: calc(50% - 30px);
+          text-align: center; font-size: 1rem; font-family: Roboto;
+          background-color: #000c; color: #fff; padding: 3px 10px; border-radius: 3px;
+        }
+      }
+      &.copied:hover{
+        cursor: default; filter: drop-shadow(0 0 5px #fff0) drop-shadow(0 0 2px #0000) contrast(0.5);
+        &::after { content: 'Copied!'; }
       }
     }
     small {
