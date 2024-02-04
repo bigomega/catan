@@ -14,8 +14,8 @@
     &:hover, &:focus {
       opacity: 1; box-shadow: 0 0 10px 0 #0009; color: #fff; background-color: #0009;
       &::after {
-        content: attr(title); white-space: nowrap; position: absolute; left: 40px; top: 2px;
-        background: inherit; font-size: 13px; font-family: Roboto; font-weight: normal;
+        content: attr(title); white-space: nowrap; position: absolute; left: 35px; top: 2px;
+        background: inherit; font-size: 13px; font-family: Raleway; font-weight: normal;
         padding: 3px 7px; border-radius: 3px;
       }
     }
@@ -40,7 +40,7 @@
   }
   .question-mark { padding-top: 2px; font-weight: bold; }
   .quit {
-    font-family: Roboto, sans-serif; position: relative;
+    font-family: Raleway, sans-serif; position: relative;
     b::before { content: 'o'; position: absolute; top: 0px; left: 6px; font-size: 25px; line-height: 25px; font-weight: normal; }
     b::after { content: '|'; position: absolute; top: 0px; left: 11px; font-size: 12px; font-weight: bold; font-family: EagleLake; }
     &:hover, &:focus { opacity: 1; box-shadow: 0 0 10px 0 #0009; color: #fff; background-color: red; }
@@ -51,7 +51,7 @@
     width: calc(100% - 90px); margin: 30px; padding: 60px 0 30px 30px;
     background: #fff; border-radius: 10px;
     box-shadow: 0 0 10px 0px #000;
-    font-family: Roboto, sans-serif; font-weight: 200;
+    font-family: Raleway, sans-serif; font-weight: 200;
     display: flex; justify-content: flex-start; flex-wrap: wrap;
     &::before {
       content: 'Keyboard Shortcuts'; font-size: 1.5em;

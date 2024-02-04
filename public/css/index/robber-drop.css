@@ -9,7 +9,7 @@
   box-sizing: border-box;
   box-shadow: 0 0px 15px 0px #000;
   justify-content: center;
-  font-family: Roboto, sans-serif;
+  font-family: Raleway, sans-serif;
 
   &.show { display: flex; }
 

@@ -49,6 +49,7 @@ class WaitingRoomUI {
   checkAndEnd() {
     if (this.joined_count === this.player_count) {
       $('.title small').innerHTML = `Starting the game…`
+      $('#waiting-room').classList.add('hide')
       setTimeout(_ => window.location.reload(), 2000)
     }
   }
@@ -63,7 +64,7 @@ class WaitingRoomUI {
     this.$joined_count.innerHTML = this.player_count - ++this.joined_count
     $player.innerHTML = `<div class="name">${name}</div>`
     $player.style.backgroundImage = `url('/images/tiles/${this.getRandomTile()}.png')`
-    $player.style.animation = 'none'
+    $player.classList.add('joined')
   }
 
   removePlayer(pid) {

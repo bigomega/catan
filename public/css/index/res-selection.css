@@ -7,7 +7,7 @@
   border-bottom: 5px solid var(--sand-color-dark);
   box-sizing: border-box;
   box-shadow: 0 0px 15px 0px #000;
-  font-family: Roboto, sans-serif;
+  font-family: Raleway, sans-serif;
   &.hide { display: none; }
 
   .title {

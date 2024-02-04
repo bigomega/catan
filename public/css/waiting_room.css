@@ -45,7 +45,7 @@ button {
   /* height: 100%; */
   display: flex; flex-wrap: wrap; align-content: flex-start;
   font-family: EagleLake;
-  /* &.hide { opacity: 0; transition: opacity .5s linear; } */
+  &.hide { opacity: 0; transition: opacity .5s 1.5s linear; }
 
   .title {
     position: absolute; top: 0; left: 0; width: 100%;
@@ -66,7 +66,7 @@ button {
         filter: drop-shadow(0 0 5px #fff) drop-shadow(0 0 2px #fff);
         &::after {
           content: 'Copy'; position: absolute; bottom: -20px; left: calc(50% - 30px);
-          text-align: center; font-size: 1rem; font-family: Roboto;
+          text-align: center; font-size: 1rem; font-family: Raleway;
           background-color: #000c; color: #fff; padding: 3px 10px; border-radius: 3px;
         }
       }
@@ -99,9 +99,9 @@ button {
       background-image: url(/images/tiles/Desert.png);
       display: flex; flex-wrap: wrap; flex-direction: column; justify-content: center;
       /* animation: 1s infinite alternate blink ease; */
-      animation: blink 2s step-start 0s infinite;
-
+      animation: blink 3s cubic-bezier(0.63, 0.01, 0.27, 0.97) 0s infinite;
       &.hide { display: none; }
+      &.joined { animation: none; }
 
       .name {
         color: #fff; background: #ffffffa8;

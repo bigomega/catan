@@ -109,7 +109,7 @@
 #game > .status-history-zone {
   position: fixed; top: 0; left: 0;
   width: calc(100% - 0px); max-height: 70%; overflow: scroll;
-  padding-top: 55px; text-align: center;
+  padding-top: 65px; text-align: center;
   box-sizing: border-box; box-shadow: 0 0 20px 0 #000;
   background: var(--sand-color); color: var(--sand-color-text-dark);
   border-bottom: 2px solid var(--sand-color-dark);
@@ -120,12 +120,12 @@
   &::after {
     content: 'Status History ⌛️'; width: 100%;
     font-family: Papyrus; font-size: 2em; text-align: center;
-    position: fixed; left: 0; top: 0;
+    position: fixed; left: 0; top: 0; padding: 5px;
     box-shadow: 0 0 10px 0; background: var(--sand-color);
   }
   &::before {
     content: 'Newest First…'; width: 100%; color: #0003;
-    font-family: Roboto, sans-serif;
+    font-family: Raleway, sans-serif;
   }
 
   .close {
@@ -135,7 +135,7 @@
     &:hover, &:focus { color: var(--trade-negative); text-shadow: 0 0 5px #fff; }
   }
 
-  .container { border-top: 1px solid; font-family: 'Roboto', sans-serif; }
+  .container { border-top: 1px solid; font-family: Raleway, sans-serif; }
   .status {
     padding: 7px 10px; border-bottom: 1px solid;
     b { color: #77450b; }

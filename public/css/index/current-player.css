@@ -87,7 +87,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        font-family: Roboto, sans-serif;
+        font-family: Raleway, sans-serif;
 
         &.hide { display: none; }
       }
@@ -238,7 +238,7 @@
       &.disabled::before { filter: brightness(.7); }
 
       .cost-tooltip {
-        position: absolute; bottom: 74px; font-family: Roboto, sans-serif;
+        position: absolute; bottom: 74px; font-family: Raleway, sans-serif;
         display: none; transform: scale(2);
         background: var(--sand-color); color: #0009;
         padding: 5px 0 5px 7px;
@@ -316,7 +316,7 @@
   &.id-4 .actions .end-turn { color: var(--player-4-color); }
 
   .status-bar {
-    font-family: Roboto, sans-serif;
+    font-family: Raleway, sans-serif;
     background: var(--sand-color);;
     color: var(--sand-color-text-dark);
     border-top: 1px solid #aa8456;
@@ -482,7 +482,7 @@
   }
 
   .info {
-    font-family: Roboto, sans-serif; font-weight: 200; color: var(--sand-color);
+    font-family: Raleway, sans-serif; font-weight: 200; color: var(--sand-color);
     opacity: 0.7;
     text-shadow: 0 0 3px #000;
     margin-top: 20px;
