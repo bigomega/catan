@@ -16,7 +16,7 @@ npm start
 - A Resource tile is represented by its key and should have a `Number` (between 2 and 12) next to it. `<TileKey><Number>`
 - A Sea tile (represented by `S`) can optionally have one trade at max. `S(<Trade>)?`
 - A `Trade` is represented by its edge `TradeEdge` (to the Sea tile it's on), type `TradeType` and a number `TradeRatio` covered by round braces `()` and split by `_` (underscore). `(<TradeEdge>_<TradeType><TradeRatio>)`
-- Surrounding your land with the sea (empty or not) is recommended.
+- Surrounding your land with the sea is not necessary but recommended.
 
 #### Keys
 ```js
@@ -52,7 +52,8 @@ const config ={
 }
 ```
 Renders the map…
- 
+<img width="900" alt="Screenshot 2024-02-04 at 11 46 20 copy" src="https://github.com/bigomega/catan/assets/2320747/7449040b-2f77-4ba1-beeb-a648af4dea05">
+
 
 ## Frameworks
 ### Major 
