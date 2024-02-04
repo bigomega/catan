@@ -144,7 +144,8 @@ export default class Game {
     let s_id = settlement_loc, r_id = road_loc
     const valid_corners = this.board.getSettlementLocations(-1).map(s => s.id)
     if (!valid_corners.includes(s_id)) { s_id = this.#getRandom(valid_corners) }
-    const valid_edges = this.board.findCorner(s_id)?.getEdges(-1).map(e => e.id)
+    const valid_edges = this.board.findCorner(s_id)?.getEdges(-1)
+      .filter(_ => !_.corner1.surroundedBySea() && !_.corner2.surroundedBySea()).map(e => e.id)
     if (!valid_edges.includes(r_id)) { r_id = this.#getRandom(valid_edges) }
     this.build(pid, 'S', s_id)
     this.build(pid, 'R', r_id)

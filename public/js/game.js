@@ -325,7 +325,9 @@ export default class Game {
       if (location_type === 'C') {
         this.#ui.showCorners([id])
         this.#temp.settlement_loc = id
-        this.#ui.showEdges(this.#board.findCorner(id)?.getEdges(-1).map(e => e.id))
+        this.#ui.showEdges(this.#board.findCorner(id)?.getEdges(-1)
+          .filter(_ => !_.corner1.surroundedBySea() && !_.corner2.surroundedBySea()).map(e => e.id)
+        )
       } else if (location_type === 'E') {
         this.#temp.road_loc = id
         this.#socket_manager.sendInitialSetup(this.#temp)
