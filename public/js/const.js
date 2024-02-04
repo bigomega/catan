@@ -83,7 +83,8 @@ export const GAME_CONFIG = {
   largest_army_count: 3,
   longest_road_count: 5,
   mapkey: DEFAULT_MAPKEY,
-  map_shuffle: true,
+  /** @type {false|'all'|'number'|'port'|'tile'|'(combo of the 3)'} */
+  map_shuffle: 'all',
 }
 
 export const GAME_STATES = {
