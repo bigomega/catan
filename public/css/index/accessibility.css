@@ -9,9 +9,16 @@
     background-color: #fff3; color: #fffc;
     font-family: monospace; font-size: 20px;
     border: 2px solid; border-radius: 100px;
-    opacity: 0.5;
+    opacity: 0.5; position: relative;
     display: flex; align-items: flex-start; justify-content: center;
-    &:hover, &:focus { opacity: 1; box-shadow: 0 0 10px 0 #0009; color: #fff; background-color: #0009; }
+    &:hover, &:focus {
+      opacity: 1; box-shadow: 0 0 10px 0 #0009; color: #fff; background-color: #0009;
+      &::after {
+        content: attr(title); white-space: nowrap; position: absolute; left: 40px; top: 2px;
+        background: inherit; font-size: 13px; font-family: Roboto; font-weight: normal;
+        padding: 3px 7px; border-radius: 3px;
+      }
+    }
   }
 
   .grouped { display: flex; }
@@ -34,8 +41,8 @@
   .question-mark { padding-top: 2px; font-weight: bold; }
   .quit {
     font-family: Roboto, sans-serif; position: relative;
-    &::before { content: 'o'; position: absolute; top: 0px; font-size: 25px; line-height: 25px; }
-    &::after { content: '|'; position: absolute; top: 3px; font-size: 12px; font-weight: bold; }
+    b::before { content: 'o'; position: absolute; top: 0px; left: 6px; font-size: 25px; line-height: 25px; font-weight: normal; }
+    b::after { content: '|'; position: absolute; top: 0px; left: 11px; font-size: 12px; font-weight: bold; font-family: EagleLake; }
     &:hover, &:focus { opacity: 1; box-shadow: 0 0 10px 0 #0009; color: #fff; background-color: red; }
   }
 

@@ -34,11 +34,11 @@ class LoginUI {
               ${[...Array(i + 2)].map((_, j) => `<div class="p${j + 1}"></div>`).join('')}
               <input type="radio" name="player_count" value="${i + 2}" ${i === 1 ? 'checked="checked"' : ''}/>
             </label>`).join('')}
-          </div>
+          </div><!--
           <label class="advaced-options disabled">
             <div class="text">Advanced Options ⇳⌄⌃</div>
             <input type="checkbox" name="advanced">
-          </label>
+          </label>-->
           <button class="submit host">Start Game</button>
         </div>
         <div class="section join-section">
@@ -67,12 +67,18 @@ class LoginUI {
   }
 
   #setupEvents() {
+    this.$container.querySelector('.host-section input').addEventListener('keydown', e => {
+      e.code === 'Enter' && this.$container.querySelector('.host-section .submit').click()
+    })
     this.$container.querySelector('.host-section .submit').addEventListener('click', e => {
       const host_name = this.$container.querySelector('.host-section input.name').value
       const player_count = +this.$container.querySelector('.host-section input[name="player_count"]:checked').value
       window.location.href = `/game/new?name=${encodeURIComponent(host_name)}&players=${encodeURIComponent(player_count)}`
     })
 
+    this.$container.querySelectorAll('.join-section input').forEach($_ => $_.addEventListener('keydown', e => {
+      e.code === 'Enter' && this.$container.querySelector('.join-section .submit').click()
+    }))
     this.$container.querySelector('.join-section .submit').addEventListener('click', e => {
       const name = this.$container.querySelector('.join-section input.name').value
       const game_key = this.$container.querySelector('.join-section input.game-key').value
