@@ -7,7 +7,7 @@
   border-bottom: 5px solid var(--sand-color-dark);
   box-sizing: border-box;
   box-shadow: 0 0px 15px 0px #000;
-  font-family: sans-serif;
+  font-family: Roboto, sans-serif;
   &.hide { display: none; }
 
   .title {
@@ -107,10 +107,10 @@
       background: #ccc;
       color: #999;
       border-radius: 5px;
-      font-size: 1.2em;
       font-weight: bold;
       border: 2px solid transparent;
       cursor: not-allowed;
+      font-family: EagleLake;
 
       &.active {
         background: #333;

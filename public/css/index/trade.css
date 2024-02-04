@@ -3,7 +3,7 @@
   width: 100%;
   /* border-bottom: 5px solid var(--sand-color-dark); */
   box-shadow: 0 0px 15px 0px #000;
-  font-family: sans-serif;
+  font-family: Roboto, sans-serif;
 
   .trade-requests {
     > div {
@@ -58,17 +58,17 @@
 
       .info { opacity: 0.5; }
       .text {
-        padding: 15px; padding-left: 10px; margin-left: 10px; border-left: 10px solid;
+        padding: 20px; padding-left: 10px; margin-left: 10px; border-left: 10px solid;
         .giving, .asking {
-          color: #fff; border-radius: 50px;
-          padding: 12px 5px 12px 10px; margin: 0 0 0 5px;
+          color: #0006; border-radius: 50px; font-family: EagleLake;
+          padding: 10px 5px 10px 13px; margin: 0 0 0 5px;
           .res-icon { transform: scale(1.5); margin: 0 13px 0 8px; }
         }
-        .giving { background: color-mix(in srgb, var(--trade-positive) 70%, transparent); }
-        .asking { background: color-mix(in srgb, var(--trade-negative) 70%, transparent); }
+        .giving { background: color-mix(in srgb, var(--trade-positive) 30%, transparent); }
+        .asking { background: color-mix(in srgb, var(--trade-negative) 30%, transparent); }
         .asking.disabled {
           cursor: not-allowed;
-          filter: contrast(0.3) brightness(1.5) grayscale(1);
+          filter: contrast(0.5) brightness(1.5) grayscale(1);
           .res-icon { filter: contrast(2); }
         }
       }
@@ -80,15 +80,15 @@
       .actions {
         display: flex;
         border-left: 1px solid #999;
-        /* margin: 0 15px 0 5px; */ padding: 10px 15px 10px 10px;
+        /* margin: 0 15px 0 5px; */ padding: 15px 15px 15px 10px;
         @media screen and (min-width: 994px) { width: 30%; }
 
         .confirm, .counter {
-          color: #999; cursor: not-allowed; border-radius: 50px;
+          color: #999; cursor: not-allowed; border-radius: 50px; font-family: EagleLake;
           &.active { cursor: pointer; }
         }
         .confirm {
-          margin: -4px 0; padding: 5px 12px 3px; background: #ccc;
+          margin: -4px 0; padding: 5px 18px 5px; background: #ccc; border: 2px solid var(--sand-color);
           &.active {
             background: #333; color: var(--sand-color);
             &:hover, &:focus { box-shadow: 0 0 10px 0px var(--sand-color-dark), 0 0 20px 0px var(--sand-color-dark); }
@@ -102,7 +102,7 @@
           }
         }
         .ignore {
-          margin: -2px 10px; padding: 3px 5px; cursor: pointer;
+          margin: -2px 10px; padding: 3px 5px; cursor: pointer; font-family: EagleLake;
           &:hover, &:focus { text-decoration: underline; }
         }
       }
@@ -160,24 +160,17 @@
       height: 20px;
       border: 0px solid var(--sand-color);
       border-width: 25px 10px;
+      font-family: EagleLake;
       &.active { border-color: var(--sand-color-dark); background: var(--sand-color-dark); }
       &.disabled { background: #ccc; color: #999; cursor: not-allowed; }
       &:not(.active, .disabled):is(:hover, :focus) { background: #fff; color: #333; }
     }
 
     .cancel {
-      display: flex; justify-content: center; align-items: center;
-      font-family: monospace;
-      /* font-weight: 600; */
-      font-size: 15px;
-      /* background: #fff; */
-      color: var(--trade-negative);
-      width: 25px; height: 25px;
-      margin: 10px 10px;
-      border-radius: 50%;
-      /* box-shadow: 0 0 5px -1px #000; */
-      /* border: 1px solid var(--trade-negative); */
-      &:is(:hover, :focus) { background: var(--trade-negative); color: #fff; }
+      position: fixed; right: 5px; top: 0px; z-index: 1;
+      font-family: Papyrus; font-size: 3em;
+      margin: 2px 10px 0 0; color: #666; cursor: pointer;
+      &:hover, &:focus { color: var(--trade-negative); text-shadow: 0 0 5px #fff; }
     }
   }
 
@@ -340,13 +333,14 @@
         text-align: center;
         background: #ccc; color: #999;
         border-radius: 5px;
-        font-size: 1.2em; font-weight: bold;
+        font-weight: bold;
+        font-family: EagleLake;
         cursor: not-allowed;
 
         &::before { content: 'Trade'; }
         &.active {
           background: #333; color: var(--sand-color);
-          border-color: var(--sand-color);
+          border-color: var(--sand-color); cursor: pointer;
           &:hover, &:focus {
             box-shadow: 0 0 10px 0px var(--sand-color), 0 0 20px 0px var(--sand-color);
           }

@@ -6,7 +6,6 @@
   width: 100%;
   position: fixed; bottom: 0; left: 0;
   z-index: 20;
-  font-family: sans-serif;
   &.blur:not(:hover) { filter: blur(2px); }
 
   /* ---- HAND ---- */
@@ -88,6 +87,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        font-family: Roboto, sans-serif;
 
         &.hide { display: none; }
       }
@@ -238,7 +238,7 @@
       &.disabled::before { filter: brightness(.7); }
 
       .cost-tooltip {
-        position: absolute; bottom: 74px;
+        position: absolute; bottom: 74px; font-family: Roboto, sans-serif;
         display: none; transform: scale(2);
         background: var(--sand-color); color: #0009;
         padding: 5px 0 5px 7px;
@@ -258,7 +258,7 @@
     .build-road .cost-tooltip { width: 75px; left: -33px; }
     .build-settlement .cost-tooltip { width: 136px; left: -60px; }
     .build-city .cost-tooltip { width: 75px; padding-left: 10px; left: -23px; }
-    .dev-card .cost-tooltip { width: 87px; left: -30px; bottom: 78px; }
+    .dev-card .cost-tooltip { width: 87px; left: -30px; bottom: 80px; }
 
     /* TRADE */
     .trade {
@@ -316,6 +316,7 @@
   &.id-4 .actions .end-turn { color: var(--player-4-color); }
 
   .status-bar {
+    font-family: Roboto, sans-serif;
     background: var(--sand-color);;
     color: var(--sand-color-text-dark);
     border-top: 1px solid #aa8456;
@@ -472,7 +473,7 @@
     margin-top: 60px; padding: 13px 35px;
     border: 2px solid; border-radius: 50px;
     color: var(--sand-color); background: #333;
-    font-family: sans-serif; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;
+    font-weight: bold; letter-spacing: 1px; text-transform: uppercase;
     cursor: pointer; z-index: 1; position: relative;
     &:hover, &:focus {
       box-shadow: 0 0 10px 0px var(--sand-color), 0 0 30px 0px var(--sand-color);
@@ -481,7 +482,7 @@
   }
 
   .info {
-    font-family: sans-serif; font-weight: 200; color: var(--sand-color);
+    font-family: Roboto, sans-serif; font-weight: 200; color: var(--sand-color);
     opacity: 0.7;
     text-shadow: 0 0 3px #000;
     margin-top: 20px;

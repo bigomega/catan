@@ -37,7 +37,7 @@ export default class TradeUI {
       <div class="info-section">
         <div class="giving-text"></div>
         <div class="action-container">
-          <button class="reset">↺</button>
+          <button class="reset" title="Reset">↺</button>
           <button class="submit"></button>
         </div>
         <div class="taking-text"></div>

@@ -9,7 +9,7 @@
   box-sizing: border-box;
   box-shadow: 0 0px 15px 0px #000;
   justify-content: center;
-  font-family: sans-serif;
+  font-family: Roboto, sans-serif;
 
   &.show { display: flex; }
 
@@ -144,8 +144,8 @@
       text-align: center;
       background: #ccc;
       color: #999;
+      font-family: EagleLake;
       border-radius: 5px;
-      font-size: 1.2em;
       font-weight: bold;
       border: 2px solid transparent;
       cursor: not-allowed;

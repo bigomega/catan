@@ -6,7 +6,7 @@
   top: 20px;
   left: 20px;
   width: calc(100% - 40px);
-  font-family: papyrus, fantasy;
+  font-family: Papyrus, fantasy;
   font-weight: bold;
   font-size: 2.5em;
   line-height: 2em;
@@ -134,7 +134,7 @@
     &:hover, &:focus { color: var(--trade-negative); text-shadow: 0 0 5px #fff; }
   }
 
-  .container { border-top: 1px solid; }
+  .container { border-top: 1px solid; font-family: 'Roboto', sans-serif; }
   .status {
     padding: 7px 10px; border-bottom: 1px solid;
     b { color: #77450b; }

@@ -9,10 +9,12 @@
 @import './index/animations.css';
 @import './index/accessibility.css';
 @import './index/alert.css';
+@import './fonts.css';
 
 body {
   margin: 0;
   background: var(--water-color);
+  font-family: EagleLake;
 }
 
 button {
