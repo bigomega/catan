@@ -10,12 +10,20 @@ npm start
 ## MapKey
 ### Rules
 - The map is decoded from **left to right** and **top to bottom**.
-- Each `row` is seperated by a `+` or `-` representing its first-tile relationship (bottom-left and bottom-right respectively) to the first-tile of the previous row. `<row> -<row> +<row>`
-- Each `Tile` is separated by a `.`(dot) `<Tile>.<Tile>.<Tile>`
-- There can by any amount of `\s`(space) and `\n`(newline) between the `row`s and `Tile`s. They are ignored by `.trim()`.
-- A Resource tile is represented by its key and should have a `Number` (between 2 and 12) next to it. `<TileKey><Number>`
-- A Sea tile (represented by `S`) can optionally have one trade at max. `S(<Trade>)?`
-- A `Trade` is represented by its edge `TradeEdge` (to the Sea tile it's on), type `TradeType` and a number `TradeRatio` covered by round braces `()` and split by `_` (underscore). `(<TradeEdge>_<TradeType><TradeRatio>)`
+- Each `row` is seperated by a `+` or `-` representing its first-tile relationship (bottom-left and bottom-right respectively) to the first-tile of the previous row.
+  ```
+  <row> -<row>
+  +<row>
+  -  <row>
+  ```
+- There can by any amount of `\s`(space) and `\n`(newline) inbetween the rows and tiles. They are ignored by `.trim()`.
+- Each `Tile` is separated by a `.`(dot) 
+  ```
+  <Tile> .<Tile> .   <Tile>
+  ```
+- A Resource tile is represented by its key and `Number` next to each other. `<TileKey><Number>`
+- A Sea tile (represented by `S`) can optionally have one trade. `S(<Trade>)?`
+- A `Trade` is represented by its edge `TradeEdge` (of the Sea tile it's on), type `TradeType` and a number `TradeRatio` covered by `()`(round braces) and split by `_`(underscore). `(<TradeEdge>_<TradeType><TradeRatio>)`
 - Surrounding your land with the sea is not necessary but recommended.
 
 #### Keys
@@ -40,14 +48,14 @@ This configuration…
 ```js
 const config ={
   mapkey: `
-                    S .S(bl_O2)   .S(br_O2)    .S
-                -S .M8        .D          .M8   .S
-              -S .G9 .S          .S           .G9 .S
-            -S .F10.S         .S          .S    .F10.S
-          -S  .S .C11.S          .S           .C12.S  .S
-        -S  .S .S  .C2        .S          .C3   .S  .S .S
-  -S(r_L2).J6 .J5.J4 .S          .S           .J4.J5  .J6.S(l_L2)
-        +S  .S .S  .S         .S          .S    .S  .S .S
+                  S  .S(bl_O2)    .S(br_O2)    .S
+                -S .M8         .D          .M8   .S
+              -S .G9    .S           .S       .G9  .S
+            -S .F10 .S         .S          .S    .F10.S
+          -S  .S .C11   .S           .S       .C12 .S  .S
+        -S  .S .S   .C2        .S          .C3   .S  .S  .S
+  -S(r_L2).J6.J5 .J4    .S           .S       .J4  .J5 .J6.S(l_L2)
+        +S  .S .S   .S         .S          .S    .S  .S  .S
 `
 }
 ```
