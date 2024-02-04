@@ -160,7 +160,9 @@ export default class BoardUI {
 
   moveRobber(id) {
     this.$el.querySelector('.tile.robbed')?.classList.remove('robbed')
-    this.#$getTile(id)?.classList.add('robbed')
+    this.$el.querySelector('.tile.robber-animate')?.classList.remove('robber-animate')
+    this.#$getTile(id)?.classList.add('robbed', 'robber-animate')
+    setTimeout(_ => this.$el.querySelector('.tile.robber-animate')?.classList.remove('robber-animate'), 200)
   }
 
   toggleZoom(out) {
@@ -183,7 +185,6 @@ export default class BoardUI {
 
   animateRobber() {
     this.$el.querySelector('.tile.robbed')?.classList.add('robber-animate')
-    setTimeout(_ => this.$el.querySelector('.tile.robber-animate')?.classList.remove('robber-animate'), 700)
   }
 
   hideAllShown() {
