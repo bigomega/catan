@@ -1,48 +1,41 @@
 # Catan
 Free to play multiplayer catan style board game
 
-### Install & Run
+## Install & Run
 ```bash
 npm i
 npm start
 ```
 
-### MapKey
-##### Rules
+## MapKey
+### Rules
 - The map is decoded from **left to right** and **top to bottom**.
 - Each `row` is seperated by a `+` or `-` representing its first-tile relationship (bottom-left and bottom-right respectively) to the first-tile of the previous row. `<row> -<row> +<row>`
 - Each `Tile` is separated by a `.`(dot) `<Tile>.<Tile>.<Tile>`
 - There can by any amount of `\s`(space) and `\n`(newline) between the `row`s and `Tile`s. They are ignored by `.trim()`.
 - A Resource tile is represented by its key and should have a `Number` (between 2 and 12) next to it. `<TileKey><Number>`
 - A Sea tile (represented by `S`) can optionally have one trade at max. `S(<Trade>)?`
-- A `Trade` is represented by it's edge-`tradeEdge` (in relation to its Sea tile), type-`tradeType` and a number `tradeRatio` covered by round braces `()` and split by `_` (underscore). `(<tradeEdge>_<tradeType><tradeRatio>)`
-- It's recommended to surround your land with sea (empty or not).
+- A `Trade` is represented by its edge `TradeEdge` (to the Sea tile it's on), type `TradeType` and a number `TradeRatio` covered by round braces `()` and split by `_` (underscore). `(<TradeEdge>_<TradeType><TradeRatio>)`
+- Surrounding your land with the sea (empty or not) is recommended.
 
-##### Keys
+#### Keys
 ```js
-const TileKey = {
-  G: 'Grassland',  J: 'Jungle',
-  C: 'Clay Pit',   M: 'Mountain',
-  F: 'Fields',     S: 'Sea',
-  D: 'Desert',
-}
+const TileKey = { G: 'Grassland', J: 'Jungle', C: 'Clay Pit', M: 'Mountain', F: 'Fields', S: 'Sea', D: 'Desert' }
 
 const Number = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
 const tradeEdge = {
-  tl: 'top_left',     tr: 'top_right',
-  l: 'left',          r: 'right',
-  bl: 'bottom_left',  br: 'bottom_right',
+              tl: 'top_left',     tr: 'top_right',
+  l: 'left',                                        r: 'right',
+              bl: 'bottom_left',  br: 'bottom_right',
 }
 
-const tradeTyp = {
-  '*': 'All', S: 'Sheep', L: 'Lumber', B: 'Brick', O: 'Ore', W: 'Wheat'
-}
+const tradeTyp = { '*': 'All', S: 'Sheep', L: 'Lumber', B: 'Brick', O: 'Ore', W: 'Wheat' }
 
 const tradeRatio = [2, 3]
 ```
 
-##### Example
+#### Example
 This configuration…
 ```js
 const config ={
@@ -59,17 +52,24 @@ const config ={
 }
 ```
 Renders the map…
+ 
 
-##### Maojor Frameworks
+## Frameworks
+### Major 
   - **[ExpressJS](https://expressjs.com/)** for HTTP server
-  - **[Mustache](https://mustache.github.io/)** for sending server data in HTML
-  - **[Socket.io](https://socket.io/)** for websocket activities
-  - **[VanillaJS](http://vanilla-js.com/)** for front-end
+  - **[Socket.io](https://socket.io/)** for WebSocket radio
+  - **[VanillaJS](http://vanilla-js.com/)** for Frontend UI
+
+### Minor Libraries
+  - [Mustache](https://mustache.github.io/) for rendering JSON data in HTML
+  - [nodemon](https://nodemon.io/) for ease of development
+  - [random-words](https://github.com/apostrophecms/random-words) for generating game-keys
+  - [cookie-parser](https://github.com/expressjs/cookie-parser)
 
 ## Status
 ### In Progress
   ##### Feb '24
-  - [x] Alert history
+  - [x] ~~Alert history~~
   - [x] ~~Quit game~~
   - [x] ~~Login & waiting room UI rework~~
   - [x] ~~End Game~~
