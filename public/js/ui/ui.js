@@ -99,6 +99,15 @@ export default class UI {
     document.addEventListener('keydown', e => {
       e.code === 'Backquote' && this.#game.clearDevCardUsage()
     })
+    // Fullscreen Reminder
+    setTimeout(_ => {
+      if (document.fullscreenElement) return
+      this.alert_ui.alertFullScreen()
+      this.alert_ui.$alert.querySelector('.text b').addEventListener('click', e => {
+        this.accessibility_ui.toggleFullScreen()
+        this.alert_ui.closeBigAlert()
+      })
+    }, 5000)
   }
 
   robberDrop(count) {

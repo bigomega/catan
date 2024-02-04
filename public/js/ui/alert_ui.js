@@ -71,6 +71,12 @@ export default class AlertUI {
   }
 
   alertStrategy(t) { this.bigAlert(MSG.STRATEGIZE.all(t)) }
+  alertFullScreen() {
+    const _tmp = this.#alert_time
+    this.#alert_time = 5000
+    this.bigAlert(MSG.FULL_SCREEN.all(), true)
+    this.#alert_time = _tmp
+  }
   alertInitialSetup(p, turn) {
     const msg = turn < 2 ? MSG.INITIAL_BUILD : MSG.INITIAL_BUILD_2
     if (this.#isMe(p)) this.bigAlert(msg.self())
