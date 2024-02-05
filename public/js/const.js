@@ -58,19 +58,20 @@ export const TRADE_OFFERS = {
 export const ROLL = _ => Math.ceil(Math.random() * 6)
 
 export const DEFAULT_MAPKEY =
-  `S(br_S2).S.S(bl_B2).S
-  -S.M5.J10.J8.S(bl_*3)
-  -S(r_O2).J2.C9.G11.C4.S
-  -S.G6.J4.D.F3.F11.S(l_W2)
-  +S(r_L2).F3.G5.C6.M12.S
-  +S.F8.G10.M9.S(tl_*3)
+  `S(br_*3).S.S(bl_W2).S
+  -S.M10.G2.J9.S(bl_O2)
+  -S(r_L2).F12.C6.G4.C10.S
+  -S.F9.J11.D.J3.M8.S(l_*3)
+  +S(r_B2).J8.M3.F4.G5.S
+  +S.C5.F6.G11.S(tl_S2)
   +S(tr_*3).S.S(tl_*3).S`
 
 export const GAME_CONFIG = {
-  private_game: true,
-  player_count: 2,
-  strategize_time: 120,
+  // private_game: true,
+  player_count: 3,
+  win_points: 10,
   timer: true,
+  strategize_time: 120,
   initial_build_time: 60,
   auto_roll: false,
   roll_time: 30,
@@ -78,12 +79,11 @@ export const GAME_CONFIG = {
   robber_drop_time: 30,
   robber_move_time: 30,
   max_trade_requests: 4,
-  win_points: 10,
   alert_time: 3,
   largest_army_count: 3,
   longest_road_count: 5,
   mapkey: DEFAULT_MAPKEY,
-  /** @type {false|'all'|'number'|'port'|'tile'|'(combo of the 3)'} */
+  /** @type {false|'none'|'all'|'number'|'port'|'tile'|'(combo of number-port-tile)'} */
   map_shuffle: 'all',
 }
 

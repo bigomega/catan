@@ -73,7 +73,7 @@ export default class AlertUI {
   alertStrategy(t) { this.bigAlert(MSG.STRATEGIZE.all(t)) }
   alertFullScreen() {
     const _tmp = this.#alert_time
-    this.#alert_time = 5000
+    this.#alert_time = 7
     this.bigAlert(MSG.FULL_SCREEN.all(), true)
     this.#alert_time = _tmp
   }

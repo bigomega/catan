@@ -26,7 +26,7 @@ export default class BoardShuffler {
     })
   }
 
-  /** @param {false|'all'|'number'|'port'|'tile'|'(combo of the 3)'} type  */
+  /** @param {false|'none'|'all'|'number'|'port'|'tile'|'(combo of number-port-tile)'} type  */
   shuffle(type) {
     if (!type || type === 'none') { return this.toMapKey() }
     type = type + ''

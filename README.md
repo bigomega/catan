@@ -7,14 +7,28 @@ npm i
 npm start
 ```
 The server will be reachable at [localhost:3000](http://localhost:3000/). You're now ready to play the game…
-> Note: I have an `.nvmrc` pointing to node version `v20.10`. Please use at least `v18` and above…
->
-> `.findLastIndex()` was added then.
+> I have an `.nvmrc` pointing to node version `v20.10`. Please use at least `v18` and above…
+
+## Future Ideas
+- Browser Notifications
+- Optimization (memory[^1], speed, colors)
+- Join random games
+  - Private & public games
+- Watch games
+- Custom map builder
+- Rethink ports
+  - multiple in single Sea tile
+  - disallow connected edges of land being added as ports
+- Introducing 8 player maps
+- Social login (w pic and/or just a name/id)
+- Discord help (for talking)
+- Seafarers expansion (fairly easy one)
+- Trade negotiations
 
 ## MapKey
 ### Rules
-- The map is decoded from **left to right** and **top to bottom**.
-- Each `row` is seperated by a `+` or `-` representing its first-tile relationship (bottom-left and bottom-right respectively) to the first-tile of the previous row.
+- The map is decoded from **left-to-right** and **top-to-bottom**.
+- Each `row` is seperated by a `-` or `+` representing its first-tile relationship to the first-tile of the previous row. `-` makes it bottom-left and `+` for bottom-right.
   ```
   <row> -<row>
   +<row>
@@ -27,14 +41,18 @@ The server will be reachable at [localhost:3000](http://localhost:3000/). You're
   ```
 - A Resource tile is represented by its key and `Number` next to each other. `<TileKey><Number>`
 - A Sea tile (represented by `S`) can optionally have one trade. `S(<Trade>)?`
-- A `Trade` is represented by its edge `TradeEdge` (of the Sea tile it's on), type `TradeType` and a number `TradeRatio` covered by `()`(round braces) and split by `_`(underscore). `(<TradeEdge>_<TradeType><TradeRatio>)`
+- A `Trade` is represented by its edge `TradeEdge` (of the Sea tile it's on), type `TradeType` and a number `TradeRatio` covered by `()`(round braces) and split by `_`(underscore).
+  ```
+  (<TradeEdge>_<TradeType><TradeRatio>)
+  ```
 - Surrounding your land with the sea is not necessary but recommended.
+- The robber will be placed in the last desert found during decoding.
 
 #### Keys
 ```js
 const TileKey = { G: 'Grassland', J: 'Jungle', C: 'Clay Pit', M: 'Mountain', F: 'Fields', S: 'Sea', D: 'Desert' }
 
-const Number = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+const Number = [2, 3, 4, 5, 6, 8, 9, 10, 11, 12]
 
 const tradeEdge = {
               tl: 'top_left',     tr: 'top_right',
@@ -50,18 +68,20 @@ const tradeRatio = [2, 3]
 #### Example
 This configuration…
 ```js
-const config ={
+const config = {
   mapkey: `
-                  S  .S(bl_O2)    .S(br_O2)    .S
-                -S .M8         .D          .M8   .S
-              -S .G9    .S           .S       .G9  .S
-            -S .F10 .S         .S          .S    .F10.S
-          -S  .S .C11   .S           .S       .C12 .S  .S
-        -S  .S .S   .C2        .S          .C3   .S  .S  .S
-  -S(r_L2).J6.J5 .J4    .S           .S       .J4  .J5 .J6.S(l_L2)
-        +S  .S .S   .S         .S          .S    .S  .S  .S
-`
+                        S  .S(bl_O2)    .S(br_O2)    .S
+                      -S .M8         .D          .M8   .S
+                    -S .G9    .S           .S       .G9  .S
+                  -S .F10 .S         .S          .S    .F10.S
+                -S  .S .C11   .S           .S       .C12 .S  .S
+              -S  .S .S   .C2        .S          .C3   .S  .S  .S
+        -S(r_L2).J6.J5 .J4    .S           .S       .J4  .J5 .J6 .S(l_L2)
+              +S  .S .S   .S         .S          .S    .S  .S  .S
+  `
 }
+// Same as writing…
+config.mapkey = `S.S(bl_O2).S(br_O2).S-S.M8.D.M8.S-S.G9.S.S.G9.S-S.F10.S.S.S.F10.S-S.S.C11.S.S.C12.S.S-S.S.S.C2.S.C3.S.S.S-S(r_L2).J6.J5.J4.S.S.J4.J5.J6.S(l_L2)+S.S.S.S.S.S.S.S.S`
 ```
 Renders the map…
 <img width="900" alt="Screenshot 2024-02-04 at 11 46 20 copy" src="https://github.com/bigomega/catan/assets/2320747/7449040b-2f77-4ba1-beeb-a648af4dea05">
@@ -77,7 +97,7 @@ Renders the map…
   - [Mustache](https://mustache.github.io/) for rendering JSON data in HTML
   - [nodemon](https://nodemon.io/) for ease of development
   - [random-words](https://github.com/apostrophecms/random-words) for generating game-keys
-  - [cookie-parser](https://github.com/expressjs/cookie-parser)
+  - [cookie-parser](https://github.com/expressjs/cookie-parser) for 🤷🏻‍♂️
 
 ## Status
 ### In Progress
@@ -118,23 +138,8 @@ Renders the map…
   - [x] ~~Login Page~~
   - [x] ~~Simple Server~~
   - [x] ~~Decoding the map from key~~
-### Next Steps
-  - [ ] Browser Notifications
-  - [ ] Optimization (memory, speed, colors) ([#ref](https://www.ditdot.hr/en/causes-of-memory-leaks-in-javascript-and-how-to-avoid-them))
-  - [ ] Trade negotiations
-  - [ ] Join random games
-    - Private & public game
-  - [ ] Watch games
 
 ### Bugs
   - [x] ~~Road into the Sea~~
 
-## Future Ideas
-- Custom map builder
-- Rethink ports
-  - multiple in single Sea tile
-  - disallow connected edges of land being added as ports
-- Introducing 8 player maps
-- Social login (w pic and/or just a name/id)
-- Discord help (for talking)
-- Seafarers expansion (fairly easy one)
+[^1]: https://www.ditdot.hr/en/causes-of-memory-leaks-in-javascript-and-how-to-avoid-them
