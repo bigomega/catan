@@ -6,6 +6,10 @@ Free to play multiplayer catan style board game
 npm i
 npm start
 ```
+The server will be reachable at [localhost:3000](http://localhost:3000/). You're now ready to play the game…
+> Note: I have an `.nvmrc` pointing to node version `v20.10`. Please use at least `v18` and above…
+>
+> `.findLastIndex()` was added then.
 
 ## MapKey
 ### Rules
@@ -17,7 +21,7 @@ npm start
   -  <row>
   ```
 - There can by any amount of `\s`(space) and `\n`(newline) inbetween the rows and tiles. They are ignored by `.trim()`.
-- Each `Tile` is separated by a `.`(dot) 
+- Each `Tile` is separated by a `.`(dot)
   ```
   <Tile> .<Tile> .   <Tile>
   ```
@@ -64,7 +68,7 @@ Renders the map…
 
 
 ## Frameworks
-### Major 
+### Major
   - **[ExpressJS](https://expressjs.com/)** for HTTP server
   - **[Socket.io](https://socket.io/)** for WebSocket radio
   - **[VanillaJS](http://vanilla-js.com/)** for Frontend UI
@@ -127,6 +131,9 @@ Renders the map…
 
 ## Future Ideas
 - Custom map builder
+- Rethink ports
+  - multiple in single Sea tile
+  - disallow connected edges of land being added as ports
 - Introducing 8 player maps
 - Social login (w pic and/or just a name/id)
 - Discord help (for talking)

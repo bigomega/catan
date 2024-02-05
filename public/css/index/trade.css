@@ -67,7 +67,7 @@
         .giving { background: color-mix(in srgb, var(--trade-positive) 30%, transparent); }
         .asking { background: color-mix(in srgb, var(--trade-negative) 30%, transparent); }
         .asking.disabled {
-          cursor: not-allowed; color: #000c;
+          cursor: not-allowed; color: #0009;
           filter: contrast(0.5) brightness(1.3) grayscale(1);
           .res-icon { filter: contrast(2); }
         }
