@@ -7,7 +7,7 @@ export const resToText = obj => Object.keys(obj).filter(k => obj[k])
 
 const GAME_MESSAGES = {
   STRATEGIZE: { all: t => `You have <b>${t}</b> seconds to Strategize!` },
-  FULL_SCREEN: { all: _ => `Press (f) or <b style="cursor: pointer;">Click Here</b> to go Full Screen 📺.<br><small>You also can press (m) for background music. Press (?) to learn about all the shortcuts.<small>` },
+  FULL_SCREEN: { all: _ => `Press (f) or <b style="cursor: pointer;">Click Here</b> to go Full Screen 📺.<br><small>You can press (m) for background music and (?) to learn about all the shortcuts.<small>` },
   INITIAL_BUILD: {
     self: _ => `Build your first Settlement and Road.`,
     other: p => `${getName(p)} is building their first Settlement and Road.`,

@@ -56,8 +56,8 @@ export default class AccessibilityUI {
             </button>` : ''}
       </div>
       ${this.#shown_icons.shorcuts ? `<button class="icon question-mark" title="Keyboard Shortcuts (?)">?</button>` : ''}
-      ${this.#shown_icons.quit ? `<button class="icon quit" title="Quit Game"><b></b></button>` : ''}<!-- ⦿◎◉●◦◦⚬☉ -->
       ${this.#shown_icons.info ? `<button class="icon info" title="About">ℹ</button>` : ''}
+      ${this.#shown_icons.quit ? `<button class="icon quit" title="Quit Game"><b></b></button>` : ''}<!-- ⦿◎◉●◦◦⚬☉ -->
       ${this.#shown_icons.shorcuts ? `
         <div class="keyboard-shortcuts hide">${this.keyboard_shortcuts.map(group =>
           `<div class="shortcuts-container">${group.map(([title, shortcut]) =>

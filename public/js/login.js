@@ -18,6 +18,7 @@ class LoginUI {
   }
 
   render() {
+    const name = localStorage.getItem('player-name') || ''
     this.accessibility_ui.render()
     this.$container.innerHTML = `
       <div class="action-types">
@@ -27,7 +28,7 @@ class LoginUI {
       </div>
       <div class="action-container">
         <div class="section host-section">
-          <input type="text" class="name" name="name" placeholder="Your Name"/>
+          <input type="text" class="name" name="name" placeholder="Your Name" value="${name}"/>
           <div class="players-count-container">${[...Array(3).keys()].map(i => `
             <label class="player-count-${i + 2}" title="${i + 2} players">
               <div class="text">${i + 2}</div>
@@ -42,7 +43,7 @@ class LoginUI {
           <button class="submit host">Start Game</button>
         </div>
         <div class="section join-section">
-          <input type="text" class="name" name="name" placeholder="Your Name"/>
+          <input type="text" class="name" name="name" placeholder="Your Name" value="${name}"/>
           <input type="text" class="game-key" name="game_id" placeholder="Game Key"/>
           <button class="submit join">Join Game</button>
         </div>
@@ -91,6 +92,10 @@ class LoginUI {
         e.preventDefault()
       }
     })
+
+    this.$container.querySelectorAll('.name').forEach($_ => $_.addEventListener('keydown', e => {
+      localStorage.setItem('player-name', e.target.value)
+    }))
   }
 }
 

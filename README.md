@@ -144,11 +144,14 @@ Renders the map…
 
 ### Feedback
   - [ ] Initial build - show the built house
-  - [ ] Resource animation after dice animation
+  - [ ] ~~Resource animation after dice animation~~
   - [x] Music reminder
   - [x] Can play DC after dice, update text
   - [ ] Trade denied/accepted message
-  - [ ] Remember player name
+  - [x] Remember player name
   - [ ] Timer focus when few seconds left
+  - [ ] Game end, new game link
+  - [ ] Login splash image quick load
+  - [ ] larger screen number fix
 
 [^1]: https://www.ditdot.hr/en/causes-of-memory-leaks-in-javascript-and-how-to-avoid-them
