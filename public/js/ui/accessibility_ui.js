@@ -1,7 +1,8 @@
 const _dummyFn = _ => _
 export default class AccessibilityUI {
   #shown_icons
-  muted = !!+localStorage.getItem('mute')
+  muted = true
+  // muted = !!+localStorage.getItem('mute')
   muted_notif = !!+localStorage.getItem('mute-notifications')
   #toggleBoardZoom; #toggleBgm; #toggleNotificationsAudio
   $el = document.querySelector('#game > .accessibility-zone')
@@ -149,7 +150,7 @@ export default class AccessibilityUI {
     if (!this.#shown_icons.bgm) return
     if (document.querySelector('input[type="text"]:focus')) return
     this.muted = !this.muted
-    localStorage.setItem('mute', +this.muted)
+    // localStorage.setItem('mute', +this.muted)
     this.#toggleBgm(!this.muted)
     this.$el.querySelector('.bgm').classList[this.muted ? 'add' : 'remove']('off')
     this.$el.querySelector('.bgm').setAttribute('title', (this.muted ? 'Unm' : 'M')+'ute Background Music (m)')

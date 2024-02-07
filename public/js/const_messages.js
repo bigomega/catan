@@ -17,7 +17,7 @@ const GAME_MESSAGES = {
     other: p => `${getName(p)} is building their second Settlement and Road.`,
   },
   ROLL_TURN: {
-    self: _ => `Roll your Dice 🎲🎲<br><small>You can optionally play a development card before.</small>`,
+    self: _ => `Roll your Dice 🎲🎲<br><small>You are allowed to play a development card before and after rolling.</small>`,
     other: p => `${getName(p)} is rolling 🎲🎲`,
   },
   // PLAYER_TURN: {

@@ -142,4 +142,12 @@ Renders the map…
 ### Bugs
   - [x] ~~Road into the Sea~~
 
+### Feedback
+  - [ ] Initial build - show the built house
+  - [ ] Resource animation after dice animation
+  - [x] Can play DC after dice, update
+  - [ ] Trade denied/accepted message
+  - [ ] Remember player name
+  - [ ] Timer focus when few seconds left
+
 [^1]: https://www.ditdot.hr/en/causes-of-memory-leaks-in-javascript-and-how-to-avoid-them
