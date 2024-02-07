@@ -145,7 +145,8 @@ Renders the map…
 ### Feedback
   - [ ] Initial build - show the built house
   - [ ] Resource animation after dice animation
-  - [x] Can play DC after dice, update
+  - [x] Music reminder
+  - [x] Can play DC after dice, update text
   - [ ] Trade denied/accepted message
   - [ ] Remember player name
   - [ ] Timer focus when few seconds left

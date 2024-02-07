@@ -7,7 +7,7 @@ export const resToText = obj => Object.keys(obj).filter(k => obj[k])
 
 const GAME_MESSAGES = {
   STRATEGIZE: { all: t => `You have <b>${t}</b> seconds to Strategize!` },
-  FULL_SCREEN: { all: _ => `Press (f) or <b style="cursor: pointer;">Click Here</b> to go Full Screen 📺.` },
+  FULL_SCREEN: { all: _ => `Press (f) or <b style="cursor: pointer;">Click Here</b> to go Full Screen 📺.<br><small>You also can press (m) for background music. Press (?) to learn about all the shortcuts.<small>` },
   INITIAL_BUILD: {
     self: _ => `Build your first Settlement and Road.`,
     other: p => `${getName(p)} is building their first Settlement and Road.`,
@@ -58,11 +58,11 @@ const GAME_MESSAGES = {
   PLAYER_STOLE_RES: { all: (p2, res) => ` Stole ${res ? `1<div class="res-icon ${res}"></div>` : 'a resource '}from ${getName(p2)}.` },
   PLAYER_TRADE_INFO: { all: ({ p1, p2, board }, given, taken) => `<b>Trade:</b> ${getName(p1)} gave ${resToText(given)} to ${board ? 'the board' : getName(p2)} and took ${resToText(taken)}.` },
   KNIGHT_USED_APPEND: { all: _ => ' - Using ⚔️ "Knight" card.' },
-  ROAD_BUILDING_USED: { all: p => `${getName(p)} used "Road Building" and built 2 roads.` },
-  MONOPOLY_USED: { all: (p, res, total, self_c) => `${getName(p)} used "Monopoly" and collected ${total ? resToText({ [res]: total }) + 'from everyone.' + (p ? ` (${self_c} from you).` : '') : 'NOTHING from anyone.'}` },
-  YEAR_OF_PLENTY_USED: { all: (p, res_obj) => `${getName(p)} used "Year of Plenty" and took ${p ? '2 resources' : resToText(res_obj)}.` },
-  LARGEST_ARMY: { all: (p, c) => `⚔️ ${getName(p)} took over the "Largest Army" with <b>${c} Knights</b> ⚔️` },
-  LONGEST_ROAD: { all: (p, l) => `👣 ${getName(p)} took over the "Longest Road" with <b>${l} Roads</b> 🐾` },
+  ROAD_BUILDING_USED: { all: p => `${getName(p)} used <b>"Road Building"<b> and built 2 roads.` },
+  MONOPOLY_USED: { all: (p, res, total, self_c) => `${getName(p)} used <b>"Monopoly"</b> and collected ${total ? resToText({ [res]: total }) + 'from everyone.' + (p ? ` (${self_c} from you).` : '') : 'NOTHING from anyone.'}` },
+  YEAR_OF_PLENTY_USED: { all: (p, res_obj) => `${getName(p)} used <b>"Year of Plenty"</b> and took ${p ? '2 resources' : resToText(res_obj)}.` },
+  LARGEST_ARMY: { all: (p, c) => `⚔️ ${getName(p)} took over the <b>"Largest Army"</b> with <b>${c} Knights</b> ⚔️` },
+  LONGEST_ROAD: { all: (p, l) => `👣 ${getName(p)} took over the <b>"Longest Road"</b> with <b>${l} Roads</b> 🐾` },
   PLAYER_QUIT: { all: (p, end) => `🏃 ${getName(p)} has QUIT the game!!!${end ? ' The game has ended. <a href="/">New Game</a>' : ''}` },
   END_STATUS: { all: (p, pt) => `🏆 ${getName(p)} won with <b>${pt} V</b>ictory <b>P</b>oints.` },
 }

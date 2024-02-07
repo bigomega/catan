@@ -43,7 +43,7 @@
     .title-emoji { font-size: 2em; }
     .player-name {
       border-radius: 100px; width: fit-content;
-      margin: 0 auto; padding: 10px 30px 0; text-shadow: none;
+      margin: 0 auto 20px; padding: 10px 30px 0; text-shadow: none;
     }
     small { display: flex; flex-direction: column; flex-wrap: wrap; align-content: center; }
     .pts { line-height: 3em; text-align: left; }
