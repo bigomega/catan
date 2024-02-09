@@ -59,6 +59,7 @@ button {
   .beach-1 { background-image: url(/catan/images/beach-1.png); }
   .beach-2 { background-image: url(/catan/images/beach-2.png); }
   .beach-3 { background-image: url(/catan/images/beach-3.png); }
+  .trade-post { background-image: url(/catan/images/trade/Dock.png); }
 }
 
 #shuffler {

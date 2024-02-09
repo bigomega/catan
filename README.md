@@ -112,7 +112,7 @@ Renders the map…
   - [x] ~~Shuffler~~
   - [x] ~~Longest Road & Largest Army~~
   - [x] ~~Animations (DC, Cost, Build, Dice, Hand)~~
-  - [x] Dev Card Actions
+  - [x] ~~Dev Card Actions~~
   - [x] ~~Trade~~
   - [x] ~~Keyboard Shortcuts~~
   - [x] ~~Client Refactor~~
