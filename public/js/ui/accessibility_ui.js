@@ -165,7 +165,10 @@ export default class AccessibilityUI {
     this.$el.querySelector('.notifications').setAttribute('title', (this.muted_notif ? 'Unm' : 'M') + 'ute Notifications (n)')
   }
 
-  toggleZoom(out) { this.#shown_icons.zoom && this.#toggleBoardZoom(out) }
+  toggleZoom(out) {
+    if (document.querySelector('textarea:focus')) return
+    this.#shown_icons.zoom && this.#toggleBoardZoom(out)
+  }
 
   showHideKeyboardShortcuts(show) {
     this.#shown_icons.shorcuts

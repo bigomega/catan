@@ -1,0 +1,109 @@
+@import "/catan/css/index/accessibility.css";
+@import "/catan/css/index/board.css";
+@import "/catan/css/constants.css";
+
+@font-face { font-family: Papyrus; src: url(/catan/css/fonts/Papyrus.ttf); }
+@font-face { font-family: EagleLake; src: url(/catan/css/fonts/EagleLake-Regular.ttf); }
+@font-face { font-family: Raleway; src: url(/catan/css/fonts/Raleway-Light.ttf); font-weight: 200; }
+@font-face { font-family: Raleway; src: url(/catan/css/fonts/Raleway-Regular.ttf); }
+@font-face { font-family: Raleway; src: url(/catan/css/fonts/Raleway-Bold.ttf); font-weight: 600; }
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: var(--water-color);
+  font-family: Raleway, sans-serif;
+  letter-spacing: .2px;
+}
+
+button {
+  display: block;
+  background: none; color: inherit; border: none;
+  font: inherit; cursor: pointer;
+  outline: inherit; appearance: unset;
+  padding: 0; padding-block: 0px; padding-inline: 0px;
+}
+
+#game > .accessibility-zone .info-zone .play-full-game {
+  font-family: EagleLake; font-size: 2em;
+  text-align: center; margin: 10px 0 30px;
+  a {
+    color: inherit; text-shadow: 0 0 20px #8fc045, 0 0 10px #8fc045, 0 0 5px #8fc045, 0 0 3px #8fc045, 0 0 1px #8fc045, 0 0 1px #8fc045, 0 0 1px #8fc045, 0 0 1px #8fc045;
+    &:hover { color: #fff; }
+  }
+}
+
+#game>.accessibility-zone .info-zone .container .text-container .subtitle .social-icon {
+  background-image: url(/catan/images/social-icons.png);
+}
+
+.board .tile {
+  &.robbed::before {
+    background-image: url(/catan/images/robber.png);
+    left: 53px; top: 30px; height: 90px; width: 47px;
+  }
+  &.G .background { background-image: url('/catan/images/tiles/Grassland.png'); }
+  &.J .background { background-image: url('/catan/images/tiles/Jungle.png'); }
+  &.C .background { background-image: url('/catan/images/tiles/Clay Pit.png'); }
+  &.M .background { background-image: url('/catan/images/tiles/Mountain.png'); }
+  &.F .background { background-image: url('/catan/images/tiles/Fields.png'); }
+  &.D .background { background-image: url('/catan/images/tiles/Desert.png'); }
+  &.S .background { background-image: url('/catan/images/tiles/Sea.png'); }
+  &.S[data-trade="B"]::after { background-image: url(/catan/images/trade/Brick.png); }
+  &.S[data-trade="L"]::after { background-image: url(/catan/images/trade/Lumber.png); }
+  &.S[data-trade="O"]::after { background-image: url(/catan/images/trade/Ore.png); }
+  &.S[data-trade="S"]::after { background-image: url(/catan/images/trade/Sheep.png); }
+  &.S[data-trade="W"]::after { background-image: url(/catan/images/trade/Wheat.png); }
+  &.S[data-trade="*"]::after { background-image: url(/catan/images/trade/*3.png); }
+  .beach-1 { background-image: url(/catan/images/beach-1.png); }
+  .beach-2 { background-image: url(/catan/images/beach-2.png); }
+  .beach-3 { background-image: url(/catan/images/beach-3.png); }
+}
+
+#shuffler {
+  position: fixed; right: 0; top: 0;
+  width: 280px; padding: 10px 30px 30px; box-sizing: border-box;
+  background: var(--sand-color); color: #333;
+  filter: drop-shadow(0px 0px 30px #000);
+  border-bottom-left-radius: 30px;
+
+  > .title { font-size: 1.2em; margin-bottom: 10px; opacity: 0.5; }
+  > label {
+    display: block; cursor: pointer; margin: 10px 0;
+    &:has(input:not(:checked)) { opacity: 0.5; }
+    &:hover { opacity: 1 !important; color: var(--sand-color-text-dark); }
+  }
+  > textarea { width: 100%; min-height: 115px;}
+  button {
+    padding: 7px 25px; width: fit-content;
+    box-sizing: border-box; font-family: inherit;
+    border: 2px solid; border-radius: 50px;
+    text-align: center;
+    background: #333; color: var(--sand-color);
+    font-size: 1.2em; font-weight: bold; word-spacing: 5px;
+    transition: all .25s ease; display: inline-block;
+
+    &:active { background: #000; }
+    &:hover, &:focus { box-shadow: 0 0 10px 0px var(--sand-color), 0 0 20px 0px #333; }
+
+    &.secondary {
+      padding: 5px 15px; font-size: 1em;
+      color: var(--sand-color-text-dark); background: transparent;
+      &:active { background: var(--sand-color-text-dark); color: var(--sand-color); }
+    }
+
+    &.shuffle { margin: 20px 0 15px ; display: block; font-family: EagleLake; }
+    &.reset { margin: 0 10px 10px 0;}
+    /* &.reset { margin-left: 10px; margin-bottom: 20px; } */
+    &.copy {
+      &::before { content: 'Share'; }
+      &.copied {
+        transition: none; font-family: Raleway;
+        opacity: 0.5; color: #333;
+        &::before { content: 'Link Copied…'; }
+      }
+    }
+    &.render { margin: 20px 10px 0 0; }
+  }
+}

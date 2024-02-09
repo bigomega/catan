@@ -45,7 +45,7 @@ The server will be reachable at [localhost:3000](http://localhost:3000/). You're
   ```
   (<TradeEdge>_<TradeType><TradeRatio>)
   ```
-- Surrounding your land with the sea is not necessary but recommended.
+- Surrounding your land with the sea is not necessary but recommended to get the beautiful sea shores.
 - The robber will be placed in the last desert found during decoding.
 
 #### Keys
