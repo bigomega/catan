@@ -1,0 +1,265 @@
+.animation-zone, .resource-animation-zone {
+  z-index: -1; opacity: 0;
+  transition: opacity .15s linear, z-index 0s linear;
+
+  &.ready {
+    position: fixed; top: 0; left: 0;
+    z-index: 25; opacity: 1;
+    width: 100%; height: 100%;
+  }
+
+  &.end {
+    opacity: 0 !important; z-index: -1 !important;
+    transition: opacity .15s linear, z-index 0s .15s linear !important;
+  }
+}
+.resource-animation-zone.ready { z-index: 0; }
+
+/* Dice Roll */
+.animation-zone.dice-roll-animation {
+  background: color-mix(in srgb, #3a3527 80%, transparent);
+  display: flex; justify-content: center; align-items: center;
+  &.start { opacity: 0; z-index: -1; transition: opacity .15s 1.5s linear, z-index 0s 1.65s linear; }
+
+  .dice-animation {
+    background-image: url(/images/dice-1-animation.gif);
+    background-size: contain;
+    width: 560px; height: 290px;
+    position: absolute; margin-top: -80px; visibility: hidden;
+  }
+  &.start .dice-animation { visibility: visible; opacity: 0; transition: opacity .25s .75s linear; }
+
+  /* https: //dev.to/ekeijl/creating-dice-using-css-grid-j4 */
+  .dice {
+    display: grid;
+    grid-template-areas:
+      "a . c"
+      "e g f"
+      "d . b";
+    flex: 0 0 auto; padding: 10px;
+    width: 104px; height: 104px;
+    background-color: #e7e7e7;
+    border-radius: 10%;
+    box-shadow: inset 0 5px white, inset 0 -5px #bbb, inset 5px 0 #d7d7d7, inset -5px 0 #d7d7d7, 0px 10px 0px 0px #000;
+    opacity: 0;
+    &.d1 { margin-left: 20px; }
+    &.d2 { margin-left: 160px; }
+  }
+  &.start .dice { opacity: 1; transition: opacity .5s .5s linear; }
+
+  .pip {
+    display: block;
+    align-self: center;
+    justify-self: center;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background-color: #333;
+    box-shadow: inset 0 3px #111, inset 0 -3px #555;
+    &:only-child { background-color: #e62527; box-shadow: inset 0 3px #760001, inset 0 -3px #f56c6d; }
+    &:nth-child(2) { grid-area: b }
+    &:nth-child(3) { grid-area: c; }
+    &:nth-child(4) { grid-area: d; }
+    &:nth-child(5) { grid-area: e; }
+    &:nth-child(6) { grid-area: f; }
+    &:nth-child(odd):last-child { grid-area: g; }
+  }
+}
+
+/* Resource taken */
+.resource-animation-zone.resources-animation {
+  display: flex; justify-content: center; align-items: center;
+  &.start { opacity: 0; z-index: -1; transition: opacity .15s .5s linear, z-index 0s .65s linear; }
+
+  .container {
+    transition: margin .5s cubic-bezier(1, 0.02, 1, 0.07), width .5s cubic-bezier(0.83, 0.16, 0.99, 0.41), opacity .15s ease;
+    width: 100px; margin-top: -20%;
+    display: flex; justify-content: center; opacity: 0;
+  }
+  &.start .container { opacity: 1; margin-top: 100%; width: 100%; justify-content: space-around; }
+
+  .res-circle {
+    width: 35px; height: 35px; box-sizing: border-box;
+    border: 1px solid var(--sand-color-dark); border-radius: 100px;
+    background: #e8d49c;
+    display: flex; justify-content: center; align-items: center;
+    transform: scale(.5);
+    transition: all .5s ease-in;
+    .res-icon {
+      margin: 0;
+      &.dK, &.dM, &.dY, &.dR, &.dVp {
+        width: 30px; height: 30px; border-radius: 30px;
+        background: url(/images/cards_sprite.png) -314px -460px/1047px no-repeat;
+      }
+      &.dK { background-position: -280px -14px; background-size: 321px; }
+      &.dR { background-position: -9px -78px; background-size: 301px; }
+      &.dM { background-position: -51px -71px; background-size: 290px; }
+      &.dY { background-position: -97px -75px; background-size: 301px; }
+      &.dVp { background-position: -96px -139px; background-size: 301px; }
+    }
+  }
+  &.start .res-circle { transform: scale(4); }
+}
+
+/* Development Card - Intro & Outro */
+.animation-zone.dev-c-animation {
+  background: color-mix(in srgb, #3a3527 80%, transparent);
+  display: flex; flex-direction: column; justify-content: flex-start; align-items: center;
+  perspective: 300px;
+
+  .card-container {
+    width: 196px; height: 302px; margin-top: 61px; margin-left: 2px;
+    perspective: 300px;
+  }
+
+  .card {
+    width: 100%; height: 100%;
+    box-shadow: 0 0 15px 0 #000c;
+    background-color: #ebd290; overflow: hidden;
+    position: relative; border-radius: 15px; perspective: 10000px;
+
+    &::before {
+      content: ''; width: 100%; height: 100%; position: absolute;
+      background-image: url(/images/cards_sprite.png);
+    }
+
+    &.dK::before { background-size: 1640px; background-position: -1409px -29px; transform: rotateZ(-1deg); }
+    &.dR::before { background-size: 1570px; transform: rotateX(-5deg) rotateY(-15deg) rotateZ(-1deg); background-position: -29px -359px; }
+    &.dY::before { background-size: 1550px; background-position: -478px -346px; transform: rotateZ(-1deg); }
+    &.dM::before { background-size: 1550px; background-position: -257px -344px; transform: rotateX(-5deg) rotateY(-10deg) rotateZ(0deg); }
+    &.dVp::before { background-size: 1520px; background-position: -461px -668px; transform: rotateX(-12deg) rotateY(-4deg) rotateZ(1deg); }
+    &.dR { background-color: #dbbe6a; }
+    &.dVp { background-color: #cfaf5d; }
+  }
+
+  &.start { opacity: 0; z-index: -1; }
+
+  &.out {
+    transition: none;
+    .card {
+      box-shadow: 0px 5px 0 -2px #5a460e, 0px 65px 20px -30px #000;
+      transform: rotateX(50deg); /* translate3d(0px, -54px, -116px); */
+      transform-origin: center; transition: all .25s linear;
+    }
+    &.start { transition: opacity .15s .25s linear, z-index 0s .4s linear; }
+    &.start .card {
+      transform: rotateX(65deg) translate3d(0px, -1000px, -20px);
+      transform-origin: top center;
+    }
+  }
+
+  &.in {
+    .card {
+      transform: rotateX(65deg) translate3d(0px, -500px, 300px);
+      transform-origin: bottom center; transition: all .25s linear;
+    }
+    &.start { transition: opacity .15s 1.75s linear, z-index 0s 1.9s linear; }
+    &.start .card {
+      transform: rotateX(0deg) translate3d(0px, 50px, 0px);
+    }
+  }
+}
+
+/* Largest Army */
+.animation-zone.largest-army-animation {
+  background: color-mix(in srgb, #3a3527 80%, transparent);
+  display: flex; flex-direction: column; justify-content: flex-start; align-items: center;
+
+  .title {
+    color: #fff; background: var(--sand-color-dark);
+    font-size: 1.2em;
+    width: 100%; padding: 10px;
+    text-align: center; border-bottom: 2px solid;
+
+    &.p1 { background-color: var(--player-1-color); }
+    &.p2 { background-color: var(--player-2-color); }
+    &.p3 { background-color: var(--player-3-color); }
+    &.p4 { background-color: var(--player-4-color); }
+  }
+
+  .container {
+    margin-top: 50px; position: relative;
+
+    .largest-army-card {
+      height: 210px;
+      width: 327px; position: relative;
+      border: 1px solid; border-radius: 10px;
+      background: #c8b66d url(/images/extra-vps-sprite.png) -23px -146px/700px no-repeat;
+      box-shadow: 5px 5px 15px 0px #000; opacity: 0;
+    }
+
+    .knight {
+      width: 92px; height: 139px;
+      position: absolute;
+      background-color: #dabd63;
+      border-radius: 5px; overflow: hidden;
+      box-shadow: 0px 0px 5px 2px #000;
+      opacity: 0;
+      &::before {
+        content: ''; width: 100%; height: 100%; display: block;
+        background-image: url(/images/cards_sprite.png);
+      }
+
+      &.first { top: 54px; left: 72px; transform: rotate(-15deg) scale(1.1); }
+      &.first::before {
+        background-size: 755px; background-position: -546px -177px; transform: rotateZ(-2deg) rotateY(10deg) rotateX(-5deg);
+      }
+      &.second { top: 47px; left: 148px; transform: scale(1.1); }
+      &.second::before {
+        background-size: 752px; background-position: -643px -181px; transform: rotateZ(-2deg) rotateY(0deg) rotateX(1deg);
+      }
+      &.third { top: 60px; left: 226px; transform: rotate(15deg) scale(1.1); }
+      &.third::before {
+        background-size: 752px; background-position: -338px -170px; transform: rotateZ(-1deg) rotateY(0deg) rotateX(0deg);
+      }
+    }
+  }
+
+  &.start .knight.third { opacity: 1; transition: opacity .25s linear; }
+  &.start .knight.second { opacity: 1; transition: opacity .25s .25s linear; }
+  &.start .knight.first { opacity: 1; transition: opacity .25s .5s linear; }
+
+  &.finish .largest-army-card { opacity: 1; height: 403px; transition: opacity .25s ease-in, height .25s 1s ease-in; }
+  &.finish .knight.third { opacity: 0; transition: opacity .25s .25s linear; }
+  &.finish .knight.second { opacity: 0; transition: opacity .25s .25s linear; }
+  &.finish .knight.first { opacity: 0; transition: opacity .25s .25s linear; }
+  &.finish {
+    opacity: 0; z-index: -1;
+    transition: opacity .15s linear 5s, z-index 0s 5.15s linear;
+  }
+}
+
+/* Longest Road */
+.animation-zone.longest-road-animation {
+  background: color-mix(in srgb, #3a3527 80%, transparent);
+  display: flex; flex-direction: column; justify-content: flex-start; align-items: center;
+  transition: opacity .5s ease-out, z-index 0s linear;
+
+  .title {
+    color: #fff; background: var(--sand-color-dark);
+    font-size: 1.2em;
+    width: 100%; padding: 10px;
+    text-align: center; border-bottom: 2px solid;
+
+    &.p1 { background-color: var(--player-1-color); }
+    &.p2 { background-color: var(--player-2-color); }
+    &.p3 { background-color: var(--player-3-color); }
+    &.p4 { background-color: var(--player-4-color); }
+  }
+
+  .container {
+    margin-top: 50px; position: relative;
+
+    .longest-road-card {
+      height: 402px;
+      width: 327px; position: relative;
+      border: 1px solid; border-radius: 10px;
+      background: #c8b66d url(/images/extra-vps-sprite.png) -353px -152px/700px no-repeat;
+      box-shadow: 5px 5px 15px 0px #000;
+    }
+  }
+
+  &.start {
+    opacity: 0; z-index: -1;
+    transition: opacity .15s linear 0s, z-index 0s 0.15s linear;
+  }
+}

@@ -1,0 +1,125 @@
+#game > .resouce-selection-zone {
+  position: fixed; top: 0; left: 0px;
+  display: flex; flex-direction: column; align-items: center;
+  width: 100%;
+  background: color-mix(in srgb, var(--sand-color) 80%, transparent);
+  padding: 0 20px 0;
+  border-bottom: 5px solid var(--sand-color-dark);
+  box-sizing: border-box;
+  box-shadow: 0 0px 15px 0px #000;
+  font-family: Raleway, sans-serif;
+  &.hide { display: none; }
+
+  .title {
+    color: var(--sand-color-text-dark);
+    font-size: 1.5em; text-align: center; font-weight: 200;
+    padding: 10px 20px 8px; margin-bottom: 20px;
+    background-color: var(--sand-color); width: 100%;
+  }
+
+  .content {
+    display: flex; justify-content: center;
+  }
+
+  .card-area {
+    display: flex; flex-wrap: wrap; justify-content: center;
+
+    .card {
+      position: relative; width: 140px; height: 212px;
+      cursor: pointer;
+      border-radius: 20px; border: 5px dashed #6c5d46;
+      margin-right: 20px; margin-bottom: 20px;
+      &:not([data-count="0"]) { border-color: transparent; }
+
+      &::before {
+        content: '';
+        width: 100%; height: 100%;
+        display: block;
+        background-image: url(/images/cards_sprite.png);
+        background-color: #ebd290;
+        border-radius: 15px;
+        /* filter: blur(3px) sepia(0.2); */
+        /* filter: blur(3px) sepia(0.5) brightness(0.7); */
+        filter: brightness(0.4) sepia(1);
+        transition: all .15s linear;
+      }
+      &:not([data-count="0"])::before {
+        filter: none; box-shadow: 0px 0px 5px 5px #0006;
+      }
+      &:not([data-count="0"]):hover {
+        transform: scale(1.1);
+        &::before { box-shadow: 0px 0px 10px 5px #0009; }
+      }
+
+      &[data-type=S]::before { background-size: 1100px; background-position: -176px -13px; }
+      &[data-type=L]::before { background-size: 1109px; background-position: -639px -9px; }
+      &[data-type=B]::before { background-size: 1077px; background-position: -12px -15px; }
+      &[data-type=O]::before { background-size: 1074px; background-position: -326px -5px; }
+      &[data-type=W]::before { background-size: 1097px; background-position: -484px -9px; }
+
+      &::after {
+        display: none;
+        content: "Take " attr(data-text);
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        background: var(--sand-color-dark);
+        border-bottom-right-radius: 15px;
+        border-bottom-left-radius: 15px;
+        color: #fff9;
+        /* font-size: 2em;
+        font-weight: 600; */
+        padding: 5px 0;
+        /* border-top: 1px solid var(--sand-color); */
+        box-shadow: 0 -5px 5px -3px var(--sand-color);
+      }
+      &:not([data-count="0"], [data-count="1"])::after { content: "Take " attr(data-count) " " attr(data-text);}
+      &:not([data-count="0"])::after { display: block; }
+    }
+    &.inactive .card[data-count="0"] { cursor: not-allowed; }
+    &:not(.inactive) .card:hover::before { filter: none; box-shadow: 0px 0px 5px 5px #0006; }
+  }
+
+
+
+  .actions {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    margin-left: 20px;
+
+    .dev-card {
+      cursor: pointer;
+      width: 70px; height: 106px; border-radius: 5px;
+      background-color: #ebd290;
+      box-shadow: 0px 0px 5px 2px #0009;
+      &:hover { box-shadow: 0px 0px 10px 2px #0009; transform: scale(1.1);}
+      &[data-type="dM"] { background-image: url(/images/cards_sprite.png); background-size: 548px; background-position: -90px -122px; }
+      &[data-type="dY"] { background-image: url(/images/cards_sprite.png); background-size: 552px; background-position: -170px -124px; background-color: #dcbc64; }
+    }
+
+    .submit {
+      margin: 30px 10px 20px;
+      padding: 7px 15px;
+      width: 100%;
+      box-sizing: border-box;
+      text-align: center;
+      background: #ccc;
+      color: #999;
+      border-radius: 5px;
+      font-weight: bold;
+      border: 2px solid transparent;
+      cursor: not-allowed;
+      font-family: EagleLake;
+
+      &.active {
+        background: #333;
+        color: var(--sand-color);
+        cursor: pointer;
+        border-color: var(--sand-color);
+
+        &:hover { box-shadow: 0 0 10px 0px var(--sand-color-dark); }
+      }
+    }
+  }
+}

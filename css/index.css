@@ -1,0 +1,64 @@
+@import './constants.css';
+@import './resources.css';
+@import './index/all-players.css';
+@import './index/board.css';
+@import './index/current-player.css';
+@import './index/robber-drop.css';
+@import './index/trade.css';
+@import './index/res-selection.css';
+@import './index/animations.css';
+@import './index/accessibility.css';
+@import './index/alert.css';
+@import './fonts.css';
+
+body {
+  margin: 0;
+  background: var(--water-color);
+  font-family: EagleLake;
+}
+
+button {
+  display: block;
+  background: none; color: inherit; border: none;
+  font: inherit; cursor: pointer;
+  outline: inherit; appearance: unset;
+  padding: 0; padding-block: 0px; padding-inline: 0px;
+}
+
+.splash {
+  background: url(/images/catan-bg.png);
+  background-size: cover;
+  background-position: center;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 100;
+
+  &.hide {
+    opacity: 0;
+    z-index: -100;
+    transition: opacity .5s .5s linear, z-index 0s 1s linear, width .5s linear, height .5s linear;
+    /* height: 100%;
+    width: 100%; */
+  }
+}
+
+#game {
+  /* transform: scale(0.85); */
+  /* transform-origin: top left; */
+  .board-container {
+    margin: 0 auto;
+    width: fit-content;
+    display: flex; justify-content: center; flex-direction: column; align-items: center;
+  }
+}
+
+@media screen and (min-width: 994px) {
+  #game {
+    /* display: flex; */
+    /* justify-content: center; */
+  }
+}
+
+/* https: //www.catancollector.com/catan-links/how-to-identify-your-version-of-catan */

@@ -1,0 +1,401 @@
+/* --------------------------------------
+ * BOARD
+ * -------------
+*/
+@keyframes tile-blink {
+  0% { filter: brightness(1.2); }
+  100% { filter: brightness(.8);}
+}
+.board {
+  position: relative;
+  transform: scale(1); margin: 50px 240px 150px 0px;
+  box-sizing: border-box;
+  filter: drop-shadow(2px 2px 3px #000a);
+  transition: filter .25s cubic-bezier(0.55, 0.06, 0.68, 0.19), transform .15s linear, margin .15s linear;
+  &[data-size="2"] { transform: scale(1.2); margin: 150px 320px 250px 110px; }
+  &[data-size="1"] { transform: scale(1.1); margin: 100px 280px 210px 60px; }
+  &[data-size="0"] { transform: scale(1.0); margin: 50px 240px 150px 0px; }
+  &[data-size="-1"] { transform: scale(.9); margin: 0px 190px 100px -50px; }
+  &[data-size="-2"] { transform: scale(.8); margin: -50px 140px 70px -100px; }
+  &[data-size="-3"] { transform: scale(.7); margin: -100px 90px 40px -150px; }
+  &[data-size="-4"] { transform: scale(.6); margin: -150px 40px 0px -210px; }
+  &[data-size="-5"] { transform: scale(.5); margin: -200px -10px -30px -260px; }
+  &[data-size="-6"] { transform: scale(.4); margin: -250px -40px -60px -310px; }
+  &[data-size="-7"] { transform: scale(.3); margin: -300px -100px -100px -365px; }
+  &.blur { filter: drop-shadow(2px 2px 3px #000a) blur(2px); }
+
+  .row {
+    position: relative;
+    height: 173px;
+    margin-top: -44px;
+  }
+
+  .tile {
+    width: var(--tile-width);
+    margin-right: -2px;
+    height: 176px;
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+
+    .background {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      left: 0;
+      top: 0;
+      background-size: cover;
+    }
+
+    .number {
+      z-index: 3;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-left: 48px;
+      margin-top: 60px;
+      /* opacity: 0.8; */
+      box-shadow: 3px 3px 5px -1px #000,
+        5px 5px 4px -1px #fffa inset,
+        -8px -8px 8px -6px #000a inset;
+      background-color: #E9D49D;
+      position: relative;
+
+      &::before {
+        display: block;
+        content: attr(num) "\a " attr(dots);
+        font-family: serif;
+        font-weight: bold;
+        white-space: pre;
+        text-align: center;
+        font-size: 25px;
+        /* letter-spacing: 1px; */
+        line-height: 10px;
+        position: relative;
+        top: 15px;
+      }
+
+      &.red::before { color: #d21c0e; }
+    }
+
+    &.shown .number,
+    &.shown.D .background {
+      cursor: pointer;
+      animation: tile-blink .7s infinite alternate ease-in-out;
+    }
+    &.shown:has(.background:hover, .background~.number:hover){
+      cursor: pointer;
+      .background {
+        z-index: 1;
+        top: -3px;
+        left: -3px;
+        animation: none;
+        filter: drop-shadow(5px 5px 5px #000) sepia(.8) brightness(0.9);
+      }
+      .number {
+        margin-left: 45px;
+        margin-top: 57px;
+        animation: none;
+        background: #999;
+        &::before { color: #666; }
+      }
+    }
+
+    &.robbed .background { filter: sepia(.8) brightness(0.9); }
+    &.robbed::before {
+      content: '';
+      /* content: "🥷";
+      font-size: 90px;
+      left: 30px;
+      top: 15px; */
+      display: block;
+      z-index: 4;
+      position: absolute;
+      background-image: url(/images/ninja.png);
+      left: 45px;
+      top: 22px;
+      height: 90px;
+      width: 65px;
+      /* background-image: url(/images/robber.png);
+      left: 54px;
+      top: 25px;
+      height: 76px;
+      width: 38px; */
+      filter: drop-shadow(0px 0px 2px var(--sand-color)) drop-shadow(0px 0px 2px var(--sand-color)) drop-shadow(0px 0px 6px var(--sand-color));
+      opacity: 1;
+      background-size: cover;
+      transition: opacity .25s ease-in, transform .25s ease-in, z-index 0s linear;
+    }
+
+    &.robbed.robber-animate::before {
+      opacity: 0; transform: scale(20); z-index: -1;
+      transition: opacity .5s ease-in, transform .5s ease-in, z-index 0s .5s linear;
+    }
+    &.robbed:not(.robber-animate):hover::before { opacity: 0.5; }
+
+    /* &:has(.number:hover),
+    &.D:hover {
+      filter: sepia(0.9) brightness(0.8);
+    } */
+  }
+}
+
+/* --------------------------------------
+ * TILE - Image & Trade
+ * -------------
+*/
+.board .tile {
+  &.G .background { background-image:url('/images/tiles/Grassland.png'); }
+  &.J .background { background-image:url('/images/tiles/Jungle.png'); }
+  &.C .background { background-image:url('/images/tiles/Clay Pit.png'); }
+  &.M .background { background-image:url('/images/tiles/Mountain.png'); }
+  &.F .background { background-image:url('/images/tiles/Fields.png'); }
+  &.D .background { background-image:url('/images/tiles/Desert.png'); }
+  &.S .background { background-image:url('/images/tiles/Sea.png'); opacity: .5; z-index: -2; }
+
+  &:not(.S) .background {
+    /* filter: drop-shadow(0px 0px 1px #000); */
+  }
+
+  &.S[data-trade]::after {
+    content: '';
+    background-size: contain;
+    position: absolute;
+    width: 65px;
+    height: 77px;
+  }
+  &.S[data-trade="B"]::after { background-image: url(/images/trade/Brick.png); }
+  &.S[data-trade="L"]::after { background-image: url(/images/trade/Lumber.png); }
+  &.S[data-trade="O"]::after { background-image: url(/images/trade/Ore.png); }
+  &.S[data-trade="S"]::after { background-image: url(/images/trade/Sheep.png); }
+  &.S[data-trade="W"]::after { background-image: url(/images/trade/Wheat.png); }
+  &.S[data-trade="*"]::after { background-image: url(/images/trade/*3.png); }
+
+  &.S[data-trade-dir="bottom_right"]::after { transform: translate(43px, 57px); }
+  &.S[data-trade-dir="bottom_left"]::after { transform: translate(43px, 53px); }
+  &.S[data-trade-dir="top_right"]::after { transform: translate(58px, 36px); }
+  &.S[data-trade-dir="top_left"]::after { transform: translate(40px, 37px); }
+  &.S[data-trade-dir="right"]::after { transform: translate(53px, 37px); }
+  &.S[data-trade-dir="left"]::after { transform: translate(35px, 41px); }
+}
+.board.darken .tile .background
+, .board.darken .tile.robbed .background
+, .board.darken .tile .number
+, .board.darken .tile .beaches
+, .board.darken .tile .trade-post
+, .board.darken .tile.robbed::before
+/* , .board.darken .tile .corner.taken */
+{
+  filter: brightness(.5);
+  transition: filter .25s ease;
+}
+
+/* --------------------------------------
+* CORNERS (& Trade Docs)
+* -------------
+*/
+@keyframes piece-space-blink { 50% { background: #b9b8b8aa; } }
+@keyframes piece-settlement-blink { 50% { transform: scale(1.3); } }
+@keyframes city-show {
+  0% { transform: scale(3); }
+  100% { transform: scale(1); }
+}
+.board .tile {
+  .corners {
+    position: absolute;
+  }
+
+  .corner {
+    width: 30px;
+    height: 30px;
+    background: #fff9;
+    border-radius: 30px;
+    position: absolute;
+    z-index: 3;
+    visibility: hidden;
+
+    &.shown {
+      visibility: visible;  cursor: pointer;
+      &:not(.taken) {
+        box-shadow: 0 0 3px 1px #000a;
+
+        &:hover {
+          background: #fff;
+          box-shadow: 0 0 0 2px #000;
+        }
+        &:not(:hover) {
+          animation: piece-space-blink 1s infinite;
+        }
+      }
+    }
+
+    &.taken {
+      visibility: visible; border-radius: 0;
+      background-color: transparent; background-size: contain; background-repeat: no-repeat;
+      /* filter: drop-shadow(1px -1px 0px #000) drop-shadow(-1px 1px 0px #000) drop-shadow(1px 1px 0px #000) drop-shadow(-1px -1px 0px #000); */
+      /* filter: drop-shadow(-3px 3px 3px #000); */
+      /* filter: drop-shadow(-3px 3px 2px #000) drop-shadow(-3px 3px 4px var(--sand-color)) drop-shadow(-3px 3px 5px var(--sand-color)); */
+      filter: drop-shadow(-3px 3px 2px #000) drop-shadow(1px -1px 3px var(--sand-color)) drop-shadow(3px -3px 5px var(--sand-color)) drop-shadow(-3px 3px 5px var(--sand-color)) drop-shadow(-3px 3px 4px var(--sand-color));
+      transform: scale(4); z-index: 4;
+      transition: all .25s ease-in;
+      &[data-taken=S] { transition: transform .5s cubic-bezier(0.38, -0.68, 0.67, -0.34); transform: scale(1); }
+      &[data-taken=C] { animation: city-show .5s cubic-bezier(0.38, -0.68, 0.67, -0.34); transform: scale(1); }
+
+      &.longest {
+        filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff);
+      }
+
+      &.shown {
+        animation: piece-settlement-blink 1s infinite;
+        filter: drop-shadow(1px 0px 0px #fff) drop-shadow(-1px 0px 0px #fff) drop-shadow(0px 1px 0px #fff)drop-shadow(0px -1px 0px #fff);
+
+        &:hover {
+          animation: none;
+          filter: brightness(1.5) drop-shadow(1px 0px 0px #fff) drop-shadow(-1px 0px 0px #fff) drop-shadow(0px 1px 0px #fff)drop-shadow(0px -1px 0px #fff);
+        }
+      }
+    }
+
+    &.p1[data-taken=S] { background-image: url(/images/pieces/settlement-1.png); }
+    &.p2[data-taken=S] { background-image: url(/images/pieces/settlement-2.png); }
+    &.p3[data-taken=S] { background-image: url(/images/pieces/settlement-3.png); }
+    &.p4[data-taken=S] { background-image: url(/images/pieces/settlement-4.png); }
+
+    &[data-taken=C] {
+      width: 40px;
+      height: 40px;
+      margin-top: -5px;
+      margin-left: -5px;
+      &.p1 { background-image: url(/images/pieces/city-1.png); }
+      &.p2 { background-image: url(/images/pieces/city-2.png); }
+      &.p3 { background-image: url(/images/pieces/city-3.png); }
+      &.p4 { background-image: url(/images/pieces/city-4.png); }
+    }
+
+    &[data-dir="top"] { top: -15px; left: 60px; }
+    &[data-dir="top_left"] { top: 30px; left: -15px; }
+    &[data-dir="top_right"] { top: 30px; left: 135px; }
+    &[data-dir="bottom"] { top: 155px; left: 60px; }
+    &[data-dir="bottom_left"] { top: 115px; left: -15px; }
+    &[data-dir="bottom_right"] { top: 115px; left: 135px; }
+  }
+
+  .trade-post {
+    background-image: url(/images/trade/Dock.png);
+    width: 34px;
+    height: 44px;
+    background-size: contain;
+    /* transform: rotate(180deg) translate(0px, 20px); */
+    z-index: 1;
+    position: absolute;
+
+    &.p-top { top: -15px; left: 60px; transform: translate(-2px, 2px); }
+    &.p-top_left { top: 30px; left: -15px; transform: rotate(-60deg) translate(9px, 2px); }
+    &.p-top_right { top: 30px; left: 135px; transform: rotate(60deg) translate(-10px, 3px); }
+    &.p-bottom { top: 155px; left: 60px; transform: rotate(180deg) translate(3px, 15px); }
+    &.p-bottom_left { top: 115px; left: -15px; transform: rotate(-120deg) translate(7px, 11px); }
+    &.p-bottom_right { top: 115px; left: 135px; transform: rotate(120deg) translate(-5px, 13px); }
+  }
+}
+.board.darken .tile .corner.taken:not(.longest) {
+  filter: brightness(1);
+}
+
+/* --------------------------------------
+ * EDGES
+ * -------------
+*/
+.board .tile {
+  .edges {
+    position: absolute;
+  }
+
+  .edge {
+    width: 7px;
+    height: 50px;
+    background: #fff9;
+    position: absolute;
+    z-index: 2;
+    cursor: pointer;
+    visibility: hidden;
+
+    &.shown {
+      visibility: visible; width: 10px;
+      &:not(.taken) {
+        box-shadow: 0 0 3px 1px #000a;
+
+        &:hover {
+          background: #fff;
+          box-shadow: 1px 1px 0px 1px #000;
+        }
+        &:not(:hover) {
+          animation: piece-space-blink 1s infinite;
+        }
+      }
+    }
+
+    &.taken {
+      opacity: 1;
+      box-shadow: 2px 2px 4px 0px #000;
+      background: #999;
+      visibility: visible;
+      cursor: default;
+      border: 1px solid;
+      width: 21px; height: 150px; z-index: 5;
+
+      &.p1, &.p2, &.p3, &.p4 {
+        transition: z-index 0s .25s linear, width 0.25s ease-in, height 0.25s ease-in;
+        width: 7px; height: 50px; z-index: 2;
+      }
+
+      &.p1 { background: var(--player-1-color); box-shadow: 1px 1px 0px 1px color-mix(in srgb, var(--player-1-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
+      &.p2 { background: var(--player-2-color); box-shadow: 1px 1px 0px 1px color-mix(in srgb, var(--player-2-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
+      &.p3 { background: var(--player-3-color); box-shadow: 1px 1px 0px 1px color-mix(in srgb, var(--player-3-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
+      &.p4 { background: var(--player-4-color); box-shadow: 1px 1px 0px 1px color-mix(in srgb, var(--player-4-color-dark) 50%, #000), 4px 4px 6px 0px #000; }
+
+
+      &.longest {
+        box-shadow: 0px 0px 0 5px #fff, 0px -20px 0 5px #fff, 0px 20px 0 5px #fff;
+        border-radius: 3px; transition: all .25s ease-in;
+      }
+    }
+
+    &[data-dir="right"] { transform: rotate(0deg) translate(146px, 61px); }
+    &[data-dir="bottom-left"] { transform: rotate(120deg) translate(92px, -91px); }
+    &[data-dir="bottom-right"] { transform: rotate(60deg) translate(164px, -30px); }
+    /* Only used in first tile */
+    &[data-dir="top-left"] { transform: rotate(60deg) translate(15px, -29px); }
+    &[data-dir="top-right"] { transform: rotate(120deg) translate(-56px, -92px); }
+    &[data-dir="left"] { transform: rotate(0deg) translate(-5px, 62px); }
+  }
+}
+
+/* --------------------------------------
+ * BEACHES
+ * -------------
+*/
+.board .tile {
+  .beaches {
+    /* display: none; */
+    position: absolute;
+  }
+
+  .beach {
+    width: 30px;
+    z-index: -1;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+
+  .beach-1 { background-image: url(/images/beach-1.png); height: 104px; }
+  .beach-2 { background-image: url(/images/beach-2.png); height: 102px; }
+  .beach-3 { background-image: url(/images/beach-3.png); height: 106px; }
+
+  .beach-left { top: 38px; left: 0px; }
+  .beach-top_left { top: -16px; left: 30px; transform: rotate(60deg); }
+  .beach-top_right { top: -17px; left: 90px; transform: rotate(120deg); }
+  .beach-right { top: 37px; left: 120px; transform: rotate(180deg); }
+  .beach-bottom_right { top: 89px; left: 91px; transform: rotate(-120deg); }
+  .beach-bottom_left { top: 90px; left: 32px; transform: rotate(-60deg); }
+}

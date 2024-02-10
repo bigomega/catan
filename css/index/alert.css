@@ -1,0 +1,151 @@
+#game > .alert {
+  opacity: 0;
+  z-index: -10;
+  transition: opacity .25s linear;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: calc(100% - 40px);
+  font-family: Papyrus, fantasy;
+  font-weight: bold;
+  font-size: 2.5em;
+  line-height: 2em;
+  letter-spacing: 1px;
+  text-align: center;
+  &.show { z-index: 20; opacity: 1; }
+
+  small { font-size: .5em; text-shadow: none; }
+
+  .close {
+    position: absolute; right: 0; top: 0; z-index: 1;
+    margin: 2px 10px 0 0; color: #666; cursor: pointer;
+    &:hover, &:focus { color: var(--trade-negative); text-shadow: 0 0 5px #000; }
+  }
+
+  .parchment {
+    box-shadow: 2px 3px 20px black, 0 0 125px #8f5922 inset;
+    background: #fffef0; color: transparent; padding: 1em;
+    filter: url(#wavy2);
+    b { background: #734101; padding: 8px; }
+  }
+
+  .text {
+    color: #9d5a0d; z-index: 1;
+    text-shadow: 1px 2px 0px #000000, -3px -3px 5px #ffffff;
+    position: absolute; top: 0; left: 0;
+    width: calc(100% - 2em); padding: 1em;
+    b {
+      color: #e5dac1; padding: 8px; text-shadow: none;
+    }
+  }
+
+  .game-ended {
+    .title-emoji { font-size: 2em; }
+    .player-name {
+      border-radius: 100px; width: fit-content;
+      margin: 0 auto 20px; padding: 10px 30px 0; text-shadow: none;
+    }
+    small { display: flex; flex-direction: column; flex-wrap: wrap; align-content: center; }
+    .pts { line-height: 3em; text-align: left; }
+    .S, .C, .dVp, .army, .road { b { position: relative; margin-right: 40px; color: inherit; background: inherit; } }
+  }
+  .text .game-ended .player-name { color: #fff; background-color: var(--sand-color-text-dark); }
+  .text .game-ended.p1 .player-name { box-shadow: 0 0 35px 0 var(--player-1-color); background: var(--player-1-color); }
+  .text .game-ended.p2 .player-name { box-shadow: 0 0 35px 0 var(--player-2-color); background: var(--player-2-color); }
+  .text .game-ended.p3 .player-name { box-shadow: 0 0 35px 0 var(--player-3-color); background: var(--player-3-color); }
+  .text .game-ended.p4 .player-name { box-shadow: 0 0 35px 0 var(--player-4-color); background: var(--player-4-color); }
+  .text .game-ended .S b::after, .text .game-ended .C b::after {
+    content: ''; background-size: cover; background-repeat: no-repeat;
+    position: absolute; right: -30px; top: 9px;
+    width: 30px; height: 30px;
+  }
+  .text .game-ended.p1 .S b::after { background-image: url(/images/pieces/settlement-1.png); }
+  .text .game-ended.p2 .S b::after { background-image: url(/images/pieces/settlement-2.png); }
+  .text .game-ended.p3 .S b::after { background-image: url(/images/pieces/settlement-3.png); }
+  .text .game-ended.p4 .S b::after { background-image: url(/images/pieces/settlement-4.png); }
+  .text .game-ended.p1 .C b::after { background-image: url(/images/pieces/city-1.png); }
+  .text .game-ended.p2 .C b::after { background-image: url(/images/pieces/city-2.png); }
+  .text .game-ended.p3 .C b::after { background-image: url(/images/pieces/city-3.png); }
+  .text .game-ended.p4 .C b::after { background-image: url(/images/pieces/city-4.png); }
+  .text .game-ended .dVp b::after {
+    content: ''; position: absolute; right: -35px; top: -4px;
+    background: #daba6a url(/images/cards_sprite.png) -82px -119px/269px no-repeat;
+    width: 33px; height: 53px;
+  }
+  .text .game-ended .army b::after, .text .game-ended .road b::after {
+    content: ''; position: absolute; right: -40px; top: 2px;
+    background: #daba6a url(/images/extra-vps-sprite.png) -31px -37px/156px no-repeat;
+    width: 43px; height: 43px;
+  }
+  .text .game-ended .road b::after { background-position-x: -103px; }
+  .text .game-ended :is(.dVp, .army, .road) {
+    cursor: pointer;
+    b::after { box-shadow: 0 0 0px 1px #733f05; border-radius: 3px; }
+    &:hover {
+      text-shadow: 0 0 5px #ff8a00;
+      b::after { box-shadow: 0 0 0px 1px #733f05, 0 0 10px 0 #000; }
+    }
+  }
+
+  .text .game-ended:not(.animate) {
+    color: transparent; text-shadow: none;
+    b::after, .player-name { opacity: 0; }
+  }
+
+  .parchment:has(.game-ended) { background: transparent; box-shadow: none; }
+  .parchment .game-ended .bg {
+    background: #fffef0; width: 100%; height: 0;
+    position: absolute; top: 0; left: 0; box-shadow: 2px 3px 20px black, 0 0 125px #8f5922 inset;
+    border-bottom-left-radius: 430px; border-bottom-right-radius: 430px;
+    transition: all 2s ease;
+  }
+  &.animate .parchment .game-ended .bg { height: 100%; border-radius: 0; }
+  &.animate .text .game-ended {
+    color: inherit; text-shadow: inherit; transition: all 1s .5s ease-in;
+    b::after, .player-name { opacity: 1; transition: opacity 1s .5s ease-in; }
+  }
+}
+
+#game > .status-history-zone {
+  position: fixed; top: 0; left: 0;
+  width: calc(100% - 0px); max-height: 70%; overflow: scroll;
+  padding-top: 65px; text-align: center;
+  box-sizing: border-box; box-shadow: 0 0 20px 0 #000;
+  background: var(--sand-color); color: var(--sand-color-text-dark);
+  border-bottom: 2px solid var(--sand-color-dark);
+  opacity: 0; z-index: -10;
+  transition: opacity .25s linear;
+  &.show { z-index: 20; opacity: 1; }
+
+  &::after {
+    content: 'Status History ⌛️'; width: 100%;
+    font-family: Papyrus; font-size: 2em; text-align: center;
+    position: fixed; left: 0; top: 0; padding: 5px;
+    box-shadow: 0 0 10px 0; background: var(--sand-color);
+  }
+  &::before {
+    content: 'Newest First…'; width: 100%; color: #0003;
+    font-family: Raleway, sans-serif;
+  }
+
+  .close {
+    position: fixed; right: 5px; top: 5px; z-index: 1;
+    font-family: Papyrus; font-size: 1.5em;
+    margin: 2px 10px 0 0; color: #666; cursor: pointer;
+    &:hover, &:focus { color: var(--trade-negative); text-shadow: 0 0 5px #fff; }
+  }
+
+  .container { border-top: 1px solid; font-family: Raleway, sans-serif; }
+  .status {
+    padding: 7px 10px; border-bottom: 1px solid;
+    b { color: #77450b; }
+    small { opacity: 0.7; }
+    .p-name {
+      border-left: 5px solid; padding-left: 3px;
+      &.p1 { border-color: var(--player-1-color); }
+      &.p2 { border-color: var(--player-2-color); }
+      &.p3 { border-color: var(--player-3-color); }
+      &.p4 { border-color: var(--player-4-color); }
+    }
+  }
+}

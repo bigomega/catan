@@ -1,0 +1,160 @@
+.all-players {
+  position: fixed; right: 0; top: 0;
+  width: 240px;
+  filter: drop-shadow(0px 0px 30px #000);
+  &.blur:not(:hover) { filter: blur(2px); }
+
+  .player {
+    width: 100%; position: relative;
+    background: var(--sand-color);
+    border: 3px solid var(--sand-color-dark);
+    border-top: none; border-right: none;
+    margin: 0 -3px;
+    &.deactivated {
+      filter: grayscale(1) contrast(0.5) brightness(0.7); cursor: not-allowed;
+      &::before { content: '🏃' !important;}
+    }
+
+    &::before {
+      position: absolute; left: -60px; top: 0px;
+      font-size: 3em; filter: drop-shadow(0px 0px 3px #000);
+    }
+
+    &.p1 { background: var(--player-1-color-light); border-color: var(--player-1-color-dark); }
+    &.p2 { background: var(--player-2-color-light); border-color: var(--player-2-color-dark); }
+    &.p3 { background: var(--player-3-color-light); border-color: var(--player-3-color-dark); }
+    &.p4 { background: var(--player-4-color-light); border-color: var(--player-4-color-dark); }
+
+    .name {
+      width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      font-size: 2em;
+      padding: 5px 10px 10px;
+      background: var(--sand-color-dark); color: #fff;
+      border-bottom: 3px solid; border-color: inherit;
+      width: 100%; box-sizing: border-box;
+    }
+    &.p1 .name { background: var(--player-1-color); }
+    &.p2 .name { background: var(--player-2-color); }
+    &.p3 .name { background: var(--player-3-color); }
+    &.p4 .name { background: var(--player-4-color); }
+
+    .victory-points {
+      display: flex; justify-content: start; font-family: Raleway, sans-serif;
+      font-size: 2.2em; padding: 0px 10px; border-bottom: 1px solid; border-color: inherit;
+
+      & span {
+        margin-right: 5px; margin-left: 30px;
+        position: relative;
+        display: flex; align-items: center;
+
+        &::after {
+          content: "";
+          position: absolute; left: -30px;
+          width: 20px; height: 20px;
+          box-shadow: 2px 2px 5px -1px #000, 0 0 5px 0px #000;
+          background: url(/images/catan-bg.png) -27px -12px / 74px;
+          border-radius: 50px;
+        }
+      }
+
+      &::after {
+        content: 'Victory\APoints';
+        font-size: 0.8rem; opacity: .5;
+        vertical-align: super; white-space: pre;
+        display: flex; flex-direction: column; justify-content: center;
+      }
+    }
+
+    .cards-container {
+      overflow: hidden; display: flex; padding: 5px 5px 5px 10px;
+    }
+
+    .resources, .development-cards {
+      background-size: cover;
+      &[data-count="0"] { filter: grayscale(1) brightness(1.5) contrast(0.5); }
+      &[data-robbable="true"] {
+        box-shadow: 0px 0px 5px 2px var(--trade-negative);
+        &::after {
+          content: '🥷' attr(data-count); width: 100%;
+          text-align: center; box-sizing: border-box;
+          border-right: 0; border-radius: 0; padding: 0;
+          background: var(--trade-negative); color: #fff;
+        }
+      }
+    }
+    .resources { background-image: url(/images/resources-back.png); margin-right: 5px; }
+    .development-cards { background-image: url(/images/dc-back.png); background-size: 31px; background-position-y: -1px; }
+
+    .largest-army, .longest-road {
+      &::before {
+        content: ''; display: block; width: 100%; height: 100%;
+        background-image: url(/images/extra-vps-sprite.png);
+        background-color: #c8b66d; background-size: 155px; background-repeat: no-repeat;
+        filter: grayscale(1) brightness(2) contrast(0.5);
+      }
+      &[data-count="0"]::after { filter: grayscale(1) brightness(1.5) contrast(0.5); }
+    }
+    .largest-army {
+      &::before{ background-position: -43px -54px; background-size: 200px; }
+    }
+    .longest-road {
+      &::before{ background-position: -185px -68px; background-size: 230px; }
+    }
+
+    :is(.largest-army, .longest-road, .resources, .development-cards) {
+      width: 30px; height: 44px;
+      position: relative; margin-right: 5px;
+      /* box-shadow: 0 0 3px 1px #0003; */ border-radius: 3px; overflow: hidden;
+      border: 1px solid #666;
+      &::after {
+        content: attr(data-count);
+        display: inline-block;
+        position: absolute; bottom: 0; left: 0;
+        color: #000;
+        font-size: 1em; font-family: monospace;
+        background: #fff;
+        border-top: 1px solid #666;
+        border-right: 1px solid #666;
+        border-top-right-radius: 3px;
+        padding: 2px 4px;
+      }
+    }
+  }
+
+  &[data-active="1"] .player.p1::before
+  , &[data-active="2"] .player.p2::before
+  , &[data-active="3"] .player.p3::before
+  , &[data-active="4"] .player.p4::before
+  { content: '👉'; }
+
+
+  &[data-army="1"] .player.p1 .largest-army
+  , &[data-army="2"] .player.p2 .largest-army
+  , &[data-army="3"] .player.p3 .largest-army
+  , &[data-army="4"] .player.p4 .largest-army
+  , &[data-road="1"] .player.p1 .longest-road
+  , &[data-road="2"] .player.p2 .longest-road
+  , &[data-road="3"] .player.p3 .longest-road
+  , &[data-road="4"] .player.p4 .longest-road
+  {
+    width: 67px; cursor: pointer;
+    &:hover { box-shadow: 0 0 5px 0 #333; }
+    &::before { filter: none; background-size: 160px; }
+    &.largest-army::before { background-position: -9px -37px; }
+    &.longest-road::before { background-position: -84px -37px; }
+    &::after { font-size: 1.3em; color: #fff; padding: 2px 5px; }
+  }
+
+  &[data-army="1"] .player.p1 .largest-army::after, &[data-road="1"] .player.p1 .longest-road::after {
+    background: var(--player-1-color);
+  }
+  &[data-army="2"] .player.p2 .largest-army::after, &[data-road="2"] .player.p2 .longest-road::after {
+    background: var(--player-2-color);
+  }
+  &[data-army="3"] .player.p3 .largest-army::after, &[data-road="3"] .player.p3 .longest-road::after {
+    background: var(--player-3-color);
+  }
+  &[data-army="4"] .player.p4 .largest-army::after, &[data-road="4"] .player.p4 .longest-road::after {
+    background: var(--player-4-color);
+  }
+}

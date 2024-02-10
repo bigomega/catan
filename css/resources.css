@@ -1,0 +1,32 @@
+.res-icon{
+  display: inline-block;
+  height: 20px;
+  width: 30px;
+  margin: 0 7px 0 3px;
+  vertical-align: bottom;
+  background-image: url(/images/res-icons.png);
+  background-repeat: no-repeat;
+  filter: drop-shadow(0px 0px 0.5px #fff) drop-shadow(0px 0px 0.5px #fff) drop-shadow(0px 0px 0.5px #fff);
+
+  &.S { background-position: -59px -3px; background-size: 135px; width: 21px; }
+  &.L { background-position: -27px -3px; background-size: 122px; width: 23px; }
+  &.B { background-position: -1px -6px; background-size: 145px; }
+  &.O { background-position: -86px -1px; background-size: 106px; width: 20px; }
+  &.W { background-position: -60px 0px; background-size: 96px; width: 15px; }
+}
+
+.res-card {
+  width: 140px;
+  height: 212px;
+  background-color: #ebd290;
+  border-radius: 15px;
+  border: 1px solid #5a460e;
+  box-shadow: 3px 0px 5px -3px #0006;
+  background-image: url(/images/cards_sprite.png);
+
+  &[data-type=S] { background-size: 1100px; background-position: -176px -13px; }
+  &[data-type=L] { background-size: 1109px; background-position: -639px -9px; }
+  &[data-type=B] { background-size: 1077px; background-position: -12px -15px; }
+  &[data-type=O] { background-size: 1074px; background-position: -326px -5px; }
+  &[data-type=W] { background-size: 1097px; background-position: -484px -9px; }
+}
