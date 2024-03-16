@@ -1,7 +1,17 @@
 # Catan
-Free to play multiplayer catan style board game
+Free to play multiplayer Catan board game
 
-## Install & Run
+## Links
+**Play Game:** [catan-qvig.onrender.com](https://catan-qvig.onrender.com/login)
+> The onrender server goes to sleep on inactivity, if you open the link it might take a few minutes to get the server up
+
+> Open the Browser Console to have control over all the game configs, including mapkey
+
+**Shuffler & Board builder:** [bharathraja.in/catan](https://bharathraja.in/catan)
+
+---
+
+## Local Installation & Running
 ```bash
 npm i
 npm start
@@ -19,7 +29,7 @@ The server will be reachable at [localhost:3000](http://localhost:3000/). You're
 - Rethink ports
   - multiple in single Sea tile
   - disallow connected edges of land being added as ports
-- Introducing 8 player maps
+- Introducing 8-player maps
 - Social login (w pic and/or just a name/id)
 - Discord help (for talking)
 - Seafarers expansion (fairly easy one)
@@ -28,7 +38,7 @@ The server will be reachable at [localhost:3000](http://localhost:3000/). You're
 ## MapKey
 ### Rules
 - The map is decoded from **left-to-right** and **top-to-bottom**.
-- Each `row` is seperated by a `-` or `+` representing its first-tile relationship to the first-tile of the previous row. `-` makes it bottom-left and `+` for bottom-right.
+- Each `row` is separated by a `-` or `+` representing its first-tile relationship to the first-tile of the previous row. `-` makes it bottom-left and `+` for bottom-right.
   ```
   <row> -<row>
   +<row>
@@ -45,7 +55,7 @@ The server will be reachable at [localhost:3000](http://localhost:3000/). You're
   ```
   (<TradeEdge>_<TradeType><TradeRatio>)
   ```
-- Surrounding your land with the sea is not necessary but recommended to get the beautiful sea shores.
+- Surrounding your land with the sea is not necessary, but recommended to get the beautiful sea shores.
 - The robber will be placed in the last desert found during decoding.
 
 #### Keys
@@ -141,6 +151,7 @@ Renders the map…
 
 ### Bugs
   - [x] ~~Road into the Sea~~
+  - [ ] Development card styling issue in Safari
 
 ### Feedback
   - [ ] Initial build - show the built house
