@@ -26,6 +26,6 @@
     "nodemon": "^3.0.3",
     "push-dir": "^0.4.1",
     "random-words": "^2.0.1",
-    "socket.io": "^4.6.2"
+    "socket.io": "^4.7.5"
   }
 }
