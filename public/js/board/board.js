@@ -18,13 +18,13 @@ export default class Board {
      * ============
      * MAP DECODING
      * ============
-     * split by +/- every row except the first MUST have a sign
+     * row split by +/- and every row except the first MUST have a sign preceeding
      * + or - represent where the hex starts in the next line. bottom right or left
      * each tile is split by dor (.) and each tile has it's own regex
      * Sea -> S(direction _ ResourceKey number)? <sea has optional trade in a direction>
      * Desert -> D
      * ResourceTile -> TileKey number {F|G|J|C|M}
-     * ex., +S(r-L2).F3.G5.C6.M12.S
+     * ex., S.J5+S(r-L2).F3.G5.C6.M12.S
      *
      * Since decoding always happens from left to right and top to bottom,
      * we reuse previous corners

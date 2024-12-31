@@ -19,9 +19,24 @@ npm start
 The server will be reachable at [localhost:3000](http://localhost:3000/). You're now ready to play the game…
 > I have an `.nvmrc` pointing to node version `v20.10`. Please use at least `v18` and above…
 
+## Game Features
+- [x] Design your own map
+- [x] 2/3/4 Players
+- [x] Build Houses, Roads, and Cities
+- [x] Robber Mechanics
+- [x] Trade Requests
+- [x] Buy and Use Development Cards
+- [x] Sounds
+- [x] Animations
+- [x] Keyboard Shortcuts
+- [x] Clear Notification History
+- [x] Smart Map Shuffler
+- [x] Optional Timer
+
 ## Future Ideas
 - Browser Notifications
 - Optimization (memory[^1], speed, colors)
+  - Further modularisation (as of Dec 2024 `model/game.js` is :700 and `public/js/game.js` is :470)
 - Join random games
   - Private & public games
 - Watch games
@@ -35,47 +50,75 @@ The server will be reachable at [localhost:3000](http://localhost:3000/). You're
 - Seafarers expansion (fairly easy one)
 - Trade negotiations
 
-## MapKey
-### Rules
-- The map is decoded from **left-to-right** and **top-to-bottom**.
-- Each `row` is separated by a `-` or `+` representing its first-tile relationship to the first-tile of the previous row. `-` makes it bottom-left and `+` for bottom-right.
-  ```
-  <row> -<row>
-  +<row>
-  -  <row>
-  ```
-- There can by any amount of `\s`(space) and `\n`(newline) inbetween the rows and tiles. They are ignored by `.trim()`.
-- Each `Tile` is separated by a `.`(dot)
-  ```
-  <Tile> .<Tile> .   <Tile>
-  ```
-- A Resource tile is represented by its key and `Number` next to each other. `<TileKey><Number>`
-- A Sea tile (represented by `S`) can optionally have one trade. `S(<Trade>)?`
-- A `Trade` is represented by its edge `TradeEdge` (of the Sea tile it's on), type `TradeType` and a number `TradeRatio` covered by `()`(round braces) and split by `_`(underscore).
-  ```
-  (<TradeEdge>_<TradeType><TradeRatio>)
-  ```
-- Surrounding your land with the sea is not necessary, but recommended to get the beautiful sea shores.
-- The robber will be placed in the last desert found during decoding.
+## Frameworks
+### Major
+  - **[ExpressJS](https://expressjs.com/)** for HTTP server
+  - **[Socket.io](https://socket.io/)** for WebSocket radio
+  - **[VanillaJS](http://vanilla-js.com/)** for Frontend UI
 
-#### Keys
+### Minor Libraries
+  - [Mustache](https://mustache.github.io/) for rendering JSON data in HTML
+  - [nodemon](https://nodemon.io/) for ease of development
+  - [random-words](https://github.com/apostrophecms/random-words) for generating game-keys
+  - [cookie-parser](https://github.com/expressjs/cookie-parser) for 🤷🏻‍♂️
+
+## MapKey DSL Explanation
+The map is decoded from left-to-right and top-to-bottom. There can by any amount of space `\s` and newline `\n` inbetween the rows and tiles. They are ignored by `.trim()`.
+
+#### Board
+The board consists of `<Rows>` separated by  a `-` (bottom-left) or `+` (bottom-right) representing its tile-relationship to the previous row.
 ```js
+<Row> ([+|-] <Row>)*
+```
+
+#### Row
+A `<Row>` consists of one or more `<Tile>` separated by dot `.`.
+```js
+<Tile> (. <Tile>)*
+```
+There are two types of Tiles - Resource and Sea.
+
+#### Resource Tile
+A Resource tile is represented by its key `<TileKey>` and a number `<Number>` next to it.
+```js
+<TileKey><Number>
+```
+```js
+// Accepted values:
 const TileKey = { G: 'Grassland', J: 'Jungle', C: 'Clay Pit', M: 'Mountain', F: 'Fields', S: 'Sea', D: 'Desert' }
-
 const Number = [2, 3, 4, 5, 6, 8, 9, 10, 11, 12]
+```
 
-const tradeEdge = {
-              tl: 'top_left',     tr: 'top_right',
+#### Sea Tile
+A Sea tile is represented by `S` and can optionally have one trade.
+```js
+S<Trade>?
+```
+
+#### Trade
+A `Trade` is represented by its edge of the Sea tile it's on `<tEdge>`, type `<tType>` and a number `<tRatio>` covered by round braces `()` and split by underscore `_`.
+```js
+(<tEdge>_<tType><tRatio>)
+```
+```js
+// Accepted values:
+const tEdge = {
+  tl: 'top_left',     tr: 'top_right',
   l: 'left',                                        r: 'right',
               bl: 'bottom_left',  br: 'bottom_right',
 }
 
-const tradeTyp = { '*': 'All', S: 'Sheep', L: 'Lumber', B: 'Brick', O: 'Ore', W: 'Wheat' }
+const tType = { '*': 'All', S: 'Sheep', L: 'Lumber', B: 'Brick', O: 'Ore', W: 'Wheat' }
 
-const tradeRatio = [2, 3]
+const tRatio = [2, 3]
+
+// Example: (tr_W3)
 ```
+#### General Note
+- Surrounding your land with the sea is not necessary, but recommended to get the beautiful sea shores.
+- The robber will be placed in the last desert found during decoding.
 
-#### Example
+### Example
 This configuration…
 ```js
 const config = {
@@ -96,21 +139,10 @@ config.mapkey = `S.S(bl_O2).S(br_O2).S-S.M8.D.M8.S-S.G9.S.S.G9.S-S.F10.S.S.S.F10
 Renders the map…
 <img width="900" alt="Screenshot 2024-02-04 at 11 46 20 copy" src="https://github.com/bigomega/catan/assets/2320747/7449040b-2f77-4ba1-beeb-a648af4dea05">
 
-
-## Frameworks
-### Major
-  - **[ExpressJS](https://expressjs.com/)** for HTTP server
-  - **[Socket.io](https://socket.io/)** for WebSocket radio
-  - **[VanillaJS](http://vanilla-js.com/)** for Frontend UI
-
-### Minor Libraries
-  - [Mustache](https://mustache.github.io/) for rendering JSON data in HTML
-  - [nodemon](https://nodemon.io/) for ease of development
-  - [random-words](https://github.com/apostrophecms/random-words) for generating game-keys
-  - [cookie-parser](https://github.com/expressjs/cookie-parser) for 🤷🏻‍♂️
-
 ## Status
 ### In Progress
+  ##### Jan '25
+  - [ ] z
   ##### Feb '24
   - [x] ~~Alert history~~
   - [x] ~~Quit game~~
@@ -157,7 +189,7 @@ Renders the map…
   - [ ] Initial build - show the built house
   - [ ] ~~Resource animation after dice animation~~
   - [x] Music reminder
-  - [x] Can play DC after dice, update text
+  - [x] Can play DevCard after dice, update text
   - [ ] Trade denied/accepted message
   - [x] Remember player name
   - [ ] Timer focus when few seconds left
