@@ -142,7 +142,9 @@ Renders the map…
 ## Status
 ### In Progress
   ##### Jan '25
-  - [ ] z
+  - [ ] Numberless Tiles MapKey (to be filled by game)
+  - [ ] Generic Resource Tiles in MapKey (to be filled by game)
+  - [ ] Map Builder
   ##### Feb '24
   - [x] ~~Alert history~~
   - [x] ~~Quit game~~

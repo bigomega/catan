@@ -7,6 +7,7 @@
   "scripts": {
     "start": "npx nodemon index.js -w index.js -w views -w models -e js,html",
     "deploy-shuffler": "sh ./deploy-gh-pages.sh",
+    "static-dev": "if [ -d \"./catan\" ]; then mv ./catan ./public; else mv ./public ./catan; fi",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
