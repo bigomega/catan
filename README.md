@@ -54,6 +54,7 @@ The server will be reachable at [localhost:3000](http://localhost:3000/). You're
 - Button and other reused components
 - Optimization (memory[^1], speed, colors)
 - Further modularisation (as of Dec 2024 `model/game.js` is :700 and `public/js/game.js` is :470)
+- Render beaches on the resource tile than Sea
 
 ## Frameworks
 ### Major

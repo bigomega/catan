@@ -55,6 +55,23 @@ export const TRADE_OFFERS = {
   Px: 'Player Trade',
 }
 
+/** @todo Use this in tile.js */
+export const DIR_HELPER = {
+  KEYS: { tl: 'top_left', tr: 'top_right', l: 'left', r: 'right', bl: 'bottom_left', br: 'bottom_right' },
+  MAPKEYS: { top_left: 'tl', top_right: 'tr', left: 'l', right: 'r', bottom_left: 'bl', bottom_right: 'br' },
+
+  OPPOSITES: {
+    top_left: 'bottom_right', top_right: 'bottom_left', left: 'r',
+    right: 'left', bottom_left: 'top_right', bottom_right: 'top_left',
+  },
+
+  EDGE_TO_CORNERS: {
+    top_left: ['top', 'top_left'], top_right: ['top', 'top_right'],
+    left: ['top_left', 'bottom_left'], right: ['top_right', 'bottom_right'],
+    bottom_left: ['bottom', 'bottom_left'], bottom_right: ['bottom', 'bottom_right'],
+  }
+}
+
 export const ROLL = _ => Math.ceil(Math.random() * 6)
 
 export const DEFAULT_MAPKEY =

@@ -10,9 +10,9 @@ const PROD_URL = 'https://catan-qvig.onrender.com/'
 
 class Shuffler {
   board; board_ui; accessibility_ui
-  $mapkey_textarea; $shuffle_tiles; $shuffle_numbers; $shuffle_ports
+  $mapkey_textarea; $shuffle_tiles; $shuffle_numbers; $shuffle_ports; $tile_selector
   $el = $('#shuffler')
-  $tile_selector = $('#tile-selector')
+  $tile_selection_container = $('#tile-selection-container')
 
   constructor() {
     const mapkey = (new URLSearchParams(window.location.search)).get('mapkey')
@@ -68,29 +68,71 @@ class Shuffler {
       </div>
     `
 
-    this.$tile_selector.innerHTML = `
-      <div class="title">Click on the tiles to edit.</div>
-      <div class="select-tiles">
-        ${Object.entries(CONST.TILES).map(([t_key, t_name]) => `
-          <div class="tile-container ${t_key}" data-type="${t_key}">
-            <div class="tile ${t_key}"><div class="background"></div></div>
-            <div class="tile-text">${t_name}</div>
-          </div>
-        `).join('')}
-        <div class="cancel-container"><div class="button text">Close</div></div>
-      </div>
-      <div class="select-trade">
-        ${Object.entries(CONST.TRADE_OFFERS).map(([t_key, t_name]) => ['Px', '*4'].includes(t_key)  ? '' : `
-          <div class="trade-container ${t_key}">
-            <div class="trade-type ${t_key.replace(/\*/, '_')}" data-type="${t_key}"></div>
-            <div class="trade-text">${t_name}</div>
-          </div>
-        `).join('')}
-        <div class="no-trade-container"><div class="button secondary">Skip<br/>Trade</div></div>
-        <div class="cancel-container"><div class="button text">Close</div></div>
+    this.$tile_selection_container.innerHTML = `
+      <div id="tile-selector"
+        data-mode="start"
+        data-trade-type="*"
+        ${Object.values(CONST.DIR_HELPER.KEYS).map(dir =>
+          `data-land-${dir}="true"`
+        ).join('')}
+      >
+        <div class="title">
+          <div>Click on the tiles to edit.</div>
+          <span class="button text">Clean Start</span>
+        </div>
+        <div class="select-tiles">
+          ${Object.entries(CONST.TILES).map(([t_key, t_name]) => `
+            <div class="tile-container ${t_key}" data-type="${t_key}">
+              <div class="tile ${t_key}">
+                ${t_key === 'S' ? `
+                  <div class="sea-hexagon"></div>
+                  <div class="beaches">
+                    ${Object.values(CONST.DIR_HELPER.KEYS).map((beach_dir, i) => `
+                      <div class="beach beach-${i % 3 + 1} beach-${beach_dir}"></div>
+                    `).join('')}
+                  </div>
+                ` : ''}
+                <div class="background"></div>
+              </div>
+              <div class="tile-text">${t_name}</div>
+            </div>
+          `).join('')}
+          <div class="cancel-container"><div class="button text">Close</div></div>
+        </div>
+        <div class="select-trade">
+          ${Object.entries(CONST.TRADE_OFFERS).map(([t_key, t_name]) => ['Px', '*4'].includes(t_key)  ? '' : `
+            <div class="trade-container ${t_key}" data-type="${t_key}">
+              <div class="trade-type ${t_key.replace(/\*/, '_')}" data-type="${t_key}"></div>
+              <div class="trade-text">${t_name}</div>
+            </div>
+          `).join('')}
+          <div class="no-trade-container"><div class="button secondary">Skip<br/>Trade</div></div>
+          <div class="cancel-container"><div class="button text">Close</div></div>
+        </div>
+        <div class="select-trade-direction">
+          ${Object.values(CONST.DIR_HELPER.KEYS).map(trade_dir => `
+            <div class="trade-direction-container" data-trade-dir="${trade_dir}">
+              <div class="tile S" data-trade="*" data-trade-dir="${trade_dir}">
+                <div class="sea-hexagon"></div>
+                <div class="background"></div>
+                ${CONST.DIR_HELPER.EDGE_TO_CORNERS[trade_dir].map(trade_post_dir =>
+                  `<div class="trade-post p-${trade_post_dir}"></div>`
+                ).join('')}
+                <div class="beaches">
+                  ${Object.values(CONST.DIR_HELPER.KEYS).map((beach_dir, i) => `
+                    <div class="beach beach-${i%3 + 1} beach-${beach_dir}"></div>
+                  `).join('')}
+                </div>
+              </div>
+              <div class="trade-dir-text">${trade_dir.replace('_', ' ')}</div>
+            </div>
+          `).join('')}
+          <div class="cancel-container"><div class="button text">Close</div></div>
+        </div>
       </div>
     `
 
+    this.$tile_selector = this.$tile_selection_container.querySelector('#tile-selector')
     this.$mapkey_textarea = this.$el.querySelector('textarea')
     this.$shuffle_tiles = this.$el.querySelector('#shuffle-tiles')
     this.$shuffle_numbers = this.$el.querySelector('#shuffle-numbers')
@@ -140,6 +182,18 @@ class Shuffler {
       })
     })
 
+    this.$tile_selector.querySelectorAll('.select-trade .trade-container').forEach($tile => {
+      $tile.addEventListener('click', e => {
+        this.onTradeSelection(e.currentTarget.dataset.type)
+      })
+    })
+
+    // this.$tile_selector.querySelectorAll('.select-trade-direction .trade-container').forEach($tile => {
+    //   $tile.addEventListener('click', e => {
+    //     this.onTradeSelection(e.currentTarget.dataset.type)
+    //   })
+    // })
+
     this.$tile_selector.querySelectorAll('.cancel-container .button').forEach($cancel => {
       $cancel.addEventListener('click', e => {
         $('#game').classList.remove('board--editing')
@@ -172,6 +226,11 @@ class Shuffler {
     if (type === 'S') {
       this.$tile_selector.dataset.mode = "trade"
     } else { }
+  }
+
+  onTradeSelection(type) {
+    this.$tile_selector.dataset.mode = "trade-direction"
+    this.$tile_selector.dataset.tradeType = type
   }
 
   shuffle({ mapkey, tile, number, port }) {

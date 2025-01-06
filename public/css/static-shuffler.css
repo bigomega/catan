@@ -67,7 +67,7 @@ body {
   }
 }
 
-#game>.accessibility-zone .info-zone .container .text-container .subtitle .social-icon {
+#game > .accessibility-zone .info-zone .container .text-container .subtitle .social-icon {
   background-image: url(/catan/images/social-icons.png);
 }
 
@@ -164,14 +164,82 @@ body {
   transition: all .125s ease-in;
   &.open { top: 0; }
 
-  .title {
-    height: 100%;
-    display: none; justify-content: center; align-items: center;
-    opacity: 0.15; font-size: 3em;
-  }
-  &[data-mode="start"] .title { display: flex; }
+  .tile {
+    width: 95px;
+    aspect-ratio: 1 / 1.164;
+    position: relative;
+    transition: top .125s ease-in;
 
-  .select-tiles {
+    .background {
+      position: absolute; width: 100%; height: 100%; left: 0; top: 0;
+      background-size: cover;
+    }
+    &:not(.S) .background { filter: drop-shadow(0px 0px 1px #0009); }
+
+    &.S .sea-hexagon {
+      background-color: var(--water-color);
+      width: calc(100% - 1px); height: 49%;
+      position: absolute; top: 26%;
+      /* border: 0.9px solid; border-top: none; border-bottom: none; */
+      &::before {
+        content: '';
+        background: inherit; border: inherit;
+        position: absolute; width: 100%; height: 100%;
+        transform: rotate(60deg);
+      }
+      &::after {
+        content: '';
+        background: inherit; border: inherit;
+        position: absolute; width: 100%; height: 100%;
+        transform: rotate(-60deg);
+      }
+    }
+  }
+
+  /* Beaches */
+  .beaches {
+    /* display: none; */
+    position: absolute;
+    transform: scale(0.623) translate(1px, 2px);
+  }
+
+  .beach {
+    width: 30px;
+    z-index: -1;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-size: contain;
+    display: none;
+  }
+
+  .beach-1 { height: 104px; }
+  .beach-2 { height: 102px; }
+  .beach-3 { height: 106px; }
+
+  .beach-left { top: 38px; left: -1px; width: 27px; }
+  .beach-top_left { top: -16px; left: 29px; transform: rotate(60deg); }
+  .beach-top_right { top: -17px; left: 91px; width: 28px; transform: rotate(121deg); }
+  .beach-right { top: 35px; left: 123px; width: 27px; transform: rotate(180deg); }
+  .beach-bottom_right { top: 87px; left: 97px; width: 26px; transform: rotate(-120deg); }
+  .beach-bottom_left { top: 91px; left: 31px; width: 28px; transform: rotate(-60deg); }
+
+  &[data-land-left="true"] .beach-left { display: block; }
+  &[data-land-top_left="true"] .beach-top_left { display: block; }
+  &[data-land-top_right="true"] .beach-top_right { display: block; }
+  &[data-land-right="true"] .beach-right { display: block; }
+  &[data-land-bottom_right="true"] .beach-bottom_right { display: block; }
+  &[data-land-bottom_left="true"] .beach-bottom_left { display: block; }
+
+  > .title {
+    height: 100%;
+    display: none; flex-direction: column; justify-content: center; align-items: center;
+    opacity: 0.15; font-size: 3em;
+
+    span { font-size: .3em; }
+  }
+  &[data-mode="start"] > .title { display: flex; }
+
+  > .select-tiles {
     display: none; justify-content: center;
     overflow: scroll;
     padding-top: 18px; margin-top: -10px;
@@ -182,31 +250,15 @@ body {
       cursor: pointer;
 
       &:first-child { margin-left: 1px; }
-      .tile {
-        width: 95px;
-        aspect-ratio: 1 / 1.164;
-        position: relative;
-        transition: top .125s ease-in;
-
-        .background {
-          position: absolute; width: 100%; height: 100%; left: 0; top: 0;
-          background-size: cover;
-        }
-        &:not(.S) .background { filter: drop-shadow(0px 0px 1px #0009); }
-        .tile-border {
-          background-image: url(/catan/images/tiles/Sea.png);
-          opacity: 0.5;
-        }
-      }
       &:hover .tile { filter: drop-shadow(0px 5px 5px #0009); top: -5px; }
       .tile-text { text-align: center; margin-top: 5px; opacity: 0.5; }
     }
 
     .cancel-container { margin: 0 0 30px 25px; display: flex; flex-direction: column; justify-content: center; }
   }
-  &[data-mode="tiles"] .select-tiles { display: flex; }
+  &[data-mode="tiles"] > .select-tiles { display: flex; }
 
-  .select-trade {
+  > .select-trade {
     display: none; justify-content: center;
     margin-top: 20px;
 
@@ -240,11 +292,80 @@ body {
       .trade-text { text-align: center; margin-top: 10px; opacity: 0.5; }
     }
 
-    .cancel-container, .no-trade-container { margin-left: 15px; display: flex; flex-direction: column; justify-content: center; }
+    .cancel-container, .no-trade-container { display: flex; flex-direction: column; justify-content: center; }
     .no-trade-container { margin-left: 25px; }
     .cancel-container { margin-left: 35px; }
   }
-  &[data-mode="trade"] .select-trade { display: flex; }
+  &[data-mode="trade"] > .select-trade { display: flex; }
+
+  /* @todo Please fkucing modularise this css. Copying and editing is ugly */
+  > .select-trade-direction {
+    display: none; justify-content: center;
+
+    .trade-direction-container {
+      cursor: pointer;
+      margin: 0 15px;
+      display: none; flex-direction: column; align-items: center;
+      &:first-child { margin-left: 1px; }
+      .tile {
+        /* Trade Piece */
+        &.S[data-trade]::after {
+          content: '';
+          background-size: contain;
+          position: absolute;
+          width: 65px;
+          height: 77px;
+          filter: drop-shadow(2px 2px 3px #000a);
+        }
+
+        &.S[data-trade-dir="bottom_right"]::after { transform: scale(0.623) translate(11px, 20px); }
+        &.S[data-trade-dir="bottom_left"]::after { transform: scale(0.623) translate(34px, 18px); }
+        &.S[data-trade-dir="top_right"]::after { transform: scale(0.623) translate(26px, 32px); }
+        &.S[data-trade-dir="top_left"]::after { transform: scale(0.623) translate(30px, 27px); }
+        &.S[data-trade-dir="right"]::after { transform: scale(0.623) translate(10px, 23px); }
+        &.S[data-trade-dir="left"]::after { transform: scale(0.623) translate(35px, 21px); }
+
+        /* Trade Dock */
+        .trade-post {
+          width: 34px;
+          height: 44px;
+          background-size: contain;
+          /* transform: rotate(180deg) translate(0px, 20px); */
+          z-index: 1;
+          position: absolute;
+
+          &.p-top { top: -15px; left: 60px; transform: scale(0.623) translate(-46px, 17px); }
+          &.p-top_left { top: 30px; left: -15px; transform: scale(0.623) rotate(-60deg) translate(32px, 5px); }
+          &.p-top_right { top: 20px; left: 68px; transform: scale(0.623) rotate(60deg) translate(-10px, 3px); }
+          &.p-bottom { top: 82px; left: 33px; transform: scale(0.623) rotate(180deg) translate(3px, 15px); }
+          &.p-bottom_left { top: 59px; left: -6px; transform: scale(0.623) rotate(-120deg) translate(7px, 11px); }
+          &.p-bottom_right { top: 61px; left: 68px; transform: scale(0.623) rotate(120deg) translate(-5px, 13px); }
+        }
+      }
+      &:hover .tile { filter: drop-shadow(0px 5px 5px #0009); top: -5px; }
+    }
+
+    .trade-dir-text { text-align: center; margin-top: 10px; opacity: 0.5; text-transform: capitalize; }
+    .cancel-container { margin: 0 0 30px 25px; display: flex; flex-direction: column; justify-content: center; }
+  }
+  &[data-mode="trade-direction"] > .select-trade-direction { display: flex; }
+
+
+  &[data-land-left="true"] > .select-trade-direction .trade-direction-container[data-trade-dir="left"] { display: flex; }
+  &[data-land-top_left="true"] > .select-trade-direction .trade-direction-container[data-trade-dir="top_left"] { display: flex; }
+  &[data-land-top_right="true"] > .select-trade-direction .trade-direction-container[data-trade-dir="top_right"] { display: flex; }
+  &[data-land-right="true"] > .select-trade-direction .trade-direction-container[data-trade-dir="right"] { display: flex; }
+  &[data-land-bottom_right="true"] > .select-trade-direction .trade-direction-container[data-trade-dir="bottom_right"] { display: flex; }
+  &[data-land-bottom_left="true"] > .select-trade-direction .trade-direction-container[data-trade-dir="bottom_left"] { display: flex; }
+
+  &[data-trade-type="B2"] .tile.S::after { background-image: url(/catan/images/trade/Brick.png); }
+  &[data-trade-type="L2"] .tile.S::after { background-image: url(/catan/images/trade/Lumber.png); }
+  &[data-trade-type="O2"] .tile.S::after { background-image: url(/catan/images/trade/Ore.png); }
+  &[data-trade-type="S2"] .tile.S::after { background-image: url(/catan/images/trade/Sheep.png); }
+  &[data-trade-type="W2"] .tile.S::after { background-image: url(/catan/images/trade/Wheat.png); }
+  &[data-trade-type="*3"] .tile.S::after { background-image: url(/catan/images/trade/*3.png); }
+
+  .cancel-container { display: none !important; }
 }
 
 /* --------------------------------------
