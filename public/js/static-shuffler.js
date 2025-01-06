@@ -35,7 +35,7 @@ class Shuffler {
 
   render() {
     this.$el.innerHTML = `
-      <div class="shuffler-options">
+      <div class="shuffler-section">
         <div class="title">Shuffle Options:</div>
         <label>
           <input type="checkbox" name="shuffle" id="shuffle-tiles" checked>
@@ -51,16 +51,17 @@ class Shuffler {
           <span>Shuffle Ports</span>
         </label>
         <div class="button shuffle">Shuffle</div>
-        <div class="button reset secondary">Reset Map</div>
-        <div class="button copy secondary"></div>
+        <div class="button text reset">Reset Map</div>
+        <div class="button text copy"></div>
       </div>
       <hr/>
-      <label class="toggle-edit">
+      <label class="edit-section">
         <input type="checkbox" name="edit-map" id="toggle-edit-input"/>
         <div class="button open-edit-text">Edit Map</div>
-        <div class="button secondary close-edit-text">Close Editor</div>
+        <div class="button text close-edit-text">Close Editor</div>
       </label>
-      <div class="edit-options">
+      <hr/>
+      <div class="mapkey-section">
         <div class="title">Map Key:</div>
         <textarea name="mapkey" id="mapkey">${this.board.mapkey}</textarea>
         <div class="button render secondary">Render</div>
@@ -69,15 +70,24 @@ class Shuffler {
 
     this.$tile_selector.innerHTML = `
       <div class="title">Click on the tiles to edit.</div>
-      <div class="all-tiles">
-        ${
-          Object.keys(CONST.TILES).map(t => `
-            <div class="tile-container ${t}">
-              <div class="tile ${t}"><div class="background"></div></div>
-              <div class="tile-text">${CONST.TILES[t]}</div>
-            </div>
-          `).join('')
-        }
+      <div class="select-tiles">
+        ${Object.entries(CONST.TILES).map(([t_key, t_name]) => `
+          <div class="tile-container ${t_key}" data-type="${t_key}">
+            <div class="tile ${t_key}"><div class="background"></div></div>
+            <div class="tile-text">${t_name}</div>
+          </div>
+        `).join('')}
+        <div class="cancel-container"><div class="button text">Close</div></div>
+      </div>
+      <div class="select-trade">
+        ${Object.entries(CONST.TRADE_OFFERS).map(([t_key, t_name]) => ['Px', '*4'].includes(t_key)  ? '' : `
+          <div class="trade-container ${t_key}">
+            <div class="trade-type ${t_key.replace(/\*/, '_')}" data-type="${t_key}"></div>
+            <div class="trade-text">${t_name}</div>
+          </div>
+        `).join('')}
+        <div class="no-trade-container"><div class="button secondary">Skip<br/>Trade</div></div>
+        <div class="cancel-container"><div class="button text">Close</div></div>
       </div>
     `
 
@@ -86,6 +96,7 @@ class Shuffler {
     this.$shuffle_numbers = this.$el.querySelector('#shuffle-numbers')
     this.$shuffle_ports = this.$el.querySelector('#shuffle-ports')
     this.#setupEvents()
+    this.#setupBoardClickEvent()
   }
 
   #setupEvents() {
@@ -117,9 +128,50 @@ class Shuffler {
     })
 
     this.$el.querySelector('#toggle-edit-input').addEventListener('change', e => {
-      $('#game').classList.toggle('editing-board')
+      $('#game').classList.toggle('board--editing')
       this.$tile_selector.classList.toggle('open')
+      this.board_ui.$el.querySelector('.tile.picked')?.classList.remove('picked')
+      this.$tile_selector.dataset.mode = "start"
     })
+
+    this.$tile_selector.querySelectorAll('.select-tiles .tile-container').forEach($tile => {
+      $tile.addEventListener('click', e => {
+        this.onTileSelection(e.currentTarget.dataset.type)
+      })
+    })
+
+    this.$tile_selector.querySelectorAll('.cancel-container .button').forEach($cancel => {
+      $cancel.addEventListener('click', e => {
+        $('#game').classList.remove('board--editing')
+        this.$tile_selector.classList.remove('open')
+        this.$el.querySelector('#toggle-edit-input').checked = false
+        this.board_ui.$el.querySelector('.tile.picked')?.classList.remove('picked')
+        this.$tile_selector.dataset.mode = "start"
+      })
+    })
+  }
+
+  #setupBoardClickEvent() {
+    this.board_ui.$el.querySelectorAll('.tile').forEach($tile => {
+      $tile.addEventListener('click', e => {
+        if (!$('#game').classList.contains('board--editing')) return
+        this.onBoardClick(+e.currentTarget.dataset.id)
+      })
+    })
+  }
+
+  onBoardClick(id) {
+    this.board_ui.$el.querySelector('.tile.picked')?.classList.remove('picked')
+    this.board_ui.$el.querySelector(`.tile[data-id="${id}"]`).classList.add('picked')
+    this.$tile_selector.dataset.mode = "tiles"
+    // this.$tile_selector
+    console.log(id)
+  }
+
+  onTileSelection(type) {
+    if (type === 'S') {
+      this.$tile_selector.dataset.mode = "trade"
+    } else { }
   }
 
   shuffle({ mapkey, tile, number, port }) {
@@ -137,6 +189,7 @@ class Shuffler {
     this.board = new Board(mapkey)
     this.board_ui = new MapBuilderBoardUI(this.board, dummyFn)
     this.board_ui.render()
+    this.#setupBoardClickEvent()
   }
 
   updateURL(mapkey) {

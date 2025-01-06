@@ -17,6 +17,8 @@ body {
   letter-spacing: .2px;
 }
 
+/* hr { border-top-color: #fff; border-bottom-color: #fff; } */
+
 .button {
   display: block;
   background: none; color: inherit; border: none;
@@ -24,6 +26,37 @@ body {
   outline: inherit; appearance: unset;
   padding: 0; padding-block: 0px; padding-inline: 0px;
 }
+
+.button {
+  padding: 7px 25px; width: fit-content;
+  box-sizing: border-box; font-family: EagleLake;
+  border: 2px solid; border-radius: 50px;
+  text-align: center;
+  background: #333; color: var(--sand-color);
+  font-size: 1.2em; font-weight: bold; word-spacing: 5px;
+  transition: all .25s ease; display: inline-block;
+
+  &:active { background: #000; }
+  &:hover, &:focus { box-shadow: 0 0 10px 0px var(--sand-color), 0 0 20px 0px #333; }
+
+  &.secondary {
+    padding: 5px 15px; font-size: 1em;
+    color: var(--sand-color-text-dark); background: transparent;
+    &:active { background: var(--sand-color-text-dark); color: var(--sand-color); }
+  }
+
+  &.text {
+    padding: 5px; font-size: 1em;
+    background: none; border: none;
+    color: #333; text-decoration: underline;
+    &:hover, &:focus { color: var(--sand-color-text-dark); box-shadow: none; }
+  }
+}
+
+/* --------------------------------------
+ * GAME & BOARD
+ * -------------
+*/
 
 #game > .accessibility-zone .info-zone .play-full-game {
   font-family: EagleLake; font-size: 2em;
@@ -38,30 +71,26 @@ body {
   background-image: url(/catan/images/social-icons.png);
 }
 
-#game .board-container { transition: all .125s ease-in; }
-#game.editing-board .board-container { margin-top: 160px; }
+#game :is(.board-container, .accessibility-zone) { transition: all .125s ease-in; }
+#game.board--editing :is(.board-container, .accessibility-zone) { margin-top: calc(170px + 10px); }
 
 .board .tile.robbed::before {
   background-image: url(/catan/images/robber.png);
   left: 53px; top: 30px; height: 90px; width: 47px;
 }
-#game.editing-board .board .tile {
+#game.board--editing .board .tile {
+  cursor: pointer;
 
   .tile-replace {
     font-family: initial;
-    position: absolute; top: 0; left: 0;
-    z-index: 4;
-    display: none;
-    background: #333;
-    color: var(--sand-color);
-    width: 50px;
-    height: 50px;
+    position: absolute; top: 0; left: 0; width: 50px; height: 50px;
     border-radius: 50px;
-    text-align: center;
-    font-size: 50px;
-    line-height: 45px;
-    margin-left: 45px;
-    margin-top: 57px;
+    margin-left: 48px;
+    margin-top: 61px;
+    z-index: 4;
+    opacity: 0;
+    background: #333; color: var(--sand-color);
+    font-size: 50px; text-align: center; line-height: 45px;
     box-shadow: 0 0 10px 0px var(--sand-color), 0 0 20px 0px #333;
     &::before { content: '↺'; }
   }
@@ -70,12 +99,14 @@ body {
     &::before { content: '+'; }
   }
 
-  &:hover {
-    cursor: pointer;
-    .background { animation: tile-blink .7s infinite alternate ease-in-out; }
-    .tile-replace { display: block; }
+
+  .background, .number { transition: all .125s ease-in; }
+  &:is(:hover, .picked) .tile-replace { opacity: 1; transition: all .125s ease-in; }
+  &.picked .tile-replace { transform: scale(1.5); font-size: 30px; &::before { content: '…' !important; } }
+  &:hover, &.picked {
+    /* .tile-replace { display: block; } */
     &:not(.S) {
-      cursor: pointer;
+      .tile-replace { margin-left: 45px; margin-top: 57px; }
 
       .background {
         z-index: 1;
@@ -84,21 +115,17 @@ body {
         animation: none;
         filter: drop-shadow(5px 5px 5px #000) sepia(.8) brightness(0.9);
       }
-
       .number {
         margin-left: 45px;
         margin-top: 57px;
         animation: none;
         background: #999;
-
-        &::before {
-          color: #666;
-        }
+        &::before { color: #666; }
       }
+
     }
   }
 }
-
 
 /* Images reloaded for the different URL path */
 :is(.board, #tile-selector) .tile {
@@ -121,11 +148,16 @@ body {
   .trade-post { background-image: url(/catan/images/trade/Dock.png); }
 }
 
+/* --------------------------------------
+ * TILE SELECTOR
+ * -------------
+*/
+
 #tile-selector {
   font-family: EagleLake;
   position: fixed; left: 0px; top: -230px;
   width: calc(100% - 280px); padding: 10px; box-sizing: border-box;
-  height: 160px;
+  height: 170px;
   overflow: scroll;
   background: var(--sand-color); color: #333;
   filter: drop-shadow(0px 0px 30px #000);
@@ -134,34 +166,91 @@ body {
 
   .title {
     height: 100%;
-    display: flex; justify-content: center; align-items: center;
+    display: none; justify-content: center; align-items: center;
     opacity: 0.15; font-size: 3em;
   }
+  &[data-mode="start"] .title { display: flex; }
 
-  .all-tiles {
-    display: flex;justify-content: center;
+  .select-tiles {
+    display: none; justify-content: center;
     overflow: scroll;
-    display: none;
+    padding-top: 18px; margin-top: -10px;
 
     .tile-container {
       margin: 0 15px;
       flex-shrink: 0;
+      cursor: pointer;
 
+      &:first-child { margin-left: 1px; }
       .tile {
-        /* width: 100px; height: 100px; */
         width: 95px;
         aspect-ratio: 1 / 1.164;
         position: relative;
+        transition: top .125s ease-in;
+
         .background {
           position: absolute; width: 100%; height: 100%; left: 0; top: 0;
           background-size: cover;
         }
+        &:not(.S) .background { filter: drop-shadow(0px 0px 1px #0009); }
+        .tile-border {
+          background-image: url(/catan/images/tiles/Sea.png);
+          opacity: 0.5;
+        }
       }
-      .tile-text { text-align: center; }
+      &:hover .tile { filter: drop-shadow(0px 5px 5px #0009); top: -5px; }
+      .tile-text { text-align: center; margin-top: 5px; opacity: 0.5; }
     }
-  }
 
+    .cancel-container { margin: 0 0 30px 25px; display: flex; flex-direction: column; justify-content: center; }
+  }
+  &[data-mode="tiles"] .select-tiles { display: flex; }
+
+  .select-trade {
+    display: none; justify-content: center;
+    margin-top: 20px;
+
+    .trade-container {
+      cursor: pointer;
+      margin: 0 15px;
+      display: flex; flex-direction: column; align-items: center;
+      &:first-child { margin-left: 1px; }
+
+      .trade-type {
+        aspect-ratio: 5 / 6;
+        height: 80px;
+        position: relative;
+
+        &::before {
+          content: '';
+          position: absolute; left: 0; top: 0;
+          width: 100%; height: 100%;
+          background-size: contain; background-repeat: no-repeat;
+        }
+
+
+        &.B2::before { background-image: url(/catan/images/trade/Brick.png); }
+        &.L2::before { background-image: url(/catan/images/trade/Lumber.png); }
+        &.O2::before { background-image: url(/catan/images/trade/Ore.png); }
+        &.S2::before { background-image: url(/catan/images/trade/Sheep.png); }
+        &.W2::before { background-image: url(/catan/images/trade/Wheat.png); }
+        &._3::before { background-image: url(/catan/images/trade/*3.png); }
+      }
+      &:hover .trade-type::before { filter: drop-shadow(0px 5px 5px #000a); top: -5px; }
+      .trade-text { text-align: center; margin-top: 10px; opacity: 0.5; }
+    }
+
+    .cancel-container, .no-trade-container { margin-left: 15px; display: flex; flex-direction: column; justify-content: center; }
+    .no-trade-container { margin-left: 25px; }
+    .cancel-container { margin-left: 35px; }
+  }
+  &[data-mode="trade"] .select-trade { display: flex; }
 }
+
+/* --------------------------------------
+ * SHUFFLER
+ * -------------
+*/
 
 #shuffler {
   position: fixed; right: 0; top: 0;
@@ -178,28 +267,12 @@ body {
     &:hover { opacity: 1 !important; color: var(--sand-color-text-dark); }
   }
   .button {
-    padding: 7px 25px; width: fit-content;
-    box-sizing: border-box; font-family: inherit;
-    border: 2px solid; border-radius: 50px;
-    text-align: center;
-    background: #333; color: var(--sand-color);
-    font-size: 1.2em; font-weight: bold; word-spacing: 5px;
-    transition: all .25s ease; display: inline-block;
-
-    &:active { background: #000; }
-    &:hover, &:focus { box-shadow: 0 0 10px 0px var(--sand-color), 0 0 20px 0px #333; }
-
-    &.secondary {
-      padding: 5px 15px; font-size: 1em;
-      color: var(--sand-color-text-dark); background: transparent;
-      &:active { background: var(--sand-color-text-dark); color: var(--sand-color); }
-    }
-
     &.shuffle { margin: 20px 0 15px ; display: block; font-family: EagleLake; }
-    &.reset { margin: 0 10px 10px 0;}
+    &.reset { margin-bottom: 10px; }
     /* &.reset { margin-left: 10px; margin-bottom: 20px; } */
     &.copy {
-      &::before { content: 'Share'; }
+      margin-bottom: 10px;
+      &::before { content: 'Copy URL'; }
       &.copied {
         transition: none; font-family: Raleway;
         opacity: 0.5; color: #333;
@@ -208,10 +281,8 @@ body {
     }
     &.render { margin: 20px 10px 0 0; }
   }
-  .shuffler-options {
-    /*  */
-  }
-  .toggle-edit {
+  .edit-section {
+    padding: 10px 0;
     input { display: none; }
     > .button { display: none; }
     input:not(:checked) ~ .open-edit-text { display: block; }
@@ -219,7 +290,7 @@ body {
     /* override */
     &:has(input:not(:checked)) { opacity: 1; }
   }
-  .edit-options {
-    textarea { width: 100%; min-height: 115px;}
+  .mapkey-section {
+    textarea { font-size: .85em; width: 100%; min-height: 115px;}
   }
 }

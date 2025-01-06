@@ -7,7 +7,7 @@ export default class MapBuilderBoardUI extends BoardUI {
   $tile_selector = $('#tile-selector')
 
   constructor(board, onClick, size) {
-    super(board, onClick)
+    super(board, onClick, size)
   }
 
   render() {

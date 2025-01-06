@@ -35,8 +35,6 @@ The server will be reachable at [localhost:3000](http://localhost:3000/). You're
 
 ## Future Ideas
 - Browser Notifications
-- Optimization (memory[^1], speed, colors)
-  - Further modularisation (as of Dec 2024 `model/game.js` is :700 and `public/js/game.js` is :470)
 - Join random games
   - Private & public games
 - Watch games
@@ -49,6 +47,13 @@ The server will be reachable at [localhost:3000](http://localhost:3000/). You're
 - Discord help (for talking)
 - Seafarers expansion (fairly easy one)
 - Trade negotiations
+
+## Tech Debt
+- Move to React (or any partial rendering libs)
+- Write Tests
+- Button and other reused components
+- Optimization (memory[^1], speed, colors)
+- Further modularisation (as of Dec 2024 `model/game.js` is :700 and `public/js/game.js` is :470)
 
 ## Frameworks
 ### Major

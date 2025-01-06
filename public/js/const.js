@@ -4,8 +4,8 @@ export const TILES = {
   C: 'Clay Pit',
   M: 'Mountain',
   F: 'Fields',
-  S: 'Sea',
   D: 'Desert',
+  S: 'Sea',
 }
 
 export const RESOURCES = { S: 'Sheep', L: 'Lumber', B: 'Brick', O: 'Ore', W: 'Wheat'}
@@ -50,8 +50,8 @@ export const TRADE_OFFERS = {
   B2: 'Brick 2:1',
   O2: 'Ore 2:1',
   W2: 'Wheat 2:1',
-  '*3': '3:1',
-  '*4': '4:1',
+  '*3': 'Any 3:1',
+  '*4': 'Any 4:1',
   Px: 'Player Trade',
 }
 
