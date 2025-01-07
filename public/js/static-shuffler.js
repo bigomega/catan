@@ -104,12 +104,21 @@ class Shuffler {
         <div class="select-number">
           <div class="number-slider-container">
             <div class="number-slider-line">
-              ${Array.from({ length: 10 }).map((_, i) =>
-                `<div style="left: ${i * 100 / 9}%"></div>`
-              ).join('')}
+              ${Array.from({ length: 10 }).map((_, i) =>`
+                <div style="left: ${i * 100 / 9}%"></div>
+              `).join('')}
             </div>
             <div class="number-slider-thumb" data-num="6"></div>
             <input class="number-slider-input" type="range" value="6" min="2" max="11" step="1">
+            <div class="probability-text">
+              ${[...Array(11).keys()].map(n => n + 2).filter(n => n !== 7).map(n => `
+                <span data-p-num="${n}">
+                  Rolling Chance:
+                  <b>${((7 - Math.abs(7 - n) - 1) / 36 * 100).toFixed(1)}%</b>
+                  (${7 - Math.abs(7 - n) - 1}/36)
+                </span>
+              `).join('')}
+            </div>
           </div>
           <div class="tile-container">
             <div class="tile">

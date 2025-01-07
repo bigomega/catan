@@ -281,7 +281,7 @@ body {
       position: relative;
       max-width: 400px;
       flex-grow: 1;
-      margin: -20px 20px 0;
+      margin: 10px 20px 0;
 
       .number-slider-line {
         width: 100%;
@@ -302,13 +302,31 @@ body {
         text-align: center;
         background: var(--sand-color-text-dark); color: var(--sand-color);
         border: 2px solid var(--sand-color); border-radius: 50px;
-        left: 44.44%;
+        left: 44.44%; transition: all .05s ease-in;
 
         &::before { content: attr(data-num); }
         &:has(+ .number-slider-input:hover) { box-shadow: 0 0 6px 0px var(--sand-color-text-dark); }
       }
 
       .number-slider-input { opacity: 0; width: 100%; cursor: pointer; }
+
+      .probability-text {
+        margin-top: 20px; text-align: center; font-family: monospace; opacity: 0.3;
+
+        span { display: none; }
+      }
+      .number-slider-thumb[data-num="2"] ~ .probability-text span[data-p-num="2"],
+      .number-slider-thumb[data-num="3"] ~ .probability-text span[data-p-num="3"],
+      .number-slider-thumb[data-num="4"] ~ .probability-text span[data-p-num="4"],
+      .number-slider-thumb[data-num="5"] ~ .probability-text span[data-p-num="5"],
+      .number-slider-thumb[data-num="6"] ~ .probability-text span[data-p-num="6"],
+      .number-slider-thumb[data-num="8"] ~ .probability-text span[data-p-num="8"],
+      .number-slider-thumb[data-num="9"] ~ .probability-text span[data-p-num="9"],
+      .number-slider-thumb[data-num="10"] ~ .probability-text span[data-p-num="10"],
+      .number-slider-thumb[data-num="11"] ~ .probability-text span[data-p-num="11"],
+      .number-slider-thumb[data-num="12"] ~ .probability-text span[data-p-num="12"] {
+        display: inline;
+      }
     }
 
     .number {
