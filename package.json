@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "npx nodemon index.js -w index.js -w views -w models -e js,html",
+    "start": "nodemon index.js -w index.js -w views -w models -e js,html",
     "deploy-shuffler": "sh ./deploy-gh-pages.sh",
     "dev-static": "sh ./dev-static-pages.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -28,5 +28,8 @@
     "push-dir": "^0.4.1",
     "random-words": "^2.0.1",
     "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "light-server": "^2.9.1"
   }
 }

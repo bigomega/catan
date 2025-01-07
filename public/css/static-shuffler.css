@@ -128,14 +128,30 @@ body {
 }
 
 /* Images reloaded for the different URL path */
+
+:is(.board, #tile-selector) .tile.G .background
+, #tile-selector[data-tile="G"] .select-number .tile .background
+  { background-image: url('/catan/images/tiles/Grassland.png'); }
+:is(.board, #tile-selector) .tile.J .background
+, #tile-selector[data-tile="J"] .select-number .tile .background
+  { background-image: url('/catan/images/tiles/Jungle.png'); }
+:is(.board, #tile-selector) .tile.C .background
+, #tile-selector[data-tile="C"] .select-number .tile .background
+  { background-image: url('/catan/images/tiles/Clay Pit.png'); }
+:is(.board, #tile-selector) .tile.M .background
+, #tile-selector[data-tile="M"] .select-number .tile .background
+  { background-image: url('/catan/images/tiles/Mountain.png'); }
+:is(.board, #tile-selector) .tile.F .background
+, #tile-selector[data-tile="F"] .select-number .tile .background
+  { background-image: url('/catan/images/tiles/Fields.png'); }
+:is(.board, #tile-selector) .tile.D .background
+, #tile-selector[data-tile="D"] .select-number .tile .background
+  { background-image: url('/catan/images/tiles/Desert.png'); }
+:is(.board, #tile-selector) .tile.S .background
+, #tile-selector[data-tile="S"] .select-number .tile .background
+  { background-image: url('/catan/images/tiles/Sea.png'); }
+
 :is(.board, #tile-selector) .tile {
-  &.G .background { background-image: url('/catan/images/tiles/Grassland.png'); }
-  &.J .background { background-image: url('/catan/images/tiles/Jungle.png'); }
-  &.C .background { background-image: url('/catan/images/tiles/Clay Pit.png'); }
-  &.M .background { background-image: url('/catan/images/tiles/Mountain.png'); }
-  &.F .background { background-image: url('/catan/images/tiles/Fields.png'); }
-  &.D .background { background-image: url('/catan/images/tiles/Desert.png'); }
-  &.S .background { background-image: url('/catan/images/tiles/Sea.png'); }
   &.S[data-trade="B"]::after { background-image: url(/catan/images/trade/Brick.png); }
   &.S[data-trade="L"]::after { background-image: url(/catan/images/trade/Lumber.png); }
   &.S[data-trade="O"]::after { background-image: url(/catan/images/trade/Ore.png); }
@@ -239,17 +255,17 @@ body {
   }
   &[data-mode="start"] > .title { display: flex; }
 
-  > .select-tiles {
-    display: none; justify-content: center;
+  > .select-tiles , > .select-number {
+    display: none; justify-content: center; align-items: center; gap: 20px;
     overflow: scroll;
     padding-top: 18px; margin-top: -10px;
 
-    .tile-container {
-      margin: 0 15px;
+    .tile-container, .number-container {
       flex-shrink: 0;
       cursor: pointer;
 
-      &:first-child { margin-left: 1px; }
+      .tile.S .background { opacity: 0.3; }
+
       &:hover .tile { filter: drop-shadow(0px 5px 5px #0009); top: -5px; }
       .tile-text { text-align: center; margin-top: 5px; opacity: 0.5; }
     }
@@ -258,14 +274,81 @@ body {
   }
   &[data-mode="tiles"] > .select-tiles { display: flex; }
 
+  > .select-number {
+    gap: 50px;
+
+    .number-slider-container {
+      position: relative;
+      max-width: 400px;
+      flex-grow: 1;
+      margin: -20px 20px 0;
+
+      .number-slider-line {
+        width: 100%;
+        height: 2px;
+        position: absolute;
+        background: var(--sand-color-text-dark);
+        top: 10px;
+        div {
+          background: inherit;
+          position: absolute; top: -4px; margin-left: -5px;
+          width: 10px; height: 10px; border-radius: 10px;
+        }
+      }
+
+      .number-slider-thumb {
+        position: absolute; width: 34px; height: 34px; top: -8px;
+        line-height: 32px; margin-left: -19px;
+        text-align: center;
+        background: var(--sand-color-text-dark); color: var(--sand-color);
+        border: 2px solid var(--sand-color); border-radius: 50px;
+        left: 44.44%;
+
+        &::before { content: attr(data-num); }
+        &:has(+ .number-slider-input:hover) { box-shadow: 0 0 6px 0px var(--sand-color-text-dark); }
+      }
+
+      .number-slider-input { opacity: 0; width: 100%; cursor: pointer; }
+    }
+
+    .number {
+      z-index: 3;
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      position: absolute; left: 22px; top: 30px;
+      /* opacity: 0.8; */
+      box-shadow: 3px 3px 5px -1px #000,
+        5px 5px 4px -1px #fffa inset,
+        -8px -8px 8px -6px #000a inset;
+      background-color: #E9D49D;
+      transform: scale(0.9);
+
+      &::before {
+        display: block;
+        content: attr(data-num) "\a " attr(data-dots);
+        font-family: serif;
+        font-weight: bold;
+        white-space: pre;
+        text-align: center;
+        font-size: 25px;
+        /* letter-spacing: 1px; */
+        line-height: 10px;
+        position: relative;
+        top: 15px;
+      }
+
+      &:is([data-num="6"], [data-num="8"])::before { color: #d21c0e; }
+    }
+  }
+  &[data-mode="number"] > .select-number { display: flex; }
+
   > .select-trade {
-    display: none; justify-content: center;
-    margin-top: 20px;
+    display: none; justify-content: center; gap: 20px;
+    margin-top: 10px;
 
     .trade-container {
       cursor: pointer;
-      margin: 0 15px;
-      display: flex; flex-direction: column; align-items: center;
+      display: flex; flex-direction: column; align-items: center; flex: 0 0 100px;
       &:first-child { margin-left: 1px; }
 
       .trade-type {
@@ -290,22 +373,28 @@ body {
       }
       &:hover .trade-type::before { filter: drop-shadow(0px 5px 5px #000a); top: -5px; }
       .trade-text { text-align: center; margin-top: 10px; opacity: 0.5; }
+
+      &:hover .tile { filter: drop-shadow(0px 5px 5px #0009); top: -5px; }
+      .no-trade-text {
+        position: absolute;
+        color: color-mix(in srgb, var(--water-color) 70%, #000);
+        text-align: center;
+        width: 100%;
+        margin-top: 28px;
+      }
     }
 
-    .cancel-container, .no-trade-container { display: flex; flex-direction: column; justify-content: center; }
-    .no-trade-container { margin-left: 25px; }
-    .cancel-container { margin-left: 35px; }
+    .cancel-container { margin-left: 35px; display: flex; flex-direction: column; justify-content: center; }
   }
   &[data-mode="trade"] > .select-trade { display: flex; }
 
   /* @todo Please fkucing modularise this css. Copying and editing is ugly */
   > .select-trade-direction {
-    display: none; justify-content: center;
+    display: none; justify-content: center; gap: 20px;
 
     .trade-direction-container {
       cursor: pointer;
-      margin: 0 15px;
-      display: none; flex-direction: column; align-items: center;
+      display: none; flex-direction: column; align-items: center; flex: 0 0 130px;
       &:first-child { margin-left: 1px; }
       .tile {
         /* Trade Piece */

@@ -71,11 +71,13 @@ class Shuffler {
     this.$tile_selection_container.innerHTML = `
       <div id="tile-selector"
         data-mode="start"
+        data-tile="J"
         data-trade-type="*"
         ${Object.values(CONST.DIR_HELPER.KEYS).map(dir =>
           `data-land-${dir}="true"`
         ).join('')}
       >
+        <!-- modes = start|tiles|number|trade|trade-direction -->
         <div class="title">
           <div>Click on the tiles to edit.</div>
           <span class="button text">Clean Start</span>
@@ -99,6 +101,24 @@ class Shuffler {
           `).join('')}
           <div class="cancel-container"><div class="button text">Close</div></div>
         </div>
+        <div class="select-number">
+          <div class="number-slider-container">
+            <div class="number-slider-line">
+              ${Array.from({ length: 10 }).map((_, i) =>
+                `<div style="left: ${i * 100 / 9}%"></div>`
+              ).join('')}
+            </div>
+            <div class="number-slider-thumb" data-num="6"></div>
+            <input class="number-slider-input" type="range" value="6" min="2" max="11" step="1">
+          </div>
+          <div class="tile-container">
+            <div class="tile">
+              <div class="background"></div>
+              <div class="number" data-num="6" data-dots="....."></div>
+            </div>
+            <div class="tile-text">Pick</div>
+          </div>
+        </div>
         <div class="select-trade">
           ${Object.entries(CONST.TRADE_OFFERS).map(([t_key, t_name]) => ['Px', '*4'].includes(t_key)  ? '' : `
             <div class="trade-container ${t_key}" data-type="${t_key}">
@@ -106,7 +126,18 @@ class Shuffler {
               <div class="trade-text">${t_name}</div>
             </div>
           `).join('')}
-          <div class="no-trade-container"><div class="button secondary">Skip<br/>Trade</div></div>
+          <div class="trade-container" data-type="--">
+            <div class="tile S">
+              <div class="background"></div>
+              <div class="sea-hexagon"></div>
+              <div class="beaches">
+                ${Object.values(CONST.DIR_HELPER.KEYS).map((beach_dir, i) => `
+                  <div class="beach beach-${i % 3 + 1} beach-${beach_dir}"></div>
+                `).join('')}
+              </div>
+              <div class="no-trade-text">No<br/>Trade</div>
+            </div>
+          </div>
           <div class="cancel-container"><div class="button text">Close</div></div>
         </div>
         <div class="select-trade-direction">
@@ -182,6 +213,10 @@ class Shuffler {
       })
     })
 
+    this.$tile_selector.querySelector('.select-number .number-slider-input').addEventListener('input', e => {
+      this.onNumberSlider(e.currentTarget.value)
+    }, false)
+
     this.$tile_selector.querySelectorAll('.select-trade .trade-container').forEach($tile => {
       $tile.addEventListener('click', e => {
         this.onTradeSelection(e.currentTarget.dataset.type)
@@ -218,17 +253,31 @@ class Shuffler {
     this.board_ui.$el.querySelector('.tile.picked')?.classList.remove('picked')
     this.board_ui.$el.querySelector(`.tile[data-id="${id}"]`).classList.add('picked')
     this.$tile_selector.dataset.mode = "tiles"
-    // this.$tile_selector
     console.log(id)
   }
 
   onTileSelection(type) {
     if (type === 'S') {
       this.$tile_selector.dataset.mode = "trade"
-    } else { }
+    } else if(type === 'D') {
+      //
+    } else {
+      this.$tile_selector.dataset.mode = "number"
+      this.$tile_selector.dataset.tile = type
+    }
+  }
+
+  onNumberSlider(value) {
+    const num = value > 6 ? +value + 1 : value
+    const $slider_thumb = this.$tile_selector.querySelector('.select-number .number-slider-thumb')
+    const $tile_num = this.$tile_selector.querySelector('.select-number .tile .number')
+    $tile_num.dataset.num = $slider_thumb.dataset.num = num
+    $slider_thumb.style.left = `${(value - 2) * 100 / 9}%`
+    $tile_num.dataset.dots = '.'.repeat(6 - Math.abs(7 - num))
   }
 
   onTradeSelection(type) {
+    if (type === '--') { return }
     this.$tile_selector.dataset.mode = "trade-direction"
     this.$tile_selector.dataset.tradeType = type
   }

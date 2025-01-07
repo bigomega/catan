@@ -54,7 +54,7 @@ export default class BoardShuffler {
          *      :: check for clear tiles
          *        - If found :: replace and update the clear tile as red zone
          *        - Else :: replace me with the first non (6|8) number from the end
-         *            - If can't fine one, let's pray
+         *            - If not found :: let's pray
          *   - Else :: mark red zone around me
          * - Else :: mark clear unless I'm red zoned already
          */
