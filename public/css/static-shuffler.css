@@ -520,9 +520,9 @@ body {
       margin-bottom: 10px;
       &::before { content: 'Copy URL'; }
       &.copied {
-        transition: none; font-family: Raleway;
+        transition: none; cursor: not-allowed;
         opacity: 0.5; color: #333;
-        &::before { content: 'Link Copied…'; }
+        &::before { content: 'Copied…'; }
       }
     }
     &.render { margin: 20px 10px 0 0; }

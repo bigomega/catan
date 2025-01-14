@@ -239,6 +239,14 @@ export default class Board {
     return new_list
   }
 
+  generateMapKey() {
+    return this.tile_rows.map((row, r_i) => {
+      const row_key = row.map(tile => tile.generateMapKey()).join('.')
+      if (!r_i) { return row_key }
+      return (row.diff > 0 ? '\n+' : '\n-') + row_key
+    }).join('')
+  }
+
   getRobbedTile() { return this.findTile(this.robber_loc) }
   findCorner(id) { return this.#corner_refs[id] }
   findEdge(id) { return this.#edge_refs[id] }

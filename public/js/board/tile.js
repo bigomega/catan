@@ -84,6 +84,15 @@ export default class Tile {
     }
   }
 
+  generateMapKey() {
+    if (this.type === 'S') {
+      return this.trade_edge && this.trade_type && this.trade_ratio
+        ? `S(${CONST.DIR_HELPER.MAPKEYS[this.trade_edge]}_${this.trade_type}${this.trade_ratio})`
+        : 'S'
+    }
+    return this.type === 'D' ? 'D' : (this.type + this.num)
+  }
+
   getAllCorners() {
     return Object.keys(this.corners).map(dir => this.corners[dir])
   }

@@ -209,10 +209,11 @@ class Shuffler {
     this.$el.querySelector('.button.copy').addEventListener('click', e => {
       window.navigator.clipboard.writeText(window.location.href)
       e.target.classList.add('copied')
+      setTimeout(_ => e.target.classList.remove('copied'), 1500)
     })
-    this.$el.querySelector('.button.copy').addEventListener('mouseout', e => {
-      e.target.classList.remove('copied')
-    })
+    // this.$el.querySelector('.button.copy').addEventListener('mouseout', e => {
+    //   e.target.classList.remove('copied')
+    // })
 
     this.$el.querySelector('.button.render').addEventListener('click', e => {
       try { this.updateBoard(this.$mapkey_textarea.value) }
@@ -274,10 +275,13 @@ class Shuffler {
   #resetBoardEdit() {
     this.board_ui.$el.querySelector('.tile.picked')?.classList.remove('picked')
     this.$tile_selector.dataset.mode = "start"
+    const $slider = this.$tile_selector.querySelector('.select-number .number-slider-input')
+    $slider.value = 6
+    $slider.dispatchEvent(new Event('input'))
   }
 
   onBoardClick(id) {
-    this.tile_selection_obj = { id }
+    this.tile_selection_obj = { id, number: 6 }
     this.board_ui.$el.querySelector('.tile.picked')?.classList.remove('picked')
     this.board_ui.$el.querySelector(`.tile[data-id="${id}"]`).classList.add('picked')
     this.$tile_selector.dataset.mode = "tiles"
@@ -326,7 +330,26 @@ class Shuffler {
   }
 
   changeTile() {
-    console.log(this.tile_selection_obj);
+    /**
+     * Change the tile data
+     * Add adjacent sea if not available
+     * Remove extra sea tiles
+     *  - Need to write a complex graph algorith to find out
+     * Re-render board
+     * Update mapkey in input and url
+     */
+    const new_tile = this.tile_selection_obj
+    const tile = this.board.findTile(new_tile.id)
+    console.log(new_tile);
+    tile.type = new_tile.type
+    tile.num = tile.type !== 'S' && tile.type !== 'D' && new_tile.number
+    if (tile.type === 'S') {
+      tile.trade_edge = new_tile.trade_dir
+      tile.trade_type = new_tile.trade_type?.replace(/\d+/, '')
+      tile.trade_ratio = new_tile.trade_type?.replace(/[^\d]+/, '')
+    }
+    const new_mapkey = this.board.generateMapKey()
+    this.updateBoard(new_mapkey)
     this.#resetBoardEdit()
   }
 
@@ -370,4 +393,4 @@ class Shuffler {
   }
 }
 
-new Shuffler()
+window.shuffler = new Shuffler()
