@@ -78,7 +78,8 @@ export default class BoardUI {
       const corner = tile.corners[dir]
       // if (corner.id == 4) {debugger}
       let $_trade = ''
-      if (tile.type === 'S' && tile.trade_edge && corner.trade) {
+      if (tile.type === 'S' && tile.trade_edge && corner.trade
+        && CONST.DIR_HELPER.EDGE_TO_CORNERS[tile.trade_edge].includes(dir)) {
         $_trade = `<div class="trade-post p-${dir}"></div>`
       }
       if (this.#renderedCorners.includes(corner.id)) { return $_trade }
