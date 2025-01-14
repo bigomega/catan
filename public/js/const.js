@@ -57,8 +57,8 @@ export const TRADE_OFFERS = {
 
 /** @todo Use this in tile.js, board_shuffler.js (and any other places) */
 export const DIR_HELPER = {
-  KEYS: { tl: 'top_left', tr: 'top_right', l: 'left', r: 'right', bl: 'bottom_left', br: 'bottom_right' },
-  MAPKEYS: { top_left: 'tl', top_right: 'tr', left: 'l', right: 'r', bottom_left: 'bl', bottom_right: 'br' },
+  KEYS: { tl: 'top_left', tr: 'top_right', r: 'right', br: 'bottom_right', bl: 'bottom_left', l: 'left' },
+  MAPKEYS: { top_left: 'tl', top_right: 'tr', right: 'r', bottom_right: 'br', bottom_left: 'bl', left: 'l' },
 
   OPPOSITES: {
     top_left: 'bottom_right', top_right: 'bottom_left', left: 'r',

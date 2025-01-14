@@ -8,6 +8,11 @@
 @font-face { font-family: Raleway; src: url(/catan/css/fonts/Raleway-Regular.ttf); }
 @font-face { font-family: Raleway; src: url(/catan/css/fonts/Raleway-Bold.ttf); font-weight: 600; }
 
+@keyframes beach-blink {
+  0% { filter: saturate(8); }
+  100% { filter: saturate(1);}
+}
+
 html,
 body {
   height: 100%;
@@ -235,16 +240,16 @@ body {
   .beach-left { top: 38px; left: -1px; width: 27px; }
   .beach-top_left { top: -16px; left: 29px; transform: rotate(60deg); }
   .beach-top_right { top: -17px; left: 91px; width: 28px; transform: rotate(121deg); }
-  .beach-right { top: 35px; left: 123px; width: 27px; transform: rotate(180deg); }
-  .beach-bottom_right { top: 87px; left: 97px; width: 26px; transform: rotate(-120deg); }
+  .beach-right { top: 31px; left: 124px; width: 26.5px; transform: rotate(180deg); }
+  .beach-bottom_right { top: 88.5px; left: 94px; width: 26.5px; transform: rotate(-120deg); }
   .beach-bottom_left { top: 91px; left: 31px; width: 28px; transform: rotate(-60deg); }
 
-  &[data-land-left="true"] .beach-left { display: block; }
-  &[data-land-top_left="true"] .beach-top_left { display: block; }
-  &[data-land-top_right="true"] .beach-top_right { display: block; }
-  &[data-land-right="true"] .beach-right { display: block; }
-  &[data-land-bottom_right="true"] .beach-bottom_right { display: block; }
-  &[data-land-bottom_left="true"] .beach-bottom_left { display: block; }
+  &[data-land_left="true"] .beach-left { display: block; }
+  &[data-land_top_left="true"] .beach-top_left { display: block; }
+  &[data-land_top_right="true"] .beach-top_right { display: block; }
+  &[data-land_right="true"] .beach-right { display: block; }
+  &[data-land_bottom_right="true"] .beach-bottom_right { display: block; }
+  &[data-land_bottom_left="true"] .beach-bottom_left { display: block; }
 
   > .title {
     height: 100%;
@@ -361,7 +366,7 @@ body {
   &[data-mode="number"] > .select-number { display: flex; }
 
   > .select-trade {
-    display: none; justify-content: center; gap: 20px;
+    display: none; justify-content: center; gap: 15px;
     margin-top: 10px;
 
     .trade-container {
@@ -414,6 +419,7 @@ body {
       cursor: pointer;
       display: none; flex-direction: column; align-items: center; flex: 0 0 130px;
       &:first-child { margin-left: 1px; }
+
       .tile {
         /* Trade Piece */
         &.S[data-trade]::after {
@@ -449,6 +455,18 @@ body {
           &.p-bottom_right { top: 61px; left: 68px; transform: scale(0.623) rotate(120deg) translate(-5px, 13px); }
         }
       }
+      &:hover .tile.S[data-trade-dir="bottom_right"] .beaches .beach-bottom_right
+      , &:hover .tile.S[data-trade-dir="bottom_left"] .beaches .beach-bottom_left
+      , &:hover .tile.S[data-trade-dir="top_right"] .beaches .beach-top_right
+      , &:hover .tile.S[data-trade-dir="top_left"] .beaches .beach-top_left
+      , &:hover .tile.S[data-trade-dir="right"] .beaches .beach-right
+      , &:hover .tile.S[data-trade-dir="left"] .beaches .beach-left
+      , &:hover .tile.S .trade-post
+      {
+        filter: saturate(1) brightness(0.9) contrast(2);
+        /* transition: all .125s ease-in-out; */
+        /* animation: beach-blink .5s infinite alternate ease-in-out; */
+      }
       &:hover .tile { filter: drop-shadow(0px 5px 5px #0009); top: -5px; }
     }
 
@@ -458,12 +476,12 @@ body {
   &[data-mode="trade-direction"] > .select-trade-direction { display: flex; }
 
 
-  &[data-land-left="true"] > .select-trade-direction .trade-direction-container[data-trade-dir="left"] { display: flex; }
-  &[data-land-top_left="true"] > .select-trade-direction .trade-direction-container[data-trade-dir="top_left"] { display: flex; }
-  &[data-land-top_right="true"] > .select-trade-direction .trade-direction-container[data-trade-dir="top_right"] { display: flex; }
-  &[data-land-right="true"] > .select-trade-direction .trade-direction-container[data-trade-dir="right"] { display: flex; }
-  &[data-land-bottom_right="true"] > .select-trade-direction .trade-direction-container[data-trade-dir="bottom_right"] { display: flex; }
-  &[data-land-bottom_left="true"] > .select-trade-direction .trade-direction-container[data-trade-dir="bottom_left"] { display: flex; }
+  &[data-land_left="true"] > .select-trade-direction .trade-direction-container[data-trade-dir="left"] { display: flex; }
+  &[data-land_top_left="true"] > .select-trade-direction .trade-direction-container[data-trade-dir="top_left"] { display: flex; }
+  &[data-land_top_right="true"] > .select-trade-direction .trade-direction-container[data-trade-dir="top_right"] { display: flex; }
+  &[data-land_right="true"] > .select-trade-direction .trade-direction-container[data-trade-dir="right"] { display: flex; }
+  &[data-land_bottom_right="true"] > .select-trade-direction .trade-direction-container[data-trade-dir="bottom_right"] { display: flex; }
+  &[data-land_bottom_left="true"] > .select-trade-direction .trade-direction-container[data-trade-dir="bottom_left"] { display: flex; }
 
   &[data-trade-type="B2"] .tile.S::after { background-image: url(/catan/images/trade/Brick.png); }
   &[data-trade-type="L2"] .tile.S::after { background-image: url(/catan/images/trade/Lumber.png); }

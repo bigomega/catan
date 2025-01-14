@@ -10,6 +10,16 @@ const PROD_URL = 'https://catan-qvig.onrender.com/'
 
 class Shuffler {
   board; board_ui; accessibility_ui
+  /**
+   * @type { {
+   *  id: number
+   *  type: string
+   *  number: number
+   *  trade_type: string
+   *  trade_dir: string
+   * } }
+   */
+  tile_selection_obj
   $mapkey_textarea; $shuffle_tiles; $shuffle_numbers; $shuffle_ports; $tile_selector
   $el = $('#shuffler')
   $tile_selection_container = $('#tile-selection-container')
@@ -74,7 +84,7 @@ class Shuffler {
         data-tile="J"
         data-trade-type="*"
         ${Object.values(CONST.DIR_HELPER.KEYS).map(dir =>
-          `data-land-${dir}="true"`
+          `data-land_${dir}="true"`
         ).join('')}
       >
         <!-- modes = start|tiles|number|trade|trade-direction -->
@@ -212,8 +222,7 @@ class Shuffler {
     this.$el.querySelector('#toggle-edit-input').addEventListener('change', e => {
       $('#game').classList.toggle('board--editing')
       this.$tile_selector.classList.toggle('open')
-      this.board_ui.$el.querySelector('.tile.picked')?.classList.remove('picked')
-      this.$tile_selector.dataset.mode = "start"
+      this.#resetBoardEdit()
     })
 
     this.$tile_selector.querySelectorAll('.select-tiles .tile-container').forEach($tile => {
@@ -226,25 +235,29 @@ class Shuffler {
       this.onNumberSlider(e.currentTarget.value)
     }, false)
 
+    this.$tile_selector.querySelector('.select-number .tile-container').addEventListener('click', e => {
+      this.changeTile()
+    })
+
     this.$tile_selector.querySelectorAll('.select-trade .trade-container').forEach($tile => {
       $tile.addEventListener('click', e => {
         this.onTradeSelection(e.currentTarget.dataset.type)
       })
     })
 
-    // this.$tile_selector.querySelectorAll('.select-trade-direction .trade-container').forEach($tile => {
-    //   $tile.addEventListener('click', e => {
-    //     this.onTradeSelection(e.currentTarget.dataset.type)
-    //   })
-    // })
+    this.$tile_selector.querySelectorAll('.select-trade-direction .trade-direction-container').forEach($tile => {
+      $tile.addEventListener('click', e => {
+        this.onTradeDirSelection(e.currentTarget.dataset.tradeDir)
+      })
+    })
 
     this.$tile_selector.querySelectorAll('.cancel-container .button').forEach($cancel => {
       $cancel.addEventListener('click', e => {
-        $('#game').classList.remove('board--editing')
-        this.$tile_selector.classList.remove('open')
-        this.$el.querySelector('#toggle-edit-input').checked = false
-        this.board_ui.$el.querySelector('.tile.picked')?.classList.remove('picked')
-        this.$tile_selector.dataset.mode = "start"
+        // $('#game').classList.remove('board--editing')
+        // this.$tile_selector.classList.remove('open')
+        // this.$el.querySelector('#toggle-edit-input').checked = false
+        // simulate the checkbox change instead
+        this.#resetBoardEdit()
       })
     })
   }
@@ -258,18 +271,29 @@ class Shuffler {
     })
   }
 
+  #resetBoardEdit() {
+    this.board_ui.$el.querySelector('.tile.picked')?.classList.remove('picked')
+    this.$tile_selector.dataset.mode = "start"
+  }
+
   onBoardClick(id) {
+    this.tile_selection_obj = { id }
     this.board_ui.$el.querySelector('.tile.picked')?.classList.remove('picked')
     this.board_ui.$el.querySelector(`.tile[data-id="${id}"]`).classList.add('picked')
     this.$tile_selector.dataset.mode = "tiles"
-    console.log(id)
+    const tile = this.board.findTile(id)
+    Object.keys(CONST.DIR_HELPER.MAPKEYS).map(dir => {
+      const dir_tile = tile.adjacent_tiles[dir]
+      this.$tile_selector.dataset[`land_${dir}`] = !!(dir_tile && dir_tile?.type !== 'S')
+    })
   }
 
   onTileSelection(type) {
+    this.tile_selection_obj.type = type
     if (type === 'S') {
       this.$tile_selector.dataset.mode = "trade"
     } else if(type === 'D') {
-      //
+      this.changeTile()
     } else {
       this.$tile_selector.dataset.mode = "number"
       this.$tile_selector.dataset.tile = type
@@ -283,12 +307,27 @@ class Shuffler {
     $tile_num.dataset.num = $slider_thumb.dataset.num = num
     $slider_thumb.style.left = `${(value - 2) * 100 / 9}%`
     $tile_num.dataset.dots = '.'.repeat(6 - Math.abs(7 - num))
+    this.tile_selection_obj.number = num
   }
 
   onTradeSelection(type) {
-    if (type === '--') { return }
+    if (type === '--') {
+      // No trade in Sea
+      return this.changeTile()
+    }
     this.$tile_selector.dataset.mode = "trade-direction"
     this.$tile_selector.dataset.tradeType = type
+    this.tile_selection_obj.trade_type = type
+  }
+
+  onTradeDirSelection(dir) {
+    this.tile_selection_obj.trade_dir = dir
+    this.changeTile()
+  }
+
+  changeTile() {
+    console.log(this.tile_selection_obj);
+    this.#resetBoardEdit()
   }
 
   shuffle({ mapkey, tile, number, port }) {
