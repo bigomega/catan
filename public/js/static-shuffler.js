@@ -192,6 +192,10 @@ class Shuffler {
   }
 
   #setupEvents() {
+    window.addEventListener('popstate', () => {
+      this.updateBoard((new URLSearchParams(window.location.search)).get('mapkey') || CONST.GAME_CONFIG.mapkey, true)
+    })
+
     this.$el.querySelector('.button.shuffle').addEventListener('click', e => {
       this.shuffle({
         mapkey: this.$mapkey_textarea.value,
@@ -362,9 +366,9 @@ class Shuffler {
     this.updateBoard(shuffled_mapkey.replace(/([+|-])/g, '\n$1'))
   }
 
-  updateBoard(mapkey) {
+  updateBoard(mapkey, no_url) {
     this.$mapkey_textarea.value = mapkey
-    this.updateURL(mapkey)
+    !no_url && this.updateURL(mapkey)
     this.board = new Board(mapkey)
     this.board_ui = new MapBuilderBoardUI(this.board, dummyFn)
     this.board_ui.render()
@@ -374,7 +378,7 @@ class Shuffler {
   updateURL(mapkey) {
     const url = new URL(window.location.href)
     url.searchParams.set('mapkey', mapkey)
-    window.history.replaceState({}, null, url.href)
+    window.history.pushState({}, null, url.href)
   }
 
   injectGameLinkInInfo() {
