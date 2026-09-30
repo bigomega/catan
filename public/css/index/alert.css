@@ -164,7 +164,7 @@
   }
 
   .dice-stats {
-    font-family: Raleway, sans-serif; padding: 0 20px 20px;
+    font-family: Raleway, sans-serif; padding: 0 30px 20px 75px;
     border-top: 1px solid;
 
     .legend {
@@ -210,13 +210,13 @@
     .expected-bar {
       z-index: 1; pointer-events: none;
       border: 2px dashed #5a3a0cb0; border-bottom: none;
-      background: #ffffff33;
+      background: #7a4a0a14;
     }
     .count {
       position: absolute; left: 0; width: 100%; padding-bottom: 2px;
       font-size: .85em; font-weight: bold; color: #77450b;
     }
-    .x-axis { display: flex; padding-top: 6px; }
+    .x-axis { grid-column: 3; display: flex; padding-top: 6px; }
     .x-label {
       flex: 1; line-height: 1.3;
       b { font-size: 1.1em; color: #77450b; }
@@ -230,7 +230,7 @@
       }
     }
 
-    .swatch.expected { border: 2px dashed #5a3a0cb0; background: #ffffff33; box-sizing: border-box; }
+    .swatch.expected { border: 2px dashed #5a3a0cb0; background: #7a4a0a14; box-sizing: border-box; }
     .p1 { background: var(--player-1-color); }
     .p2 { background: var(--player-2-color); }
     .p3 { background: var(--player-3-color); }

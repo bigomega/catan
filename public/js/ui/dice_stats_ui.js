@@ -86,7 +86,6 @@ export default class DiceStatsUI {
             `
           }).join('')}
         </div>
-        <div></div>
         <div class="x-axis">
           ${NUMBERS.map(n => `
             <div class="x-label">
