@@ -24,6 +24,7 @@ export default class Game {
   /** @type {{ pid, giving, asking, id, status:('open'|'closed'|'success'|'failed'|'deleted'), rejected:number[] }[]} */
   ongoing_trades = []
   turn = 1; dice_value = 2
+  /** @type {{ pid, d1, d2 }[]} */ dice_rolls = []
   dev_cards = shuffle(CONST.DEVELOPMENT_CARDS_DECK)
   largest_army_pid = -1
   longest_road_pid = -1
@@ -164,6 +165,7 @@ export default class Game {
   /** Roll Dice */
   #expectedRoll(pid) {
     this.dice_value = [CONST.ROLL(), CONST.ROLL()]
+    this.dice_rolls.push({ pid: this.active_pid, d1: this.dice_value[0], d2: this.dice_value[1] })
     this.#io_manager.updateDiceValue(this.dice_value, this.active_pid)
     const dice_total = this.dice_value[0] + this.dice_value[1]
     if (dice_total === 7) {
@@ -673,6 +675,7 @@ export default class Game {
       dev_cards_len: this.dev_cards.length,
       robber_loc: this.board?.robber_loc,
       ongoing_trades: this.ongoing_trades,
+      dice_rolls: this.dice_rolls,
       timer: timer_left > 1 ? timer_left : 0,
     }
   }
