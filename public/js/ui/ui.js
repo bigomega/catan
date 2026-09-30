@@ -10,12 +10,13 @@ import TradeUI from "./trade_ui.js"
 import ResSelectionUI from "./res_selection_ui.js"
 import AnimationUI from "./animations_ui.js"
 import AccessibilityUI from "./accessibility_ui.js"
+import DiceStatsUI from "./dice_stats_ui.js"
 const $ = document.querySelector.bind(document)
 
 export default class UI {
   #game; #board; #player
   board_ui; player_ui; alert_ui; trade_ui; animation_ui; all_players_ui
-  robber_drop_ui; res_selection_ui; accessibility_ui
+  robber_drop_ui; res_selection_ui; accessibility_ui; dice_stats_ui
   #temp = {}
   $splash = $('.splash')
 
@@ -32,6 +33,8 @@ export default class UI {
       onStatusUpdate: st => game.saveStatus(st),
       showCard: type => this.player_ui.showCardPreview(type),
     })
+
+    this.dice_stats_ui = new DiceStatsUI(board, _ => [player, ...opponents])
 
     this.accessibility_ui = new AccessibilityUI({
       toggleBoardZoom: out => this.board_ui.toggleZoom(out),
@@ -89,6 +92,7 @@ export default class UI {
     this.player_ui.render()
     this.all_players_ui.render()
     this.alert_ui.render()
+    this.dice_stats_ui.render()
     this.trade_ui.render()
     this.res_selection_ui.render()
     this.$splash.classList.add('hide')

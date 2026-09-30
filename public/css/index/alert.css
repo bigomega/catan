@@ -117,11 +117,25 @@
   transition: opacity .25s linear;
   &.show { z-index: 20; opacity: 1; }
 
-  &::after {
-    content: 'Status History ⌛️'; width: 100%;
-    font-family: Papyrus; font-size: 2em; text-align: center;
+  .header {
+    width: 100%; box-sizing: border-box; z-index: 1;
     position: fixed; left: 0; top: 0; padding: 5px;
+    display: flex; justify-content: center; align-items: center; gap: 15px;
     box-shadow: 0 0 10px 0; background: var(--sand-color);
+    .title { font-family: Papyrus; font-size: 2em; }
+  }
+  .view-toggle {
+    font-family: Raleway, sans-serif; font-size: .85em;
+    padding: 4px 12px; border-radius: 100px;
+    border: 1px solid var(--sand-color-text-dark);
+    &:hover, &:focus-visible { background: var(--sand-color-text-dark); color: var(--sand-color); }
+  }
+  .dice-stats-title, .dice-stats { display: none; }
+  &.dice-stats-mode {
+    .history-title, .container { display: none; }
+    .dice-stats-title { display: inline; }
+    .dice-stats { display: block; }
+    &::before { display: none; }
   }
   &::before {
     content: 'Newest First…'; width: 100%; color: #0003;
@@ -129,7 +143,7 @@
   }
 
   .close {
-    position: fixed; right: 5px; top: 5px; z-index: 1;
+    position: fixed; right: 5px; top: 5px; z-index: 2;
     font-family: Papyrus; font-size: 1.5em;
     margin: 2px 10px 0 0; color: #666; cursor: pointer;
     &:hover, &:focus { color: var(--trade-negative); text-shadow: 0 0 5px #fff; }
@@ -147,5 +161,79 @@
       &.p3 { border-color: var(--player-3-color); }
       &.p4 { border-color: var(--player-4-color); }
     }
+  }
+
+  .dice-stats {
+    font-family: Raleway, sans-serif; padding: 0 30px 20px 75px;
+    border-top: 1px solid;
+
+    .legend {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 5px 20px;
+      padding: 10px 0 15px;
+      small { opacity: .7; }
+      .total { margin-left: 10px; }
+    }
+    .swatch {
+      display: inline-block; width: 14px; height: 14px; margin-right: 5px;
+      vertical-align: middle; border-radius: 2px;
+    }
+
+    .chart {
+      display: grid; grid-template-columns: 20px 30px 1fr; grid-template-rows: 260px auto;
+      max-width: 1000px; margin: 0 auto;
+    }
+    .y-title {
+      writing-mode: vertical-rl; transform: rotate(180deg);
+      text-align: center; font-size: .8em; color: #0008;
+    }
+    .y-axis {
+      position: relative; margin-right: 6px;
+      .tick { position: absolute; right: 0; transform: translateY(50%); font-size: .8em; line-height: 1; }
+    }
+    .plot {
+      position: relative; display: flex;
+      border-left: 1px solid var(--sand-color-dark); border-bottom: 1px solid var(--sand-color-dark);
+    }
+    .grid-line { position: absolute; left: 0; right: 0; border-top: 1px solid #0000000f; }
+    .column {
+      position: relative; flex: 1;
+      &:hover { background: #ffffff26; }
+    }
+    .bar, .expected-bar {
+      position: absolute; bottom: 0; left: 20%; width: 60%; box-sizing: border-box;
+    }
+    .bar {
+      display: flex; flex-direction: column-reverse;
+      border-radius: 3px 3px 0 0; overflow: hidden;
+    }
+    .segment { min-height: 0; border-top: 1px solid #fff6; }
+    .expected-bar {
+      z-index: 1; pointer-events: none;
+      border: 2px dashed #5a3a0cb0; border-bottom: none;
+      background: #7a4a0a14;
+    }
+    .count {
+      position: absolute; left: 0; width: 100%; padding-bottom: 2px;
+      font-size: .85em; font-weight: bold; color: #77450b;
+    }
+    .x-axis { grid-column: 3; display: flex; padding-top: 6px; }
+    .x-label {
+      flex: 1; line-height: 1.3;
+      b { font-size: 1.1em; color: #77450b; }
+      b.hot { color: #c62b1b; }
+      small { font-size: .7em; color: #0007; }
+      .x-res {
+        display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 4px;
+        .res-icon { margin: 0; }
+        .res-icon.robbed { opacity: .3; }
+        .none { color: #0004; }
+      }
+    }
+
+    .swatch.expected { border: 2px dashed #5a3a0cb0; background: #7a4a0a14; box-sizing: border-box; }
+    .p1 { background: var(--player-1-color); }
+    .p2 { background: var(--player-2-color); }
+    .p3 { background: var(--player-3-color); }
+    .p4 { background: var(--player-4-color); }
   }
 }

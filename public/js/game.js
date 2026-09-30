@@ -36,6 +36,7 @@ export default class Game {
     })
     this.#ui.all_players_ui.updateActive(this.active_pid)
     this.#ui.player_ui.setDevCardCount(game_obj.dev_cards_len)
+    this.#ui.dice_stats_ui.setRolls(game_obj.dice_rolls)
     this.#ui.player_ui.updatePiecesCount()
     game_obj.timer && this.config.timer && this.setTimerSoc(game_obj.timer, this.active_pid)
     if (game_obj.robber_loc) {
@@ -183,6 +184,7 @@ export default class Game {
     this.#ui.player_ui.toggleDice(false)
     this.#isMyPid(pid) && this.#ui.animation_ui.animateDiceRoll(d1, d2)
     this.#audio_manager.playDice(this.#isMyPid(pid))
+    this.#ui.dice_stats_ui.addRoll(pid, d1, d2)
     const total = d1 + d2
     total === 7 && setTimeout(_ => {
       this.#audio_manager.playRobber()
@@ -213,6 +215,7 @@ export default class Game {
   updateRobberMovementSoc(pid, id) {
     this.#board.moveRobber(id)
     this.#ui.moveRobber(id)
+    this.#ui.dice_stats_ui.update()
     const tile = this.#board.findTile(id).type
     const num = this.#board.findTile(id).num || ''
     this.#ui.alert_ui.alertRobberMoveDone(this.getPlayer(pid), tile, num)
